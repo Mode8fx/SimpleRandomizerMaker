@@ -1,4 +1,5 @@
 from my_randomizer import *
+import copy
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -10,15 +11,31 @@ outputFolder = path.join(mainFolder, "output")
 
 def main():
 	# initialize attributes
-	for att in my_attributes:
-		my_attributes[att].prepare()
+	for att in attributes:
+		attributes[att].prepare()
 
+	myRules = copy.copy(required_rules)
+	optionalRulesToFollow = {
+		"My Rules 1" : False,
+		"My Rules 2" : False,
+	}
+	for ruleset in optional_rulesets:
+		if optionalRulesToFollow[ruleset] == True:
+			for rule in optional_rulesets[ruleset]:
+				myRules.append(rule)
+	enforceRuleset(myRules)
+
+	print("Complete.\n")
+	for att in attributes:
+		print(attributes[att].name+": "+str(attributes[att].value))
+
+def enforceRuleset(ruleset):
 	ruleNum = 0
-	while ruleNum < len(my_rules):
-		if not my_rules[ruleNum].rulePasses():
+	while ruleNum < len(ruleset):
+		if not ruleset[ruleNum].rulePasses():
 			nextValueSet = False
-			for att in my_attributes:
-				if my_attributes[att].setToNextValue():
+			for att in attributes:
+				if attributes[att].setToNextValue():
 					nextValueSet = True
 					break
 			if not nextValueSet:
@@ -27,10 +44,6 @@ def main():
 			ruleNum = 0
 		else:
 			ruleNum += 1
-
-	print("Complete.\n")
-	for att in my_attributes:
-		print(my_attributes[att].name+": "+str(my_attributes[att].value))
 
 if __name__ == '__main__':
 	main()

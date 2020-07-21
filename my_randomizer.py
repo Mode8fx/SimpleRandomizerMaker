@@ -4,7 +4,7 @@ from classes import *
 # EDIT BELOW THIS LINE #
 ########################
 
-my_attributes = {
+attributes = {
 	"Sword Knight" : Attribute(
 		name="Sword Knight",
 		description="The ability given by Sword Knight",
@@ -21,23 +21,61 @@ my_attributes = {
 	),
 }
 
-my_rules = [
-	# Rule(
-	# 	name="Sword Knight and Cupie give the same ability",
-	# 	left_side=my_attributes["Sword Knight"],
-	# 	rule_type="==",
-	# 	right_side=my_attributes["Cupie"],
-	# ),
+required_rules = [
 	Rule(
-		name="Sword Knight is one more than Cupie",
-		left_side=my_attributes["Sword Knight"],
+		name="Sword Knight and Cupie give the same ability",
+		left_side=[attributes["Sword Knight"], attributes["Cupie"]],
 		rule_type="==",
-		right_side=my_attributes["Cupie"]*2+1,
 	),
 	# Rule(
+	# 	name="Sword Knight is one more than Cupie",
+	# 	left_side=attributes["Sword Knight"],
+	# 	rule_type="==",
+	# 	right_side=attributes["Cupie"]*2+1,
+	# ),
+	# Rule(
 	# 	name="Sword Knight gives ability 5",
-	# 	left_side=my_attributes["Sword Knight"],
+	# 	left_side=attributes["Sword Knight"],
 	# 	rule_type="==",
 	# 	right_side=10,
 	# ),
 ]
+
+optional_rulesets = {
+	"My Rules 1" : [
+		Rule(
+			name="Sword Knight < 10",
+			left_side=attributes["Sword Knight"],
+			rule_type="<",
+			right_side=10
+		),
+		Rule(
+			name="Cupie >= 3",
+			left_side=attributes["Cupie"],
+			rule_type=">=",
+			right_side=3
+		),
+	],
+	"My Rules 2" : [
+		Rule(
+			name="Sword Knight > 12",
+			left_side=attributes["Sword Knight"],
+			rule_type=">",
+			right_side=12
+		),
+		Rule(
+			name="Cupie > 18",
+			left_side=attributes["Cupie"],
+			rule_type=">",
+			right_side=18
+		),
+	],
+}
+
+################
+##### TODO #####
+################
+"""
+- use strings as arguments in rule ("Sword Knight" instead of attributes["Sword Knight"])
+- actually change addresses in ROM
+"""

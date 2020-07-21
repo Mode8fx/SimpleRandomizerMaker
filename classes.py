@@ -156,41 +156,64 @@ class Attribute:
 		return self
 
 ruleTypesDict = {
-	"=": "eq",
-	"==": "eq",
-	"!=": "ne",
-	">": "gt",
-	">=": "ge",
-	"=>": "ge",
-	"<": "lt",
-	"<=": "le",
-	"=<": "le"
+	"=" : "eq",
+	"==" : "eq",
+	"all equal" : "eq",
+	"all same" : "eq",
+	"!=" : "ne",
+	"all not equal" : "ne",
+	"all different" : "ne",
+	">" : "gt",
+	">=" : "ge",
+	"=>" : "ge",
+	"<" : "lt",
+	"<=" : "le",
+	"=<" : "le",
 }
 
 class Rule:
-	def __init__(self, name, left_side, rule_type, right_side, description=None):
+	def __init__(self, name, left_side, rule_type, right_side=None, description=None):
 		self.name = name
 		self.description = description
 		self.left_side = left_side
-		self.rule_type = ruleTypesDict.get(rule_type)
+		self.rule_type = ruleTypesDict.get(rule_type.lower())
 		if self.rule_type is None:
-			self.rule_type = rule_type
+			self.rule_type = rule_type.lower()
 		self.right_side = right_side
 	def rulePasses(self):
 		try:
-			if isinstance(self.left_side, Attribute):
-				left = self.left_side.performSpecialOperation()
-			else:
-				left = self.left_side
-			if isinstance(self.right_side, Attribute):
-				right = self.right_side.performSpecialOperation()
-			else:
-				right = self.right_side
+			if self.rule_type == "eq" and self.right_side is None:
+				if not isinstance(self.left_side, list):
+					return True
+				for i in range(len(self.left_side)-1):
+					for j in range(i+1, len(self.left_side)):
+						left = self.setSide(self.left_side[i])
+						right = self.setSide(self.left_side[j])
+						if left != right:
+							return False
+				return True
+			if self.rule_type == "ne" and self.right_side is None:
+				if not isinstance(self.left_side, list):
+					return True
+				for i in range(len(self.left_side)-1):
+					for j in range(i+1, len(self.left_side)):
+						left = self.setSide(self.left_side[i])
+						right = self.setSide(self.left_side[j])
+						if left == right:
+							return False
+				return True
+			left = self.setSide(self.left_side)
+			right = self.setSide(self.right_side)
 			func = operator.methodcaller(self.rule_type, left, right)
 			return func(operator)
 		except:
-			print("Invalid rule type.")
+			print("Something went wrong. Failed to verify rule.")
 			return False
+	def setSide(self, side):
+		if isinstance(side, Attribute):
+			return side.performSpecialOperation()
+		else:
+			return side
 
 
 
