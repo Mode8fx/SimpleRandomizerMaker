@@ -59,10 +59,13 @@ class Attribute:
 		else:
 			self.addresses = [addresses]
 		self.possible_values = possible_values
+		self.value = 0
 		if len(possible_values) == 0:
 			self.possible_values = list(range(min_value, max_value+1))
 		else:
 			self.possible_values = [v for v in possible_values if min_value <= v <= max_value]
+		self.specialOperators = []
+		self.specialVal = []
 	def resetToFirstValue(self):
 		self.index = 0
 		self.value = self.possible_values[0]
@@ -78,6 +81,79 @@ class Attribute:
 			# print("Resetting value to start of array.")
 			self.resetToFirstValue()
 			return False
+	# allows rules to perform dynamic operations on attribute value; no pointers necessary!
+	def performSpecialOperation(self):
+		if len(self.specialOperators) == 0:
+			return self.value
+		comparedVal = self.value
+		for i in range(len(self.specialOperators)):
+			func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i])
+			comparedVal = func(operator)
+		return comparedVal
+	def __add__(self, val):
+		self.specialOperators.append("add")
+		self.specialVal.append(val)
+		return self
+	def __sub__(self, val):
+		self.specialOperators.append("sub")
+		self.specialVal.append(val)
+		return self
+	def __mul__(self, val):
+		self.specialOperators.append("mul")
+		self.specialVal.append(val)
+		return self
+	def __floordiv__(self, val):
+		self.specialOperators.append("floordiv")
+		self.specialVal.append(val)
+		return self
+	def __truediv__(self, val):
+		self.specialOperators.append("truediv")
+		self.specialVal.append(val)
+		return self
+	def __mod__(self, val):
+		self.specialOperators.append("mod")
+		self.specialVal.append(val)
+		return self
+	def __pow__(self, val):
+		self.specialOperators.append("pow")
+		self.specialVal.append(val)
+		return self
+	def __lshift__(self, val):
+		self.specialOperators.append("lshift")
+		self.specialVal.append(val)
+		return self
+	def __rshift__(self, val):
+		self.specialOperators.append("rshift")
+		self.specialVal.append(val)
+		return self
+	def __and__(self, val):
+		self.specialOperators.append("and")
+		self.specialVal.append(val)
+		return self
+	def __xor__(self, val):
+		self.specialOperators.append("xor")
+		self.specialVal.append(val)
+		return self
+	def __or__(self, val):
+		self.specialOperators.append("or")
+		self.specialVal.append(val)
+		return self
+	def __neg__(self, val):
+		self.specialOperators.append("neg")
+		self.specialVal.append(val)
+		return self
+	def __pos__(self, val):
+		self.specialOperators.append("pos")
+		self.specialVal.append(val)
+		return self
+	def __abs__(self, val):
+		self.specialOperators.append("abs")
+		self.specialVal.append(val)
+		return self
+	def __invert__(self, val):
+		self.specialOperators.append("invert")
+		self.specialVal.append(val)
+		return self
 
 ruleTypesDict = {
 	"=": "eq",
@@ -103,11 +179,11 @@ class Rule:
 	def rulePasses(self):
 		try:
 			if isinstance(self.left_side, Attribute):
-				left = self.left_side.value
+				left = self.left_side.performSpecialOperation()
 			else:
 				left = self.left_side
 			if isinstance(self.right_side, Attribute):
-				right = self.right_side.value
+				right = self.right_side.performSpecialOperation()
 			else:
 				right = self.right_side
 			func = operator.methodcaller(self.rule_type, left, right)

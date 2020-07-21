@@ -22,16 +22,22 @@ my_attributes = {
 }
 
 my_rules = [
+	# Rule(
+	# 	name="Sword Knight and Cupie give the same ability",
+	# 	left_side=my_attributes["Sword Knight"],
+	# 	rule_type="==",
+	# 	right_side=my_attributes["Cupie"],
+	# ),
 	Rule(
-		name="Sword Knight and Cupie give the same ability",
+		name="Sword Knight is one more than Cupie",
 		left_side=my_attributes["Sword Knight"],
 		rule_type="==",
-		right_side=my_attributes["Cupie"],
+		right_side=my_attributes["Cupie"]*2+1,
 	),
-	Rule(
-		name="Sword Knight gives ability 5",
-		left_side=my_attributes["Sword Knight"],
-		rule_type="==",
-		right_side=5,
-	),
+	# Rule(
+	# 	name="Sword Knight gives ability 5",
+	# 	left_side=my_attributes["Sword Knight"],
+	# 	rule_type="==",
+	# 	right_side=10,
+	# ),
 ]

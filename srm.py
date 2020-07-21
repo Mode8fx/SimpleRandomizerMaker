@@ -13,8 +13,6 @@ def main():
 	for att in my_attributes:
 		my_attributes[att].prepare()
 
-	# forget about backtracking... just brute-force it? (if everything is already shuffled, it shouldn't matter... though it'll obviously take longer to randomize)
-
 	ruleNum = 0
 	while ruleNum < len(my_rules):
 		if not my_rules[ruleNum].rulePasses():
