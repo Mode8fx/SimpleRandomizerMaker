@@ -8,48 +8,31 @@ else:
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
 
+def main():
+	# initialize attributes
+	for att in my_attributes:
+		my_attributes[att].prepare()
 
+	# forget about backtracking... just brute-force it? (if everything is already shuffled, it shouldn't matter... though it'll obviously take longer to randomize)
 
-def makeChoice(question, choices, allowMultiple=False):
-	numChoices = len(choices)
-	if numChoices == 0:
-		print("Warning: A question was asked with no valid answers. Returning None.")
-		return None
-	if numChoices == 1:
-		print("A question was asked with only one valid answer. Returning this answer.")
-		return choices[0]
-	print("\n"+question)
-	for i in range(numChoices):
-		print(str(i+1)+": "+choices[i])
-	cInput = input().split(" ")
-	if not allowMultiple:
-		try:
-			assert len(cInput) == 1
-			choice = int(cInput[0])
-			assert choice > 0 and choice <= numChoices
-			return choice
-		except:
-			print("Invalid input.")
-			return makeChoice(question, choices, allowMultiple)
-	else:
-		try:
-			choices = [int(c) for c in cInput]
-			for choice in choices:
-				assert choice > 0 and choice <= numChoices
-			return choices
-		except:
-			print("Invalid input.")
-			return makeChoice(question, choices, allowMultiple)
+	ruleNum = 0
+	while ruleNum < len(my_rules):
+		if not my_rules[ruleNum].rulePasses():
+			nextValueSet = False
+			for att in my_attributes:
+				if my_attributes[att].setToNextValue():
+					nextValueSet = True
+					break
+			if not nextValueSet:
+				print("No combination satisfies the given attributes and rules. Quitting.")
+				sys.exit()
+			ruleNum = 0
+		else:
+			ruleNum += 1
 
-def makeChoiceNumInput(question, minVal, maxVal):
-	while True:
-		print("\n"+question)
-		try:
-			var = float(input())
-			assert minVal <= var <= maxVal
-			return var
-		except:
-			print("Invalid input.")
+	print("Complete.\n")
+	for att in my_attributes:
+		print(my_attributes[att].name+": "+str(my_attributes[att].value))
 
 if __name__ == '__main__':
 	main()
