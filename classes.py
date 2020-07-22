@@ -214,25 +214,3 @@ class Rule:
 			return side.performSpecialOperation()
 		else:
 			return side
-
-
-
-"""
-NOTES FOR ME
-
-Possible Strategy for Constraint Satisfaction:
-get att1 values
-get att2 values
-apply given rules/constraints on each att2 value, comparing each one to all att1 values
-if att2 value fails for all att1 values, remove att2 value
-if all att2 values fail for an att1 value, remove the att1 value
-if there are no remaining values for an attribute, throw exception (there is no possible combination of attribute values)
-
-Strategy 2 (more feasible) (Constraint Satisfaction with Backtracking)
-for each attribute, shuffle all possible values according to seed
-set att1 value to first possible_value
-apply given rules/constraints to first att2 possible_value, comparing this value to the att1 value
-if it passes, move on; if it fails, keep going down the list of possible att2 values until one passes
-if no att2 values pass, backtrack to att1 and set its value to the next possible_value, then continue
-this will always give a possible solution in a good (enough) amount of time, if one exists
-"""
