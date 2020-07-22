@@ -3,8 +3,9 @@ import copy
 import math
 import shutil
 from gatelib import *
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+# from tkinter import Tk
+# from tkinter.filedialog import askopenfilename
+from gui import *
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -15,29 +16,28 @@ sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
 
 def main():
+	vp_start_gui()
+
+def randomize():
 	global sourceRom
 	global currSeed
 	global seedString
 
-	sourceRom = ""
-	while sourceRom == "":
-		Tk().withdraw()
-		sourceRom = askopenfilename(filetypes=[("ROM files", "*."+romFileFormat)])
+	# sourceRom = ""
+	# while sourceRom == "":
+	# 	Tk().withdraw()
+	# 	sourceRom = askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)])
 
 	# initialize attributes
 	for att in attributes:
 		attributes[att].prepare()
 
 	myRules = copy.copy(required_rules)
-	optionalRulesToFollow = {
-		"My Rules 1" : 0,
-		"My Rules 2" : 1,
-	}
 
 	varArray = []
 	maxValueArray = []
-	for key in optionalRulesToFollow:
-		varArray.append(optionalRulesToFollow[key])
+	for ruleset in optionalRulesets:
+		varArray.append(ruleset[1])
 		maxValueArray.append(1)
 	settingsSeed = encodeSeed(varArray, maxValueArray, 36)[0]
 	maxVal = int("ZZZZZ", 36)
@@ -47,7 +47,7 @@ def main():
 	seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(numOptionalRulesets/5.0))
 
 	for ruleset in optional_rulesets:
-		if optionalRulesToFollow[ruleset] == True:
+		if optionalRulesets[ruleset] == True:
 			for rule in optional_rulesets[ruleset]:
 				myRules.append(rule)
 	enforceRuleset(myRules)
@@ -79,7 +79,7 @@ def generateRom():
 	global seedString
 
 	random.seed(currSeed)
-	newRom = path.join(outputFolder, path.splitext(path.basename(sourceRom))[0]+"-"+seedString+"."+romFileFormat)
+	newRom = path.join(outputFolder, path.splitext(path.basename(sourceRom))[0]+"-"+seedString+"."+rom_file_format)
 	if not path.isdir(outputFolder):
 		mkdir(outputFolder)
 	shutil.copyfile(sourceRom, newRom)

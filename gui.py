@@ -19,17 +19,18 @@ except ImportError:
     import tkinter.ttk as ttk
     py3 = True
 
-import AMR_support
-
 from my_randomizer import *
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    AMR_support.set_Tk_var()
+    # 1.7 seems to be default scaling
+    size = root.winfo_screenheight()
+    root.tk.call('tk', 'scaling', 2.0*size/1440)
+    set_Tk_var()
     top = TopLevel (root)
-    AMR_support.init(root, top)
+    init(root, top)
     root.mainloop()
 
 w = None
@@ -40,9 +41,9 @@ def create_TopLevel(rt, *args, **kwargs):
     #rt = root
     root = rt
     w = tk.Toplevel (root)
-    AMR_support.set_Tk_var()
+    set_Tk_var()
     top = TopLevel (w)
-    AMR_support.init(w, top, *args, **kwargs)
+    init(w, top, *args, **kwargs)
     return (w, top)
 
 def destroy_TopLevel():
@@ -71,8 +72,8 @@ class TopLevel:
         top.geometry("600x450")
         top.minsize(120, 1)
         top.maxsize(2564, 1421)
-        top.resizable(1, 1)
-        top.title("Amazing Mirror Randomizer")
+        top.resizable(0, 0)
+        top.title(program_name)
         top.configure(background="#d9d9d9")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
@@ -84,25 +85,25 @@ class TopLevel:
         self.TFrame1.configure(relief="groove")
 
         self.Label_RomInput = ttk.Label(top)
-        self.Label_RomInput.place(x=20, y=20,  height=19, width=215)
+        self.Label_RomInput.place(x=20, y=20,  height=25, width=215)
         self.Label_RomInput.configure(background="#d9d9d9")
         self.Label_RomInput.configure(foreground="#000000")
         self.Label_RomInput.configure(font="TkDefaultFont")
         self.Label_RomInput.configure(relief="flat")
         self.Label_RomInput.configure(anchor='w')
         self.Label_RomInput.configure(justify='left')
-        self.Label_RomInput.configure(text='''Kirby & The Amazing Mirror (USA) ROM''')
+        self.Label_RomInput.configure(text=rom_name+''' ROM''')
 
         self.Button_RomInput = ttk.Button(top)
-        self.Button_RomInput.place(x=500, y=18,  height=25, width=76)
-        self.Button_RomInput.configure(command=AMR_support.setSourceRom)
+        self.Button_RomInput.place(x=500, y=18,  height=30, width=76)
+        self.Button_RomInput.configure(command=setSourceRom)
         self.Button_RomInput.configure(takefocus="")
         self.Button_RomInput.configure(text='''Select ROM''')
 
         self.Entry_RomInput = ttk.Entry(top)
-        self.Entry_RomInput.place(x=240, y=20, height=21, width=250)
+        self.Entry_RomInput.place(x=240, y=20, height=25, width=250)
         self.Entry_RomInput.configure(state='readonly')
-        self.Entry_RomInput.configure(textvariable=AMR_support.sourceRom)
+        self.Entry_RomInput.configure(textvariable=sourceRom)
         self.Entry_RomInput.configure(background="#000000")
         self.Entry_RomInput.configure(cursor="ibeam")
 
@@ -111,19 +112,25 @@ class TopLevel:
 
         self.style.map('TCheckbutton',background=
             [('selected', _bgcolor), ('active', _ana2color)])
-        self.CheckButton_RandomizeMiniBosses = ttk.Checkbutton(self.TFrame1)
-        self.CheckButton_RandomizeMiniBosses.place(x=20, y=95, width=150
-                , height=21)
-        self.CheckButton_RandomizeMiniBosses.configure(variable=AMR_support.includeMiniBosses)
-        self.CheckButton_RandomizeMiniBosses.configure(offvalue="2")
-        self.CheckButton_RandomizeMiniBosses.configure(takefocus="")
-        self.CheckButton_RandomizeMiniBosses.configure(text='''Randomize Mini-Bosses''')
-        self.tooltip_font = "TkDefaultFont"
-        self.CheckButton_RandomizeMiniBosses_tooltip = \
-        ToolTip(self.CheckButton_RandomizeMiniBosses, self.tooltip_font, '''Should Mini-Boss abilities also be randomized, or should they stay the same?''')
+
+        self.CheckButtons = []
+        self.CheckButtons_tooltips = []
+        optRulesetNum = 0
+        global optRulesetValues
+        for key in optional_rulesets:
+            self.CheckButtons.append(ttk.Checkbutton(self.TFrame1))
+            self.CheckButtons[optRulesetNum].place(x=20, y=95+50*optRulesetNum, height=25, width=150)
+            self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
+            self.CheckButtons[optRulesetNum].configure(offvalue="0")
+            self.CheckButtons[optRulesetNum].configure(onvalue="1")
+            self.CheckButtons[optRulesetNum].configure(takefocus="")
+            self.CheckButtons[optRulesetNum].configure(text=key)
+            self.tooltip_font = "TkDefaultFont"
+            self.CheckButtons_tooltips.append(ToolTip(self.CheckButtons[optRulesetNum], self.tooltip_font, '''PLACEHOLDER DESCRIPTION'''))
+            optRulesetNum += 1
 
         self.Label_NumSeeds = ttk.Label(self.TFrame1)
-        self.Label_NumSeeds.place(x=400, y=148,  height=21, width=58)
+        self.Label_NumSeeds.place(x=400, y=148, height=25, width=58)
         self.Label_NumSeeds.configure(background="#d9d9d9")
         self.Label_NumSeeds.configure(foreground="#000000")
         self.Label_NumSeeds.configure(font="TkDefaultFont")
@@ -136,18 +143,18 @@ class TopLevel:
         ToolTip(self.Label_NumSeeds, self.tooltip_font, '''How many seeds would you like to generate?''')
 
         self.ComboBox_NumSeeds = ttk.Combobox(self.TFrame1)
-        self.ComboBox_NumSeeds.place(x=400, y=170, height=21, width=53)
+        self.ComboBox_NumSeeds.place(x=400, y=170, height=25, width=53)
         self.value_list = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',]
         self.ComboBox_NumSeeds.configure(values=self.value_list)
         self.ComboBox_NumSeeds.configure(state='readonly')
-        self.ComboBox_NumSeeds.configure(textvariable=AMR_support.numSeeds)
+        self.ComboBox_NumSeeds.configure(textvariable=numSeeds)
 
         self.style.map('TRadiobutton',background=
             [('selected', _bgcolor), ('active', _ana2color)])
         self.RadioButton_UseSettings = ttk.Radiobutton(top)
-        self.RadioButton_UseSettings.place(x=20, y=50, width=89, height=21)
-        self.RadioButton_UseSettings.configure(variable=AMR_support.useSeed)
-        self.RadioButton_UseSettings.configure(value="2")
+        self.RadioButton_UseSettings.place(x=20, y=50, height=25, width=89)
+        self.RadioButton_UseSettings.configure(variable=useSeed)
+        self.RadioButton_UseSettings.configure(value="0")
         self.RadioButton_UseSettings.configure(text='''Use Settings''')
         self.RadioButton_UseSettings.configure(compound='none')
         self.tooltip_font = "TkDefaultFont"
@@ -155,26 +162,25 @@ class TopLevel:
         ToolTip(self.RadioButton_UseSettings, self.tooltip_font, '''Use the settings defined below to create a random seed.''')
 
         self.RadioButton_UseSeed = ttk.Radiobutton(top)
-        self.RadioButton_UseSeed.place(x=280, y=50, width=79, height=21)
-        self.RadioButton_UseSeed.configure(variable=AMR_support.useSeed)
+        self.RadioButton_UseSeed.place(x=280, y=50, height=25, width=79)
+        self.RadioButton_UseSeed.configure(variable=useSeed)
         self.RadioButton_UseSeed.configure(text='''Use Seed''')
         self.tooltip_font = "TkDefaultFont"
         self.RadioButton_UseSeed_tooltip = \
         ToolTip(self.RadioButton_UseSeed, self.tooltip_font, '''Recreate a specific set of changes according to a 10-character seed.''')
 
         self.Entry_SeedInput = ttk.Entry(top)
-        self.Entry_SeedInput.place(x=360, y=50, height=21, width=130)
+        self.Entry_SeedInput.place(x=360, y=50, height=25, width=130)
         self.Entry_SeedInput.configure(state='disabled')
-        self.Entry_SeedInput.configure(textvariable=AMR_support.seedInput)
+        self.Entry_SeedInput.configure(textvariable=seedInput)
         self.Entry_SeedInput.configure(takefocus="")
         self.Entry_SeedInput.configure(cursor="ibeam")
-        self.Entry_SeedInput.bind('<Key>',AMR_support.keepUpperCharsSeed)
-        self.Entry_SeedInput.bind('<KeyRelease>',AMR_support.keepUpperCharsSeed)
+        self.Entry_SeedInput.bind('<Key>',keepUpperCharsSeed)
+        self.Entry_SeedInput.bind('<KeyRelease>',keepUpperCharsSeed)
 
         self.CheckButton_GenerateTextLog = ttk.Checkbutton(top)
-        self.CheckButton_GenerateTextLog.place(x=150, y=400, width=118
-                , height=21)
-        self.CheckButton_GenerateTextLog.configure(variable=AMR_support.generateAbilityLog)
+        self.CheckButton_GenerateTextLog.place(x=150, y=400, height=25, width=118)
+        self.CheckButton_GenerateTextLog.configure(variable=generateAbilityLog)
         self.CheckButton_GenerateTextLog.configure(takefocus="")
         self.CheckButton_GenerateTextLog.configure(text='''Generate Text Log''')
         self.tooltip_font = "TkDefaultFont"
@@ -182,37 +188,48 @@ class TopLevel:
         ToolTip(self.CheckButton_GenerateTextLog, self.tooltip_font, '''Would you like to generate a text file that details what abilities are tied to each enemy/object in the created seed?''')
 
         self.Button_CreateRom = ttk.Button(top)
-        self.Button_CreateRom.place(x=330, y=400,  height=25, width=76)
+        self.Button_CreateRom.place(x=330, y=400, height=30, width=76)
         self.Button_CreateRom.configure(takefocus="")
         self.Button_CreateRom.configure(text='''Randomize!''')
 
         self.Label_Message = ttk.Label(top)
-        self.Label_Message.place(x=30, y=350,  height=30, width=545)
+        self.Label_Message.place(x=30, y=350, height=40, width=545)
         self.Label_Message.configure(background="#d9d9d9")
         self.Label_Message.configure(foreground="#000000")
         self.Label_Message.configure(font="TkDefaultFont")
         self.Label_Message.configure(relief="flat")
         self.Label_Message.configure(anchor='center')
         self.Label_Message.configure(justify='left')
-        self.Label_Message.configure(textvariable=AMR_support.message)
+        self.Label_Message.configure(textvariable=message)
 
         self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
         self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
         self.Button_CreateRom.configure(command=self.attemptRandomize)
 
     def prepareSettingsAndSeed(self, unused=None):
-        if AMR_support.useSeed.get()=="1":
+        if useSeed.get()=="1":
             self.Entry_SeedInput.configure(state="normal")
             self.Label_NumSeeds.configure(state="disabled")
             self.ComboBox_NumSeeds.configure(state="disabled")
+            for button in self.CheckButtons:
+                button.configure(state="disabled")
         else:
             self.Entry_SeedInput.configure(state="disabled")
             self.Label_NumSeeds.configure(state="normal")
             self.ComboBox_NumSeeds.configure(state="readonly")
+            for button in self.CheckButtons:
+                button.configure(state="normal")
 
     def attemptRandomize(self):
+        global optionalRulesetsList
+        global optRulesetValues
+
+        optionalRulesetsList = []
+        keys = optional_rulesets.keys()
+        for i in range(len(optRulesetValues)):
+            optionalRulesetsList.append((keys[i], int(optRulesetValues[i])))
         results = randomize()
-        AMR_support.message.set(results[1])
+        message.set(results[1])
         self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
 
 # ======================================================
@@ -344,17 +361,34 @@ class ToolTip(tk.Toplevel):
 def set_Tk_var():
     global sourceRom
     sourceRom = tk.StringVar()
+    global optRulesetValues
+    optRulesetValues = []
+    for i in range(len(optional_rulesets.keys())):
+        optRulesetValues.append(tk.StringVar())
+    global numSeeds
+    numSeeds = tk.StringVar()
+    global useSeed
+    useSeed = tk.StringVar()
+    global seedInput
+    seedInput = tk.StringVar()
+    global generateAbilityLog
+    generateAbilityLog = tk.StringVar()
     global message
     message = tk.StringVar()
     message.set('')
     initVars()
 
 def initVars():
+    numSeeds.set("1")
+    useSeed.set("0")
+    generateAbilityLog.set("1")
+    for val in optRulesetValues:
+        val.set("0")
     message.set("Welcome to the Amazing Mirror Randomizer! Move your mouse over a label to learn more about it.")
 
 def setSourceRom():
     global sourceRom
-    sourceRom.set(tk.filedialog.askopenfilename(filetypes=[("ROM files", "*."+romFileFormat)]))
+    sourceRom.set(tk.filedialog.askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
 
 def keepUpperCharsSeed(unused):
     global seedInput

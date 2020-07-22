@@ -4,7 +4,9 @@ from classes import *
 # EDIT BELOW THIS LINE #
 ########################
 
-romFileFormat = "gba"
+program_name = "Amazing Mirror Randomizer"
+rom_name = "Kirby & The Amazing Mirror (USA)"
+rom_file_format = "gba"
 
 attributes = {
 	"Sword Knight" : Attribute(
