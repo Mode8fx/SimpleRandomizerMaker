@@ -1,5 +1,10 @@
 from my_randomizer import *
 import copy
+import math
+import shutil
+from gatelib import *
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -10,24 +15,47 @@ sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
 
 def main():
+	global sourceRom
+	global currSeed
+	global seedString
+
+	sourceRom = ""
+	while sourceRom == "":
+		Tk().withdraw()
+		sourceRom = askopenfilename(filetypes=[("ROM files", "*."+romFileFormat)])
+
 	# initialize attributes
 	for att in attributes:
 		attributes[att].prepare()
 
 	myRules = copy.copy(required_rules)
 	optionalRulesToFollow = {
-		"My Rules 1" : False,
-		"My Rules 2" : False,
+		"My Rules 1" : 0,
+		"My Rules 2" : 1,
 	}
+
+	varArray = []
+	maxValueArray = []
+	for key in optionalRulesToFollow:
+		varArray.append(optionalRulesToFollow[key])
+		maxValueArray.append(1)
+	settingsSeed = encodeSeed(varArray, maxValueArray, 36)[0]
+	maxVal = int("ZZZZZ", 36)
+	genSeed = random.randint(0, maxVal)
+	currSeed = (settingsSeed*(maxVal+1)) + genSeed
+	numOptionalRulesets = len(optional_rulesets.keys())
+	seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(numOptionalRulesets/5.0))
+
 	for ruleset in optional_rulesets:
 		if optionalRulesToFollow[ruleset] == True:
 			for rule in optional_rulesets[ruleset]:
 				myRules.append(rule)
 	enforceRuleset(myRules)
 
-	print("Complete.\n")
 	for att in attributes:
 		print(attributes[att].name+": "+str(attributes[att].value))
+
+	generateRom()
 
 def enforceRuleset(ruleset):
 	ruleNum = 0
@@ -44,6 +72,31 @@ def enforceRuleset(ruleset):
 			ruleNum = 0
 		else:
 			ruleNum += 1
+
+def generateRom():
+	global sourceRom
+	global currSeed
+	global seedString
+
+	random.seed(currSeed)
+	newRom = path.join(outputFolder, path.splitext(path.basename(sourceRom))[0]+"-"+seedString+"."+romFileFormat)
+	if not path.isdir(outputFolder):
+		mkdir(outputFolder)
+	shutil.copyfile(sourceRom, newRom)
+	try:
+		file = open(newRom, "r+b")
+		for att in attributes:
+			for address in attributes[att].addresses:
+				file.seek(address)
+				file.write(bytes([attributes[att].value]))
+		file.close()
+		print("Succesfully generated ROM with seed "+seedString)
+		return True
+	except:
+		print("Something went wrong. Deleting generated ROM.")
+		file.close()
+		remove(newRom)
+		return False
 
 if __name__ == '__main__':
 	main()

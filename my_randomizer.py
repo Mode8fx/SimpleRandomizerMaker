@@ -4,6 +4,8 @@ from classes import *
 # EDIT BELOW THIS LINE #
 ########################
 
+romFileFormat = "gba"
+
 attributes = {
 	"Sword Knight" : Attribute(
 		name="Sword Knight",
@@ -71,11 +73,3 @@ optional_rulesets = {
 		),
 	],
 }
-
-################
-##### TODO #####
-################
-"""
-- use strings as arguments in rule ("Sword Knight" instead of attributes["Sword Knight"])
-- actually change addresses in ROM
-"""

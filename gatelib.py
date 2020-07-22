@@ -38,3 +38,59 @@ def makeChoiceNumInput(question, minVal, maxVal):
 			return var
 		except:
 			print("Invalid input.")
+
+def encodeSeed(varArray, maxValueArray, base=10):
+	if base > 36:
+		print("Base must be between 2 and 36. Lowering to 36.")
+		base = 36
+	seed = 0
+	baseShift = 0
+	for i in range(len(varArray)):
+		seed += varArray[i]<<baseShift
+		baseShift += maxValueArray[i].bit_length()
+	return seed, dec_to_base(seed, base)
+
+def decodeSeed(seed, maxValueArray, base=10):
+	if base > 36:
+		print("Base must be between 2 and 36. Lowering to 36.")
+		base = 36
+	if type(seed) is str:
+		seed = int(seed, base)
+	baseShift = 0
+	varArray = []
+	for i in range(len(maxValueArray)):
+		bitLength = maxValueArray[i].bit_length()
+		varArray.append((seed>>baseShift) & ((2**bitLength)-1))
+		baseShift += bitLength
+	return varArray
+
+# values in maxValueArray start from 0
+def verifySeed(seed, maxValueArray, base=10):
+	if base > 36:
+		print("Base must be between 2 and 36. Lowering to 36.")
+		base = 36
+	if type(seed) is int:
+		base = 10
+		seed = dec_to_base(seed,base)
+	seed = seed.upper().strip()
+
+	try:
+		varsInSeed = decodeSeed(seed, maxValueArray, base)
+		for i in range(len(varsInSeed)):
+			assert 0 <= varsInSeed[i] <= maxValueArray[i]
+		return True
+	except:
+		return False
+
+# taken from https://www.codespeedy.com/inter-convert-decimal-and-any-base-using-python/
+def dec_to_base(num,base):  #Maximum base - 36
+    base_num = ""
+    while num>0:
+        dig = int(num%base)
+        if dig<10:
+            base_num += str(dig)
+        else:
+            base_num += chr(ord('A')+dig-10)  #Using uppercase letters
+        num //= base
+    base_num = base_num[::-1]  #To reverse the string
+    return base_num
