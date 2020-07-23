@@ -75,6 +75,12 @@ def verifySeed(seed, maxValueArray, base=10):
 	seed = seed.upper().strip()
 
 	try:
+		maxSeed = 0
+		baseShift = 0
+		for i in range(len(maxValueArray)):
+			maxSeed += maxValueArray[i]<<baseShift
+			baseShift += maxValueArray[i].bit_length()
+		assert int(seed, 36) <= maxSeed
 		varsInSeed = decodeSeed(seed, maxValueArray, base)
 		for i in range(len(varsInSeed)):
 			assert 0 <= varsInSeed[i] <= maxValueArray[i]

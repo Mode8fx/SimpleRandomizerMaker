@@ -3,7 +3,6 @@ import copy
 import math
 import shutil
 from gatelib import *
-# from gui import *
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -12,6 +11,8 @@ else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
+
+# TODO: finish implementing seeds, and implement log file
 
 def main():
 	vp_start_gui()
@@ -26,38 +27,58 @@ def randomize():
 	# 	Tk().withdraw()
 	# 	sourceRom = askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)])
 
-	# initialize attributes
-	for att in attributes:
-		attributes[att].prepare()
-
 	myRules = copy.copy(required_rules)
 
-	varArray = []
-	maxValueArray = []
-	for ruleset in optionalRulesetsList:
-		varArray.append(ruleset[1])
-		maxValueArray.append(1)
-	settingsSeed = encodeSeed(varArray, maxValueArray, 36)[0]
-	maxVal = int("ZZZZZ", 36)
-	genSeed = random.randint(0, maxVal)
-	currSeed = (settingsSeed*(maxVal+1)) + genSeed
-	numOptionalRulesets = len(optional_rulesets.keys())
-	seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(numOptionalRulesets/5.0))
-
+	numOfSeeds = int(numSeeds.get())
 	optionalRulesetNum = 0
-	# TODO: optionalRulesetsList isn't changing...?
 	for ruleset in optionalRulesetsList:
 		if ruleset[1] == 1:
 			for rule in optional_rulesets[ruleset[0]]:
 				myRules.append(rule)
 		optionalRulesetNum += 1
-	if not enforceRuleset(myRules):
-		return (False, "No combination of values satisfies the given combination of rules.")
 
-	for att in attributes:
-		print(attributes[att].name+": "+str(attributes[att].value))
+	numSeedsGenerated = 0
+	for seedNum in range(numOfSeeds):
+		if useSeed.get()=="1":
+			seedString = seedInput.get()
+			try:
+				assert len(seedString) == 6
+				assert verifySeed(seedString[:-5], [1]*len(optionalRulesetsList), 36)
+			except:
+				return (False, "Invalid seed.")
+			decodedSeedVals = decodeSeed(seedString[:-5], [1]*len(optionalRulesetsList), 36)
+			for i in range(len(optionalRulesetsList)):
+				optionalRulesetsList[i] = (optionalRulesetsList[i][0], decodedSeedVals[i])
+			currSeed = int(seedString, 36)
+		else:
+			varArray = []
+			maxValueArray = []
+			for ruleset in optionalRulesetsList:
+				varArray.append(ruleset[1])
+				maxValueArray.append(1)
+			settingsSeed = encodeSeed(varArray, maxValueArray, 36)[0]
+			maxVal = int("ZZZZZ", 36)
+			genSeed = random.randint(0, maxVal)
+			currSeed = (settingsSeed*(maxVal+1)) + genSeed
+			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(len(optional_rulesets.keys())/5.0))
+		random.seed(currSeed)
+		# initialize attributes
+		for att in attributes:
+			attributes[att].prepare()
+		if not enforceRuleset(myRules):
+			return (False, "No combination of values satisfies the given combination of rules.")
 
-	return generateRom()
+		for att in attributes:
+			print(attributes[att].name+": "+str(attributes[att].value))
+
+		generatedRom = generateRom()
+		for att in attributes:
+			attributes[att].resetToDefault()
+		if generatedRom[0]:
+			numSeedsGenerated += 1
+		else:
+			return generatedRom
+	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
 def enforceRuleset(ruleset):
 	ruleNum = 0
@@ -77,10 +98,8 @@ def enforceRuleset(ruleset):
 
 def generateRom():
 	global sourceRom
-	global currSeed
 	global seedString
 
-	random.seed(currSeed)
 	newRom = path.join(outputFolder, path.splitext(path.basename(sourceRom.get()))[0]+"-"+seedString+"."+rom_file_format)
 	if not path.isdir(outputFolder):
 		mkdir(outputFolder)
@@ -108,7 +127,7 @@ def generateRom():
 #! /usr/bin/env python
 #  -*- coding: utf-8 -*-
 #
-# GUI module originally created by PAGE version 5.4
+# GUI module initially created by PAGE version 5.4
 #  in conjunction with Tcl version 8.6
 #    platform: Windows NT
 
@@ -136,7 +155,7 @@ def vp_start_gui():
     sizeRatio = size/1440
     # root.tk.call('tk', 'scaling', 2.0*sizeRatio)
     set_Tk_var()
-    top = TopLevel (root)
+    top = TopLevel(root)
     init(root, top)
     root.mainloop()
 
@@ -249,7 +268,7 @@ class TopLevel:
 
         # Frame
         self.TFrame1 = ttk.Frame(top)
-        self.TFrame1.place(x=35*sizeRatio, y=120*sizeRatio, height=250*sizeRatio, width=560*sizeRatio)
+        self.TFrame1.place(x=35*sizeRatio, y=120*sizeRatio, height=400*sizeRatio, width=930*sizeRatio)
         self.TFrame1.configure(relief='groove')
         self.TFrame1.configure(borderwidth="2")
         self.TFrame1.configure(relief="groove")
@@ -509,7 +528,7 @@ def setSourceRom():
 def keepUpperCharsSeed(unused):
     global seedInput
     seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
-    seedInput.set(seedInput.get()[:10])
+    seedInput.set(seedInput.get()[:(5+math.ceil(len(optional_rulesets.keys())/5.0))])
 
 def init(top, gui, *args, **kwargs):
     global w, top_level, root
@@ -524,8 +543,6 @@ def destroy_window(endProg=False):
     top_level = None
     if endProg:
         sys.exit()
-
-
 
 if __name__ == '__main__':
 	main()

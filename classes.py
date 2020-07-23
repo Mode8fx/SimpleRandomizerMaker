@@ -59,16 +59,20 @@ class Attribute:
 		else:
 			self.addresses = [addresses]
 		self.possible_values = possible_values
-		self.value = 0
 		if len(possible_values) == 0:
 			self.possible_values = list(range(min_value, max_value+1))
+			self.default_possible_values = copy.copy(self.possible_values)
 		else:
 			self.possible_values = [v for v in possible_values if min_value <= v <= max_value]
+			self.default_possible_values = copy.copy(self.possible_values)
 		self.specialOperators = []
 		self.specialVal = []
 	def resetToFirstValue(self):
 		self.index = 0
 		self.value = self.possible_values[0]
+	def resetToDefault(self):
+		self.possible_values = copy.copy(self.default_possible_values)
+		self.resetToFirstValue()
 	def prepare(self):
 		random.shuffle(self.possible_values)
 		self.resetToFirstValue()
