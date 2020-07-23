@@ -111,8 +111,20 @@ def generateRom():
 		file = open(newRom, "r+b")
 		for att in attributes:
 			for address in attributes[att].addresses:
-				file.seek(address)
-				file.write(bytes([attributes[att].value]))
+				currAddress = address
+				val = attributes[att].value
+				while True:
+					file.seek(currAddress)
+					currByte = val
+					numShifted = 0
+					while currByte > 0xFF:
+						currByte = currByte>>8
+						numShifted += 8
+					file.write(bytes([currByte]))
+					currAddress += 1
+					val -= currByte<<numShifted
+					if numShifted == 0:
+						break
 		file.close()
 		print("Succesfully generated ROM with seed "+seedString)
 		return (True, "ROM successfully generated.")
