@@ -6,7 +6,7 @@ from gatelib import *
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
-    mainFolder = path.dirname(sys.executable) # EXE (executable) file
+	mainFolder = path.dirname(sys.executable) # EXE (executable) file
 else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
@@ -14,7 +14,6 @@ outputFolder = path.join(mainFolder, "output")
 
 """
 TODO:
-- implement log file
 - figure out how to do popups (if possible)
 - organize GUI
 - add credits button
@@ -36,7 +35,7 @@ def randomize():
 	optionalRulesetNum = 0
 	for ruleset in optionalRulesetsList:
 		if ruleset[1] == 1:
-			for rule in optional_rulesets[ruleset[0]]:
+			for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
 				myRules.append(rule)
 		optionalRulesetNum += 1
 
@@ -64,7 +63,7 @@ def randomize():
 			maxVal = int("ZZZZZ", 36)
 			genSeed = random.randint(0, maxVal)
 			currSeed = (settingsSeed*(maxVal+1)) + genSeed
-			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(len(optional_rulesets.keys())/5.0))
+			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(len(optional_rulesets)/5.0))
 		random.seed(currSeed)
 		# initialize attributes
 		for att in attributes:
@@ -85,6 +84,11 @@ def randomize():
 		else:
 			return generatedRom
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
+
+def getFromListByName(arr, name):
+	for a in arr:
+		if a.name == name:
+			return a
 
 def enforceRuleset(ruleset):
 	ruleNum = 0
@@ -144,250 +148,267 @@ def generateTextLog():
 #
 # GUI module initially created by PAGE version 5.4
 #  in conjunction with Tcl version 8.6
-#    platform: Windows NT
+#	platform: Windows NT
 
 import sys
 
 try:
-    import Tkinter as tk
-    from Tkinter.filedialog import askopenfilename
-    from Tkinter import font as tkFont
+	import Tkinter as tk
+	from Tkinter.filedialog import askopenfilename
+	from Tkinter import font as tkFont
 except ImportError:
-    import tkinter as tk
-    from tkinter.filedialog import askopenfilename
-    from tkinter import font as tkFont
+	import tkinter as tk
+	from tkinter.filedialog import askopenfilename
+	from tkinter import font as tkFont
 
 try:
-    import ttk
-    py3 = False
+	import ttk
+	py3 = False
 except ImportError:
-    import tkinter.ttk as ttk
-    py3 = True
+	import tkinter.ttk as ttk
+	py3 = True
 
 def vp_start_gui():
-    '''Starting point when module is the main routine.'''
-    global val, w, root, sizeRatio
-    root = tk.Tk()
-    # 1.7 seems to be default scaling
-    size = root.winfo_screenheight()
-    sizeRatio = size/1440
-    # root.tk.call('tk', 'scaling', 2.0*sizeRatio)
-    set_Tk_var()
-    top = TopLevel(root)
-    init(root, top)
-    root.mainloop()
+	'''Starting point when module is the main routine.'''
+	global val, w, root, sizeRatio
+	root = tk.Tk()
+	# 1.7 seems to be default scaling
+	size = root.winfo_screenheight()
+	sizeRatio = size/1440
+	# root.tk.call('tk', 'scaling', 2.0*sizeRatio)
+	set_Tk_var()
+	top = TopLevel(root)
+	init(root, top)
+	root.mainloop()
 
 w = None
 def create_TopLevel(rt, *args, **kwargs):
-    '''Starting point when module is imported by another module.
-       Correct form of call: 'create_TopLevel(root, *args, **kwargs)' .'''
-    global w, w_win, root
-    #rt = root
-    root = rt
-    w = tk.Toplevel (root)
-    set_Tk_var()
-    top = TopLevel (w)
-    init(w, top, *args, **kwargs)
-    return (w, top)
+	'''Starting point when module is imported by another module.
+	   Correct form of call: 'create_TopLevel(root, *args, **kwargs)' .'''
+	global w, w_win, root
+	#rt = root
+	root = rt
+	w = tk.Toplevel (root)
+	set_Tk_var()
+	top = TopLevel (w)
+	init(w, top, *args, **kwargs)
+	return (w, top)
 
 def destroy_TopLevel():
-    global w
-    w.destroy()
-    w = None
+	global w
+	w.destroy()
+	w = None
 
 class TopLevel:
-    def __init__(self, top=None):
-        '''This class configures and populates the toplevel window.
-           top is the toplevel containing window.'''
-        _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
-        self.style = ttk.Style()
-        if sys.platform == "win32":
-            self.style.theme_use('winnative')
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font="TkDefaultFont")
-        self.style.map('.',background=
-            [('selected', _compcolor), ('active',_ana2color)])
-        self.font = tkFont.Font(family='TkDefaultFont')
+	def __init__(self, top=None):
+		'''This class configures and populates the toplevel window.
+		   top is the toplevel containing window.'''
+		_bgcolor = '#d9d9d9'  # X11 color: 'gray85'
+		_fgcolor = '#000000'  # X11 color: 'black'
+		_compcolor = '#d9d9d9' # X11 color: 'gray85'
+		_ana1color = '#d9d9d9' # X11 color: 'gray85'
+		_ana2color = '#ececec' # Closest X11 color: 'gray92'
+		self.style = ttk.Style()
+		if sys.platform == "win32":
+			self.style.theme_use('winnative')
+		self.style.configure('.',background=_bgcolor)
+		self.style.configure('.',foreground=_fgcolor)
+		self.style.configure('.',font="TkDefaultFont")
+		self.style.map('.',background=
+			[('selected', _compcolor), ('active',_ana2color)])
+		self.font = tkFont.Font(family='TkDefaultFont')
 
-        top.geometry(str(int(1000*sizeRatio))+"x"+str(int(700*sizeRatio)))
-        # top.minsize(120, 1)
-        # top.maxsize(2564, 1421)
-        top.resizable(0, 0)
-        top.title(program_name)
-        top.configure(background="#d9d9d9")
-        top.configure(highlightbackground="#d9d9d9")
-        top.configure(highlightcolor="black")
+		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(700*sizeRatio)))
+		# top.minsize(120, 1)
+		# top.maxsize(2564, 1421)
+		top.resizable(0, 0)
+		top.title(program_name)
+		top.configure(background="#d9d9d9")
+		top.configure(highlightbackground="#d9d9d9")
+		top.configure(highlightcolor="black")
 
-        self.style.map('TCheckbutton',background=
-            [('selected', _bgcolor), ('active', _ana2color)])
-        self.style.map('TRadiobutton',background=
-        	[('selected', _bgcolor), ('active', _ana2color)])
+		self.style.map('TCheckbutton',background=
+			[('selected', _bgcolor), ('active', _ana2color)])
+		self.style.map('TRadiobutton',background=
+			[('selected', _bgcolor), ('active', _ana2color)])
 
-        # Rom Input Label
-        self.Label_RomInput = ttk.Label(top)
-        self.Label_RomInput.place(relx=.035, rely=.04, relheight=.05, relwidth=self.getTextLength(rom_name+' ROM'))
-        self.Label_RomInput.configure(background="#d9d9d9")
-        self.Label_RomInput.configure(foreground="#000000")
-        self.Label_RomInput.configure(font="TkDefaultFont")
-        self.Label_RomInput.configure(relief="flat")
-        self.Label_RomInput.configure(anchor='w')
-        self.Label_RomInput.configure(justify='left')
-        self.Label_RomInput.configure(text=rom_name+' ROM')
+		# Rom Input Label
+		self.Label_RomInput = ttk.Label(top)
+		self.Label_RomInput.place(relx=.035, rely=.04, relheight=.05, relwidth=self.getTextLength(rom_name+' ROM'))
+		self.Label_RomInput.configure(background="#d9d9d9")
+		self.Label_RomInput.configure(foreground="#000000")
+		self.Label_RomInput.configure(font="TkDefaultFont")
+		self.Label_RomInput.configure(relief="flat")
+		self.Label_RomInput.configure(anchor='w')
+		self.Label_RomInput.configure(justify='left')
+		self.Label_RomInput.configure(text=rom_name+' ROM')
 
-        # Rom Input Entry
-        self.Entry_RomInput = ttk.Entry(top)
-        self.Entry_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02, rely=.04, relheight=.05, relwidth=.25)
-        self.Entry_RomInput.configure(state='readonly')
-        self.Entry_RomInput.configure(textvariable=sourceRom)
-        self.Entry_RomInput.configure(background="#000000")
-        self.Entry_RomInput.configure(cursor="ibeam")
+		# Rom Input Entry
+		self.Entry_RomInput = ttk.Entry(top)
+		self.Entry_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02, rely=.04, relheight=.05, relwidth=.25)
+		self.Entry_RomInput.configure(state='readonly')
+		self.Entry_RomInput.configure(textvariable=sourceRom)
+		self.Entry_RomInput.configure(background="#000000")
+		self.Entry_RomInput.configure(cursor="ibeam")
 
-        # Rom Input Button
-        self.Button_RomInput = ttk.Button(top)
-        self.Button_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02+.25+.01, rely=.0365, relheight=.057, relwidth=.12)
-        self.Button_RomInput.configure(command=setSourceRom)
-        self.Button_RomInput.configure(takefocus="")
-        self.Button_RomInput.configure(text='Select ROM')
+		# Rom Input Button
+		self.Button_RomInput = ttk.Button(top)
+		self.Button_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02+.25+.01, rely=.0365, relheight=.057, relwidth=.12)
+		self.Button_RomInput.configure(command=setSourceRom)
+		self.Button_RomInput.configure(takefocus="")
+		self.Button_RomInput.configure(text='Select ROM')
 
-        # Use Settings Radio Button
-        self.RadioButton_UseSettings = ttk.Radiobutton(top)
-        self.RadioButton_UseSettings.place(relx=.035, rely=.11, relheight=.05, relwidth=self.getTextLength('Use Settings'))
-        self.RadioButton_UseSettings.configure(variable=useSeed)
-        self.RadioButton_UseSettings.configure(value="0")
-        self.RadioButton_UseSettings.configure(text='Use Settings')
-        self.RadioButton_UseSettings.configure(compound='none')
-        self.tooltip_font = "TkDefaultFont"
-        self.RadioButton_UseSettings_tooltip = ToolTip(self.RadioButton_UseSettings, self.tooltip_font, 'Use the settings defined below to create a random seed.')
+		# Use Settings Radio Button
+		self.RadioButton_UseSettings = ttk.Radiobutton(top)
+		self.RadioButton_UseSettings.place(relx=.035, rely=.11, relheight=.05, relwidth=self.getTextLength('Use Settings'))
+		self.RadioButton_UseSettings.configure(variable=useSeed)
+		self.RadioButton_UseSettings.configure(value="0")
+		self.RadioButton_UseSettings.configure(text='Use Settings')
+		self.RadioButton_UseSettings.configure(compound='none')
+		self.tooltip_font = "TkDefaultFont"
+		self.RadioButton_UseSettings_tooltip = ToolTip(self.RadioButton_UseSettings, self.tooltip_font, 'Use the settings defined below to create a random seed.')
 
-        # Use Seed Radio Button
-        self.RadioButton_UseSeed = ttk.Radiobutton(top)
-        self.RadioButton_UseSeed.place(relx=.37, rely=.11, relheight=.057, relwidth=self.getTextLength('Use Seed'))
-        self.RadioButton_UseSeed.configure(variable=useSeed)
-        self.RadioButton_UseSeed.configure(text='''Use Seed''')
-        self.tooltip_font = "TkDefaultFont"
-        self.RadioButton_UseSeed_tooltip = ToolTip(self.RadioButton_UseSeed, self.tooltip_font, 'Recreate a specific set of changes according to a 10-character seed.')
+		# Use Seed Radio Button
+		self.RadioButton_UseSeed = ttk.Radiobutton(top)
+		self.RadioButton_UseSeed.place(relx=.37, rely=.11, relheight=.057, relwidth=self.getTextLength('Use Seed'))
+		self.RadioButton_UseSeed.configure(variable=useSeed)
+		self.RadioButton_UseSeed.configure(text='''Use Seed''')
+		self.tooltip_font = "TkDefaultFont"
+		self.RadioButton_UseSeed_tooltip = ToolTip(self.RadioButton_UseSeed, self.tooltip_font, 'Recreate a specific set of changes according to a 10-character seed.')
 
-        # Seed Input Entry
-        self.Entry_SeedInput = ttk.Entry(top)
-        self.Entry_SeedInput.place(relx=.37+self.getTextLength('Use Seed'), rely=.11, relheight=.05, relwidth=self.getTextLength("W"*(6+math.ceil(len(optional_rulesets.keys())/5.0))))
-        self.Entry_SeedInput.configure(state='disabled')
-        self.Entry_SeedInput.configure(textvariable=seedInput)
-        self.Entry_SeedInput.configure(takefocus="")
-        self.Entry_SeedInput.configure(cursor="ibeam")
-        self.Entry_SeedInput.bind('<Key>',keepUpperCharsSeed)
-        self.Entry_SeedInput.bind('<KeyRelease>',keepUpperCharsSeed)
+		# Seed Input Entry
+		self.Entry_SeedInput = ttk.Entry(top)
+		self.Entry_SeedInput.place(relx=.37+self.getTextLength('Use Seed'), rely=.11, relheight=.05, relwidth=self.getTextLength("W"*(6+math.ceil(len(optional_rulesets)/5.0))))
+		self.Entry_SeedInput.configure(state='disabled')
+		self.Entry_SeedInput.configure(textvariable=seedInput)
+		self.Entry_SeedInput.configure(takefocus="")
+		self.Entry_SeedInput.configure(cursor="ibeam")
+		self.Entry_SeedInput.bind('<Key>',keepUpperCharsSeed)
+		self.Entry_SeedInput.bind('<KeyRelease>',keepUpperCharsSeed)
 
-        # self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
-        # top.configure(menu = self.menubar)
+		# self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
+		# top.configure(menu = self.menubar)
 
-        # Frame
-        self.TFrame1 = ttk.Frame(top)
-        self.TFrame1.place(relx=.035, rely=.18, relheight=.50, relwidth=.93) # (35, 119) to (965, 518)
-        self.TFrame1.configure(relief='groove')
-        self.TFrame1.configure(borderwidth="2")
-        self.TFrame1.configure(relief="groove")
+		# Frame
+		self.TFrame1 = ttk.Frame(top)
+		self.TFrame1.place(relx=.035, rely=.18, relheight=.51, relwidth=.93) # (35, 119) to (965, 518)
+		self.TFrame1.configure(relief='groove')
+		self.TFrame1.configure(borderwidth="2")
+		self.TFrame1.configure(relief="groove")
 
-        # Ruleset Check Buttons
-        self.CheckButtons = []
-        self.CheckButtons_tooltips = []
-        optRulesetNum = 0
-        global optRulesetValues
-        for key in optional_rulesets:
-            self.CheckButtons.append(ttk.Checkbutton(top)) # self.TFrame1 to put in frame
-            self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=self.getTextLength(key))
-            self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
-            self.CheckButtons[optRulesetNum].configure(offvalue="0")
-            self.CheckButtons[optRulesetNum].configure(onvalue="1")
-            self.CheckButtons[optRulesetNum].configure(takefocus="")
-            self.CheckButtons[optRulesetNum].configure(text=key)
-            self.tooltip_font = "TkDefaultFont"
-            self.CheckButtons_tooltips.append(ToolTip(self.CheckButtons[optRulesetNum], self.tooltip_font, 'PLACEHOLDER DESCRIPTION'))
-            optRulesetNum += 1
+		# Ruleset Check Buttons
+		self.CheckButtons = []
+		self.CheckButtons_tooltips = []
+		optRulesetNum = 0
+		global optRulesetValues
+		for ruleset in optional_rulesets:
+			self.CheckButtons.append(ttk.Checkbutton(top)) # self.TFrame1 to put in frame
+			self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=self.getTextLength(ruleset.name))
+			self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
+			self.CheckButtons[optRulesetNum].configure(offvalue="0")
+			self.CheckButtons[optRulesetNum].configure(onvalue="1")
+			self.CheckButtons[optRulesetNum].configure(takefocus="")
+			self.CheckButtons[optRulesetNum].configure(text=ruleset.name)
+			self.tooltip_font = "TkDefaultFont"
+			self.CheckButtons_tooltips.append(ToolTip(self.CheckButtons[optRulesetNum], self.tooltip_font, 'PLACEHOLDER DESCRIPTION'))
+			optRulesetNum += 1
 
-        # Number of Seeds Label
-        self.Label_NumSeeds = ttk.Label(top)
-        self.Label_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=.11)
-        self.Label_NumSeeds.configure(background="#d9d9d9")
-        self.Label_NumSeeds.configure(foreground="#000000")
-        self.Label_NumSeeds.configure(font="TkDefaultFont")
-        self.Label_NumSeeds.configure(relief="flat")
-        self.Label_NumSeeds.configure(anchor='w')
-        self.Label_NumSeeds.configure(justify='left')
-        self.Label_NumSeeds.configure(text='# of Seeds')
-        self.tooltip_font = "TkDefaultFont"
-        self.Label_NumSeeds_tooltip = ToolTip(self.Label_NumSeeds, self.tooltip_font, 'How many seeds would you like to generate?')
+		# Number of Seeds Label
+		self.Label_NumSeeds = ttk.Label(top)
+		self.Label_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=.11)
+		self.Label_NumSeeds.configure(background="#d9d9d9")
+		self.Label_NumSeeds.configure(foreground="#000000")
+		self.Label_NumSeeds.configure(font="TkDefaultFont")
+		self.Label_NumSeeds.configure(relief="flat")
+		self.Label_NumSeeds.configure(anchor='w')
+		self.Label_NumSeeds.configure(justify='left')
+		self.Label_NumSeeds.configure(text='# of Seeds')
+		self.tooltip_font = "TkDefaultFont"
+		self.Label_NumSeeds_tooltip = ToolTip(self.Label_NumSeeds, self.tooltip_font, 'How many seeds would you like to generate?')
 
-        # Number of Seeds Dropdown
-        self.ComboBox_NumSeeds = ttk.Combobox(top)
-        self.ComboBox_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.27+.09*(optRulesetNum%5), relheight=.05, relwidth=.088)
-        self.value_list = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',]
-        self.ComboBox_NumSeeds.configure(values=self.value_list)
-        self.ComboBox_NumSeeds.configure(state='readonly')
-        self.ComboBox_NumSeeds.configure(textvariable=numSeeds)
+		# Number of Seeds Dropdown
+		self.ComboBox_NumSeeds = ttk.Combobox(top)
+		self.ComboBox_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.27+.09*(optRulesetNum%5), relheight=.05, relwidth=.088)
+		self.value_list = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',]
+		self.ComboBox_NumSeeds.configure(values=self.value_list)
+		self.ComboBox_NumSeeds.configure(state='readonly')
+		self.ComboBox_NumSeeds.configure(textvariable=numSeeds)
 
-        # Text Log Check Button
-        self.CheckButton_GenerateTextLog = ttk.Checkbutton(top)
-        self.CheckButton_GenerateTextLog.place(relx=.25, rely=.85, relheight=.05, relwidth=.20)
-        self.CheckButton_GenerateTextLog.configure(variable=generateLog)
-        self.CheckButton_GenerateTextLog.configure(takefocus="")
-        self.CheckButton_GenerateTextLog.configure(text='Generate Text Log')
-        self.tooltip_font = "TkDefaultFont"
-        self.CheckButton_GenerateTextLog_tooltip = ToolTip(self.CheckButton_GenerateTextLog, self.tooltip_font, 'Would you like to generate a text file that details what abilities are tied to each enemy/object in the created seed?')
+		# Text Log Check Button
+		self.CheckButton_GenerateTextLog = ttk.Checkbutton(top)
+		self.CheckButton_GenerateTextLog.place(relx=.25, rely=.85, relheight=.05, relwidth=.20)
+		self.CheckButton_GenerateTextLog.configure(variable=generateLog)
+		self.CheckButton_GenerateTextLog.configure(takefocus="")
+		self.CheckButton_GenerateTextLog.configure(text='Generate Text Log')
+		self.tooltip_font = "TkDefaultFont"
+		self.CheckButton_GenerateTextLog_tooltip = ToolTip(self.CheckButton_GenerateTextLog, self.tooltip_font, 'Would you like to generate a text file that details what abilities are tied to each enemy/object in the created seed?')
 
-        # Create Rom Button
-        self.Button_CreateRom = ttk.Button(top)
-        self.Button_CreateRom.place(relx=.55, rely=.8465, relheight=.057, relwidth=.144)
-        self.Button_CreateRom.configure(takefocus="")
-        self.Button_CreateRom.configure(text='''Randomize!''')
+		# Create Rom Button
+		self.Button_CreateRom = ttk.Button(top)
+		self.Button_CreateRom.place(relx=.55, rely=.8465, relheight=.057, relwidth=.144)
+		self.Button_CreateRom.configure(takefocus="")
+		self.Button_CreateRom.configure(text='''Randomize!''')
 
-        # Message
-        self.Label_Message = ttk.Label(top)
-        self.Label_Message.place(relx=.05, rely=.75, relheight=.05, relwidth=.90)
-        self.Label_Message.configure(background="#d9d9d9")
-        self.Label_Message.configure(foreground="#000000")
-        self.Label_Message.configure(font="TkDefaultFont")
-        self.Label_Message.configure(relief="flat")
-        self.Label_Message.configure(anchor='center')
-        self.Label_Message.configure(justify='left')
-        self.Label_Message.configure(textvariable=message)
+		# Message
+		self.Label_Message = ttk.Label(top)
+		self.Label_Message.place(relx=.05, rely=.75, relheight=.05, relwidth=.90)
+		self.Label_Message.configure(background="#d9d9d9")
+		self.Label_Message.configure(foreground="#000000")
+		self.Label_Message.configure(font="TkDefaultFont")
+		self.Label_Message.configure(relief="flat")
+		self.Label_Message.configure(anchor='center')
+		self.Label_Message.configure(justify='left')
+		self.Label_Message.configure(textvariable=message)
 
-        self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
-        self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
-        self.Button_CreateRom.configure(command=self.attemptRandomize)
+		# Other
+		self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
+		self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
+		self.Button_CreateRom.configure(command=self.attemptRandomize)
+		for i in range(len(optional_rulesets)):
+			self.CheckButtons[i].configure(command=self.prepareSettingsFromDependencies)
+		self.prepareSettingsFromDependencies()
 
-    def getTextLength(self, text):
-    	return .03+self.font.measure(text)/1000.0
+	def getTextLength(self, text):
+		return .03+self.font.measure(text)/1000.0
 
-    def prepareSettingsAndSeed(self, unused=None):
-        if useSeed.get()=="1":
-            self.Entry_SeedInput.configure(state="normal")
-            self.Label_NumSeeds.configure(state="disabled")
-            self.ComboBox_NumSeeds.configure(state="disabled")
-            for button in self.CheckButtons:
-                button.configure(state="disabled")
-        else:
-            self.Entry_SeedInput.configure(state="disabled")
-            self.Label_NumSeeds.configure(state="normal")
-            self.ComboBox_NumSeeds.configure(state="readonly")
-            for button in self.CheckButtons:
-                button.configure(state="normal")
+	def prepareSettingsAndSeed(self, unused=None):
+		if useSeed.get()=="1":
+			self.Entry_SeedInput.configure(state="normal")
+			self.Label_NumSeeds.configure(state="disabled")
+			self.ComboBox_NumSeeds.configure(state="disabled")
+			for button in self.CheckButtons:
+				button.configure(state="disabled")
+		else:
+			self.Entry_SeedInput.configure(state="disabled")
+			self.Label_NumSeeds.configure(state="normal")
+			self.ComboBox_NumSeeds.configure(state="readonly")
+			for button in self.CheckButtons:
+				button.configure(state="normal")
+			self.prepareSettingsFromDependencies()
 
-    def attemptRandomize(self):
-        global optionalRulesetsList
-        global optRulesetValues
+	def prepareSettingsFromDependencies(self):
+		for i in range(len(optional_rulesets)):
+			currCheckButton = self.CheckButtons[i]
+			currCheckButton.configure(state="normal")
+			for j in range(len(optional_rulesets)):
+				currRulesetVal = optRulesetValues[j].get()
+				currRulesetName = optional_rulesets[j].name
+				if ((currRulesetVal == "1") and (currRulesetName in optional_rulesets[i].must_be_disabled)
+					) or ((currRulesetVal == "0") and (currRulesetName in optional_rulesets[i].must_be_enabled)):
+					optRulesetValues[i].set("0")
+					currCheckButton.configure(state="disabled")
+					break
 
-        optionalRulesetsList = [("", 0)] * len(optRulesetValues)
-        keys = list(optional_rulesets.keys())
-        for i in range(len(optRulesetValues)):
-            optionalRulesetsList[i] = (keys[i], int(optRulesetValues[i].get()))
-        results = randomize()
-        message.set(results[1])
-        self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
+	def attemptRandomize(self):
+		global optionalRulesetsList
+		global optRulesetValues
+
+		optionalRulesetsList = [("", 0)] * len(optRulesetValues)
+		for i in range(len(optRulesetValues)):
+			optionalRulesetsList[i] = (optional_rulesets[i].name, int(optRulesetValues[i].get()))
+		results = randomize()
+		message.set(results[1])
+		self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
@@ -400,171 +421,171 @@ class TopLevel:
 from time import time, localtime, strftime
 
 class ToolTip(tk.Toplevel):
-    """
-    Provides a ToolTip widget for Tkinter.
-    To apply a ToolTip to any Tkinter widget, simply pass the widget to the
-    ToolTip constructor
-    """
-    def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None,
-                 delay=0.5, follow=True):
-        """
-        Initialize the ToolTip
+	"""
+	Provides a ToolTip widget for Tkinter.
+	To apply a ToolTip to any Tkinter widget, simply pass the widget to the
+	ToolTip constructor
+	"""
+	def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None,
+				 delay=0.5, follow=True):
+		"""
+		Initialize the ToolTip
 
-        Arguments:
-          wdgt: The widget this ToolTip is assigned to
-          tooltip_font: Font to be used
-          msg:  A static string message assigned to the ToolTip
-          msgFunc: A function that retrieves a string to use as the ToolTip text
-          delay:   The delay in seconds before the ToolTip appears(may be float)
-          follow:  If True, the ToolTip follows motion, otherwise hides
-        """
-        self.wdgt = wdgt
-        # The parent of the ToolTip is the parent of the ToolTips widget
-        self.parent = self.wdgt.master
-        # Initalise the Toplevel
-        tk.Toplevel.__init__(self, self.parent, bg='black', padx=1, pady=1)
-        # Hide initially
-        self.withdraw()
-        # The ToolTip Toplevel should have no frame or title bar
-        self.overrideredirect(True)
+		Arguments:
+		  wdgt: The widget this ToolTip is assigned to
+		  tooltip_font: Font to be used
+		  msg:  A static string message assigned to the ToolTip
+		  msgFunc: A function that retrieves a string to use as the ToolTip text
+		  delay:   The delay in seconds before the ToolTip appears(may be float)
+		  follow:  If True, the ToolTip follows motion, otherwise hides
+		"""
+		self.wdgt = wdgt
+		# The parent of the ToolTip is the parent of the ToolTips widget
+		self.parent = self.wdgt.master
+		# Initalise the Toplevel
+		tk.Toplevel.__init__(self, self.parent, bg='black', padx=1, pady=1)
+		# Hide initially
+		self.withdraw()
+		# The ToolTip Toplevel should have no frame or title bar
+		self.overrideredirect(True)
 
-        # The msgVar will contain the text displayed by the ToolTip
-        self.msgVar = tk.StringVar()
-        if msg is None:
-            self.msgVar.set('No message provided')
-        else:
-            self.msgVar.set(msg)
-        self.msgFunc = msgFunc
-        self.delay = delay
-        self.follow = follow
-        self.visible = 0
-        self.lastMotion = 0
-        # The text of the ToolTip is displayed in a Message widget
-        tk.Message(self, textvariable=self.msgVar, bg='#FFFFDD',
-                font=tooltip_font,
-                aspect=1000).grid()
+		# The msgVar will contain the text displayed by the ToolTip
+		self.msgVar = tk.StringVar()
+		if msg is None:
+			self.msgVar.set('No message provided')
+		else:
+			self.msgVar.set(msg)
+		self.msgFunc = msgFunc
+		self.delay = delay
+		self.follow = follow
+		self.visible = 0
+		self.lastMotion = 0
+		# The text of the ToolTip is displayed in a Message widget
+		tk.Message(self, textvariable=self.msgVar, bg='#FFFFDD',
+				font=tooltip_font,
+				aspect=1000).grid()
 
-        # Add bindings to the widget.  This will NOT override
-        # bindings that the widget already has
-        self.wdgt.bind('<Enter>', self.spawn, '+')
-        self.wdgt.bind('<Leave>', self.hide, '+')
-        self.wdgt.bind('<Motion>', self.move, '+')
+		# Add bindings to the widget.  This will NOT override
+		# bindings that the widget already has
+		self.wdgt.bind('<Enter>', self.spawn, '+')
+		self.wdgt.bind('<Leave>', self.hide, '+')
+		self.wdgt.bind('<Motion>', self.move, '+')
 
-    def spawn(self, event=None):
-        """
-        Spawn the ToolTip.  This simply makes the ToolTip eligible for display.
-        Usually this is caused by entering the widget
+	def spawn(self, event=None):
+		"""
+		Spawn the ToolTip.  This simply makes the ToolTip eligible for display.
+		Usually this is caused by entering the widget
 
-        Arguments:
-          event: The event that called this funciton
-        """
-        self.visible = 1
-        # The after function takes a time argument in milliseconds
-        self.after(int(self.delay * 1000), self.show)
+		Arguments:
+		  event: The event that called this funciton
+		"""
+		self.visible = 1
+		# The after function takes a time argument in milliseconds
+		self.after(int(self.delay * 1000), self.show)
 
-    def show(self):
-        """
-        Displays the ToolTip if the time delay has been long enough
-        """
-        if self.visible == 1 and time() - self.lastMotion > self.delay:
-            self.visible = 2
-        if self.visible == 2:
-            self.deiconify()
+	def show(self):
+		"""
+		Displays the ToolTip if the time delay has been long enough
+		"""
+		if self.visible == 1 and time() - self.lastMotion > self.delay:
+			self.visible = 2
+		if self.visible == 2:
+			self.deiconify()
 
-    def move(self, event):
-        """
-        Processes motion within the widget.
-        Arguments:
-          event: The event that called this function
-        """
-        self.lastMotion = time()
-        # If the follow flag is not set, motion within the
-        # widget will make the ToolTip disappear
-        #
-        if self.follow is False:
-            self.withdraw()
-            self.visible = 1
+	def move(self, event):
+		"""
+		Processes motion within the widget.
+		Arguments:
+		  event: The event that called this function
+		"""
+		self.lastMotion = time()
+		# If the follow flag is not set, motion within the
+		# widget will make the ToolTip disappear
+		#
+		if self.follow is False:
+			self.withdraw()
+			self.visible = 1
 
-        # Offset the ToolTip 10x10 pixes southwest of the pointer
-        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-        try:
-            # Try to call the message function.  Will not change
-            # the message if the message function is None or
-            # the message function fails
-            self.msgVar.set(self.msgFunc())
-        except:
-            pass
-        self.after(int(self.delay * 1000), self.show)
+		# Offset the ToolTip 10x10 pixes southwest of the pointer
+		self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
+		try:
+			# Try to call the message function.  Will not change
+			# the message if the message function is None or
+			# the message function fails
+			self.msgVar.set(self.msgFunc())
+		except:
+			pass
+		self.after(int(self.delay * 1000), self.show)
 
-    def hide(self, event=None):
-        """
-        Hides the ToolTip.  Usually this is caused by leaving the widget
-        Arguments:
-          event: The event that called this function
-        """
-        self.visible = 0
-        self.withdraw()
+	def hide(self, event=None):
+		"""
+		Hides the ToolTip.  Usually this is caused by leaving the widget
+		Arguments:
+		  event: The event that called this function
+		"""
+		self.visible = 0
+		self.withdraw()
 
-    def update(self, msg):
-        """
-        Updates the Tooltip with a new message. Added by Rozen
-        """
-        self.msgVar.set(msg)
+	def update(self, msg):
+		"""
+		Updates the Tooltip with a new message. Added by Rozen
+		"""
+		self.msgVar.set(msg)
 
 # ===========================================================
-#                   End of Class ToolTip
+#				   End of Class ToolTip
 # ===========================================================
 
 def set_Tk_var():
-    global sourceRom
-    sourceRom = tk.StringVar()
-    global optRulesetValues
-    optRulesetValues = []
-    for i in range(len(optional_rulesets.keys())):
-        optRulesetValues.append(tk.StringVar())
-    global numSeeds
-    numSeeds = tk.StringVar()
-    global useSeed
-    useSeed = tk.StringVar()
-    global seedInput
-    seedInput = tk.StringVar()
-    global generateLog
-    generateLog = tk.StringVar()
-    global message
-    message = tk.StringVar()
-    message.set('')
-    initVars()
+	global sourceRom
+	sourceRom = tk.StringVar()
+	global optRulesetValues
+	optRulesetValues = []
+	for i in range(len(optional_rulesets)):
+		optRulesetValues.append(tk.StringVar())
+	global numSeeds
+	numSeeds = tk.StringVar()
+	global useSeed
+	useSeed = tk.StringVar()
+	global seedInput
+	seedInput = tk.StringVar()
+	global generateLog
+	generateLog = tk.StringVar()
+	global message
+	message = tk.StringVar()
+	message.set('')
+	initVars()
 
 def initVars():
-    numSeeds.set("1")
-    useSeed.set("0")
-    generateLog.set("1")
-    for val in optRulesetValues:
-        val.set("0")
-    message.set("Welcome to the Amazing Mirror Randomizer! Move your mouse over a label to learn more about it.")
+	useSeed.set("0")
+	numSeeds.set("1")
+	generateLog.set("1")
+	for val in optRulesetValues:
+		val.set("0")
+	message.set("Welcome to the Amazing Mirror Randomizer! Move your mouse over a label to learn more about it.")
 
 def setSourceRom():
-    global sourceRom
-    sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
+	global sourceRom
+	sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
 
 def keepUpperCharsSeed(unused):
-    global seedInput
-    seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
-    seedInput.set(seedInput.get()[:(5+math.ceil(len(optional_rulesets.keys())/5.0))])
+	global seedInput
+	seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
+	seedInput.set(seedInput.get()[:(5+math.ceil(len(optional_rulesets)/5.0))])
 
 def init(top, gui, *args, **kwargs):
-    global w, top_level, root
-    w = gui
-    top_level = top
-    root = top
+	global w, top_level, root
+	w = gui
+	top_level = top
+	root = top
 
 def destroy_window(endProg=False):
-    # Function which closes the window.
-    global top_level
-    top_level.destroy()
-    top_level = None
-    if endProg:
-        sys.exit()
+	# Function which closes the window.
+	global top_level
+	top_level.destroy()
+	top_level = None
+	if endProg:
+		sys.exit()
 
 if __name__ == '__main__':
 	main()

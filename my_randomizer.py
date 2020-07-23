@@ -46,41 +46,75 @@ required_rules = [
 	# ),
 ]
 
-optional_rulesets = {
-	"My Rules 1" : [
-		Rule(
-			name="Sword Knight < 10",
-			left_side=attributes["Sword Knight"],
-			rule_type="<",
-			right_side=10
-		),
-		Rule(
-			name="Cupie >= 3",
-			left_side=attributes["Cupie"],
-			rule_type=">=",
-			right_side=3
-		),
-	],
-	"My Rules 2" : [
-		Rule(
-			name="Sword Knight > 12",
-			left_side=attributes["Sword Knight"],
-			rule_type=">",
-			right_side=12
-		),
-		Rule(
-			name="Cupie > 18",
-			left_side=attributes["Cupie"],
-			rule_type=">",
-			right_side=18
-		),
-	],
-	"My Rules 3" : [],
-	"My Rules 4" : [],
-	"My Rules 5" : [],
-	"My Rules 6" : [],
-	"My Rules 7" : [],
-	"My Rules 8" : [],
-	"My Rules 9" : [],
-	"My Rules 10" : [],
-}
+optional_rulesets = [
+	Ruleset(
+		name="My Rules 1",
+		description="Description of My Rules 1",
+		rules=[
+			Rule(
+				name="Sword Knight < 10",
+				left_side=attributes["Sword Knight"],
+				rule_type="<",
+				right_side=10
+			),
+			Rule(
+				name="Cupie >= 3",
+				left_side=attributes["Cupie"],
+				rule_type=">=",
+				right_side=3
+			),
+		],
+	),
+	Ruleset(
+		name="My Rules 2",
+		description="Description of My Rules 2",
+		rules=[
+			Rule(
+				name="Sword Knight > 12",
+				left_side=attributes["Sword Knight"],
+				rule_type=">",
+				right_side=12
+			),
+			Rule(
+				name="Cupie > 18",
+				left_side=attributes["Cupie"],
+				rule_type=">",
+				right_side=18
+			),
+		],
+	),
+	Ruleset(
+		name="My Rules 3",
+		description="Description of My Rules 3",
+		must_be_enabled=["My Rules 1"],
+	),
+	Ruleset(
+		name="My Rules 4",
+		description="Description of My Rules 4",
+		must_be_disabled=["My Rules 2"],
+	),
+	Ruleset(
+		name="My Rules 5",
+		description="Description of My Rules 5",
+	),
+	Ruleset(
+		name="My Rules 6",
+		description="Description of My Rules 6",
+	),
+	Ruleset(
+		name="My Rules 7",
+		description="Description of My Rules 7",
+	),
+	Ruleset(
+		name="My Rules 8",
+		description="Description of My Rules 8",
+	),
+	Ruleset(
+		name="My Rules 9",
+		description="Description of My Rules 9",
+	),
+	# Ruleset(
+	# 	name="My Rules 10",
+	# 	description="Description of My Rules 10",
+	# ),
+]

@@ -84,7 +84,6 @@ class Attribute:
 			self.value = self.possible_values[self.index]
 			return True
 		except:
-			# print("Resetting value to start of array.")
 			self.resetToFirstValue()
 			return False
 	# allows rules to perform dynamic operations on attribute value; no pointers necessary!
@@ -220,3 +219,19 @@ class Rule:
 			return side.performSpecialOperation()
 		else:
 			return side
+
+class Ruleset:
+	def __init__(self, name=None, description=None, rules=[], must_be_enabled=[], must_be_disabled=[]):
+		self.name = name
+		self.description = description
+		self.rules = rules
+		if isinstance(must_be_enabled, list):
+			self.must_be_enabled = must_be_enabled
+		else:
+			self.must_be_enabled = must_be_enabled
+		if isinstance(must_be_disabled, list):
+			self.must_be_disabled = must_be_disabled
+		else:
+			self.must_be_disabled = must_be_disabled
+	def addRule(rule):
+		self.rules.append(rule)
