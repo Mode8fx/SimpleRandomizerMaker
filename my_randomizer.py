@@ -75,4 +75,12 @@ optional_rulesets = {
 			right_side=18
 		),
 	],
+	"My Rules 3" : [],
+	"My Rules 4" : [],
+	"My Rules 5" : [],
+	"My Rules 6" : [],
+	"My Rules 7" : [],
+	"My Rules 8" : [],
+	"My Rules 9" : [],
+	"My Rules 10" : [],
 }
