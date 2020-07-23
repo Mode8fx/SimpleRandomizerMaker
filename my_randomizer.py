@@ -23,14 +23,6 @@ attributes = {
 		min_value=0,
 		max_value=26,
 	),
-	"Test" : Attribute(
-		name="Test",
-		description="The ability given by Test",
-		addresses=0x111110,
-		number_of_bytes=2,
-		min_value=16,
-		max_value=16,
-	),
 }
 
 required_rules = [

@@ -51,10 +51,9 @@ golden_mushroom_price = Attribute(
 """
 
 class Attribute:
-	def __init__(self, name, addresses, description=None, number_of_bytes=1, possible_values=[], min_value=None, max_value=None):
+	def __init__(self, name, addresses, description=None, number_of_bytes=None, possible_values=[], min_value=None, max_value=None):
 		self.name = name
 		self.description = description
-		self.number_of_bytes = number_of_bytes
 		if isinstance(addresses, list):
 			self.addresses = addresses
 		else:
@@ -66,6 +65,8 @@ class Attribute:
 		else:
 			self.possible_values = [v for v in possible_values if min_value <= v <= max_value]
 			self.default_possible_values = copy.copy(self.possible_values)
+		if number_of_bytes is None:
+			self.number_of_bytes = ceil(max(self.possible_values).bit_length() / 8.0)
 		self.specialOperators = []
 		self.specialVal = []
 	def resetToFirstValue(self):
