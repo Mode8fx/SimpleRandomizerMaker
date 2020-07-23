@@ -100,3 +100,17 @@ def dec_to_base(num,base):  #Maximum base - 36
         num //= base
     base_num = base_num[::-1]  #To reverse the string
     return base_num
+
+# Writes a value to a file address. Supports multi-byte addresses.
+def writeToAddress(file, address, val, numBytes=1):
+	if val.bit_length() > numBytes*8:
+		print("Given value is greater than "+str(numBytes)+" bytes.")
+		return False
+	address += (numBytes-1)
+	for i in range(numBytes):
+		file.seek(address)
+		currByte = val & 0xFF
+		file.write(bytes([currByte]))
+		address -= 1
+		val = val>>8
+	return True

@@ -17,6 +17,7 @@ TODO:
 - implement log file
 - figure out how to do popups (if possible)
 - organize GUI
+- add credits button
 - remove leftover print statements
 """
 
@@ -111,20 +112,7 @@ def generateRom():
 		file = open(newRom, "r+b")
 		for att in attributes:
 			for address in attributes[att].addresses:
-				currAddress = address
-				val = attributes[att].value
-				while True:
-					file.seek(currAddress)
-					currByte = val
-					numShifted = 0
-					while currByte > 0xFF:
-						currByte = currByte>>8
-						numShifted += 8
-					file.write(bytes([currByte]))
-					currAddress += 1
-					val -= currByte<<numShifted
-					if numShifted == 0:
-						break
+				writeToAddress(file, address, attributes[att].value, attributes[att].number_of_bytes)
 		file.close()
 		print("Succesfully generated ROM with seed "+seedString)
 		return (True, "ROM successfully generated.")
