@@ -30,6 +30,7 @@ required_rules = [
 		name="Sword Knight and Cupie give the same ability",
 		left_side=[attributes["Sword Knight"], attributes["Cupie"]],
 		rule_type="==",
+		right_side=None
 	),
 	# Rule(
 	# 	name="Sword Knight is one more than Cupie",

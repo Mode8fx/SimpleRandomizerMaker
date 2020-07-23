@@ -12,7 +12,13 @@ else:
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
 
-# TODO: finish implementing seeds, and implement log file
+"""
+TODO:
+- implement log file
+- figure out how to do popups (if possible)
+- organize GUI
+- remove leftover print statements
+"""
 
 def main():
 	vp_start_gui()
@@ -22,14 +28,10 @@ def randomize():
 	global currSeed
 	global seedString
 
-	# sourceRom = ""
-	# while sourceRom == "":
-	# 	Tk().withdraw()
-	# 	sourceRom = askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)])
+	if not path.isfile(sourceRom.get()):
+		return (False, "Invalid ROM input.")
 
 	myRules = copy.copy(required_rules)
-
-	numOfSeeds = int(numSeeds.get())
 	optionalRulesetNum = 0
 	for ruleset in optionalRulesetsList:
 		if ruleset[1] == 1:
@@ -37,6 +39,7 @@ def randomize():
 				myRules.append(rule)
 		optionalRulesetNum += 1
 
+	numOfSeeds = int(numSeeds.get())
 	numSeedsGenerated = 0
 	for seedNum in range(numOfSeeds):
 		if useSeed.get()=="1":
