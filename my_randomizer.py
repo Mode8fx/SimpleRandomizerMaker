@@ -84,38 +84,58 @@ optional_rulesets = [
 			),
 		],
 	),
-	# Ruleset(
-	# 	name="My Rules 3",
-	# 	description="Description of My Rules 3",
-	# 	must_be_enabled=["My Rules 1"],
-	# ),
-	# Ruleset(
-	# 	name="My Rules 4",
-	# 	description="Description of My Rules 4",
-	# 	must_be_disabled=["My Rules 2"],
-	# ),
-	# Ruleset(
-	# 	name="My Rules 5",
-	# 	description="Description of My Rules 5",
-	# ),
-	# Ruleset(
-	# 	name="My Rules 6",
-	# 	description="Description of My Rules 6",
-	# ),
-	# Ruleset(
-	# 	name="My Rules 7",
-	# 	description="Description of My Rules 7",
-	# ),
-	# Ruleset(
-	# 	name="My Rules 8",
-	# 	description="Description of My Rules 8",
-	# ),
-	# Ruleset(
-	# 	name="My Rules 9",
-	# 	description="Description of My Rules 9",
-	# ),
-	# Ruleset(
-	# 	name="My Rules 10",
-	# 	description="Description of My Rules 10",
-	# ),
+	Ruleset(
+		name="My Rules 3",
+		description="Description of My Rules 3",
+		must_be_enabled=["My Rules 1"],
+	),
+	Ruleset(
+		name="Pretty Log Name for Ruleset",
+		description="Description of My Rules 4",
+		must_be_disabled=["My Rules 2"],
+	),
+	Ruleset(
+		name="My Rules 5",
+		description="Description of My Rules 5",
+	),
+	Ruleset(
+		name="My Rules 6",
+		description="Description of My Rules 6",
+	),
+	Ruleset(
+		name="My Rules 7",
+		description="Description of My Rules 7",
+	),
+	Ruleset(
+		name="My Rules 8",
+		description="Description of My Rules 8",
+	),
+	Ruleset(
+		name="My Rules 9",
+		description="Description of My Rules 9",
+	),
+	Ruleset(
+		name="My Rules 10",
+		description="Description of My Rules 10",
+	),
+	Ruleset(
+		name="My Rules 11",
+		description="Description of My Rules 11",
+	),
+	Ruleset(
+		name="My Rules 12",
+		description="Description of My Rules 12",
+	),
+	Ruleset(
+		name="My Rules 13",
+		description="Description of My Rules 13",
+	),
+	Ruleset(
+		name="My Rules 14",
+		description="Description of My Rules 14",
+	),
+	Ruleset(
+		name="My Rules 15",
+		description="Description of My Rules 15",
+	),
 ]

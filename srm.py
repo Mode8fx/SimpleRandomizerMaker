@@ -219,7 +219,7 @@ class TopLevel:
 		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(600*sizeRatio)))
 		# top.minsize(120, 1)
 		# top.maxsize(2564, 1421)
-		top.resizable(0, 0)
+		top.resizable(1, 1)
 		top.title(program_name)
 		top.configure(background="#d9d9d9")
 		top.configure(highlightbackground="#d9d9d9")
@@ -338,21 +338,25 @@ class TopLevel:
 		optRulesetNum = 0
 		global optRulesetValues
 		for ruleset in optional_rulesets:
+			if optRulesetNum >= 14:
+				print("Warning: You can only have up to 14 optional rulesets. Ignoring the rest.")
+				break
 			self.CheckButtons.append(ttk.Checkbutton(top)) # self.TFrame1 to put in frame
 			# self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=(.22+.09*(optRulesetNum%5))*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
-			self.CheckButtons[optRulesetNum].place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
+			self.CheckButtons[optRulesetNum].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
 			self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
 			self.CheckButtons[optRulesetNum].configure(offvalue="0")
 			self.CheckButtons[optRulesetNum].configure(onvalue="1")
 			self.CheckButtons[optRulesetNum].configure(takefocus="")
 			self.CheckButtons[optRulesetNum].configure(text=ruleset.name)
 			self.tooltip_font = "TkDefaultFont"
-			self.CheckButtons_tooltips.append(ToolTip(self.CheckButtons[optRulesetNum], self.tooltip_font, 'PLACEHOLDER DESCRIPTION'))
+			self.CheckButtons_tooltips.append(ToolTip(self.CheckButtons[optRulesetNum], self.tooltip_font, ruleset.description))
 			optRulesetNum += 1
 
 		# Number of Seeds Label
+		seedX = .475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5]
 		self.Label_NumSeeds = ttk.Label(top)
-		self.Label_NumSeeds.place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.11)
+		self.Label_NumSeeds.place(relx=seedX, rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.11)
 		self.Label_NumSeeds.configure(background="#d9d9d9")
 		self.Label_NumSeeds.configure(foreground="#000000")
 		self.Label_NumSeeds.configure(font="TkDefaultFont")
@@ -365,7 +369,7 @@ class TopLevel:
 
 		# Number of Seeds Dropdown
 		self.ComboBox_NumSeeds = ttk.Combobox(top)
-		self.ComboBox_NumSeeds.place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.45+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.088)
+		self.ComboBox_NumSeeds.place(relx=seedX, rely=(.45+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.088)
 		self.value_list = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',]
 		self.ComboBox_NumSeeds.configure(values=self.value_list)
 		self.ComboBox_NumSeeds.configure(state='readonly')
@@ -373,7 +377,7 @@ class TopLevel:
 
 		# Text Log Check Button
 		self.CheckButton_GenerateTextLog = ttk.Checkbutton(top)
-		self.CheckButton_GenerateTextLog.place(relx=.25, rely=.90, relheight=.05*vMult, relwidth=.20)
+		self.CheckButton_GenerateTextLog.place(relx=.25, rely=.895, relheight=.05*vMult, relwidth=.20)
 		self.CheckButton_GenerateTextLog.configure(variable=generateLog)
 		self.CheckButton_GenerateTextLog.configure(takefocus="")
 		self.CheckButton_GenerateTextLog.configure(text='Generate Text Log')
@@ -382,7 +386,7 @@ class TopLevel:
 
 		# Create Rom Button
 		self.Button_CreateRom = ttk.Button(top)
-		self.Button_CreateRom.place(relx=.55, rely=.8965, relheight=.057*vMult, relwidth=.144)
+		self.Button_CreateRom.place(relx=.55, rely=.8915, relheight=.057*vMult, relwidth=.144)
 		self.Button_CreateRom.configure(takefocus="")
 		self.Label_NumSeeds.configure(anchor='w')
 		self.Button_CreateRom.configure(text='''Randomize!''')
@@ -402,12 +406,22 @@ class TopLevel:
 		self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
 		self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
 		self.Button_CreateRom.configure(command=self.attemptRandomize)
-		for i in range(len(optional_rulesets)):
+		for i in range(min(len(optional_rulesets), 13)):
 			self.CheckButtons[i].configure(command=self.prepareSettingsFromDependencies)
 		self.prepareSettingsFromDependencies()
 
 	def getTextLength(self, text):
 		return .03+self.font.measure(text)/1000.0
+
+	def getMaxColumnWidth(self, num):
+		lower = 5 * (num//5)
+		upper = lower + 5
+		sizeArr = []
+		for i in range(lower, min(upper, len(optional_rulesets))):
+			sizeArr.append(self.getTextLength(optional_rulesets[i].name)-.03)
+		if len(sizeArr) == 0:
+			return self.getTextLength("# of Seeds")-.03
+		return max(sizeArr)
 
 	def prepareSettingsAndSeed(self, unused=None):
 		if useSeed.get()=="1":
@@ -425,10 +439,10 @@ class TopLevel:
 			self.prepareSettingsFromDependencies()
 
 	def prepareSettingsFromDependencies(self):
-		for i in range(len(optional_rulesets)):
+		for i in range(len(self.CheckButtons)):
 			currCheckButton = self.CheckButtons[i]
 			currCheckButton.configure(state="normal")
-			for j in range(len(optional_rulesets)):
+			for j in range(len(self.CheckButtons)):
 				currRulesetVal = optRulesetValues[j].get()
 				currRulesetName = optional_rulesets[j].name
 				if ((currRulesetVal == "1") and (currRulesetName in optional_rulesets[i].must_be_disabled)
@@ -453,13 +467,17 @@ class TopLevel:
 			showerror("Error", results[1])
 
 	def showHelpPopup(self):
-		showinfo("About", "PLACEHOLDER")
+		showinfo("Help",
+			"To learn more about an option, move your mouse over it.\
+			\nYou can generate multiple unique ROMs at once by changing the # of seeds.\
+			\nYou can also generate a text log that gives information about a created seed.\
+			\nGenerated ROMs will be placed in an \"output\" folder, which will be in the same folder as this program.")
 
 	def showAboutPopup(self):
 		showinfo("About", about_page_text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.0", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
