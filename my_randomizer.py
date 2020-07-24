@@ -7,6 +7,7 @@ from classes import *
 program_name = "Amazing Mirror Randomizer"
 rom_name = "Kirby & The Amazing Mirror (USA)"
 rom_file_format = "gba"
+about_page_text = ""
 
 attributes = {
 	"Sword Knight" : Attribute(
@@ -83,36 +84,36 @@ optional_rulesets = [
 			),
 		],
 	),
-	Ruleset(
-		name="My Rules 3",
-		description="Description of My Rules 3",
-		must_be_enabled=["My Rules 1"],
-	),
-	Ruleset(
-		name="My Rules 4",
-		description="Description of My Rules 4",
-		must_be_disabled=["My Rules 2"],
-	),
-	Ruleset(
-		name="My Rules 5",
-		description="Description of My Rules 5",
-	),
-	Ruleset(
-		name="My Rules 6",
-		description="Description of My Rules 6",
-	),
-	Ruleset(
-		name="My Rules 7",
-		description="Description of My Rules 7",
-	),
-	Ruleset(
-		name="My Rules 8",
-		description="Description of My Rules 8",
-	),
-	Ruleset(
-		name="My Rules 9",
-		description="Description of My Rules 9",
-	),
+	# Ruleset(
+	# 	name="My Rules 3",
+	# 	description="Description of My Rules 3",
+	# 	must_be_enabled=["My Rules 1"],
+	# ),
+	# Ruleset(
+	# 	name="My Rules 4",
+	# 	description="Description of My Rules 4",
+	# 	must_be_disabled=["My Rules 2"],
+	# ),
+	# Ruleset(
+	# 	name="My Rules 5",
+	# 	description="Description of My Rules 5",
+	# ),
+	# Ruleset(
+	# 	name="My Rules 6",
+	# 	description="Description of My Rules 6",
+	# ),
+	# Ruleset(
+	# 	name="My Rules 7",
+	# 	description="Description of My Rules 7",
+	# ),
+	# Ruleset(
+	# 	name="My Rules 8",
+	# 	description="Description of My Rules 8",
+	# ),
+	# Ruleset(
+	# 	name="My Rules 9",
+	# 	description="Description of My Rules 9",
+	# ),
 	# Ruleset(
 	# 	name="My Rules 10",
 	# 	description="Description of My Rules 10",

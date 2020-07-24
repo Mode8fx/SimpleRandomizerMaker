@@ -11,14 +11,7 @@ else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
-
-"""
-TODO:
-- figure out how to do popups (if possible)
-- organize GUI
-- add credits button
-- remove leftover print statements
-"""
+stringLen = 5+math.ceil(len(optional_rulesets)/5.0)
 
 def main():
 	vp_start_gui()
@@ -31,23 +24,16 @@ def randomize():
 	if not path.isfile(sourceRom.get()):
 		return (False, "Invalid ROM input.")
 
-	myRules = copy.copy(required_rules)
-	optionalRulesetNum = 0
-	for ruleset in optionalRulesetsList:
-		if ruleset[1] == 1:
-			for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
-				myRules.append(rule)
-		optionalRulesetNum += 1
-
 	numOfSeeds = int(numSeeds.get())
 	numSeedsGenerated = 0
 	for seedNum in range(numOfSeeds):
-		if useSeed.get()=="1":
+		if useSeed.get() == "1":
 			seedString = seedInput.get()
 			try:
-				assert len(seedString) == 6
+				assert len(seedString) == stringLen
 				assert verifySeed(seedString[:-5], [1]*len(optionalRulesetsList), 36)
 			except:
+				print("Invalid seed.")
 				return (False, "Invalid seed.")
 			decodedSeedVals = decodeSeed(seedString[:-5], [1]*len(optionalRulesetsList), 36)
 			for i in range(len(optionalRulesetsList)):
@@ -63,16 +49,26 @@ def randomize():
 			maxVal = int("ZZZZZ", 36)
 			genSeed = random.randint(0, maxVal)
 			currSeed = (settingsSeed*(maxVal+1)) + genSeed
-			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(5+math.ceil(len(optional_rulesets)/5.0))
+			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(stringLen)
+		myRules = copy.copy(required_rules)
+		for ruleset in optionalRulesetsList:
+			if ruleset[1] == 1:
+				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
+					myRules.append(rule)
 		random.seed(currSeed)
 		# initialize attributes
 		for att in attributes:
 			attributes[att].prepare()
 		if not enforceRuleset(myRules):
-			return (False, "No combination of values satisfies the given combination of rules.")
+			if useSeed.get() == "1":
+				print("Invalid seed")
+				return (False, "Invalid seed.")
+			else:
+				print("No combination of values satisfies the given combination of rules.")
+				return (False, "No combination of values satisfies the given combination of rules.")
 
-		for att in attributes:
-			print(attributes[att].name+": "+str(attributes[att].value))
+		# for att in attributes:
+		# 	print(attributes[att].name+": "+str(attributes[att].value))
 
 		generatedRom = generateRom()
 		if generateLog.get() == "1":
@@ -121,7 +117,7 @@ def generateRom():
 				writeToAddress(file, address, attributes[att].value, attributes[att].number_of_bytes)
 		file.close()
 		print("Succesfully generated ROM with seed "+seedString)
-		return (True, "ROM successfully generated.")
+		return (True, "")
 	except:
 		print("Something went wrong. Deleting generated ROM.")
 		file.close()
@@ -156,10 +152,12 @@ try:
 	import Tkinter as tk
 	from Tkinter.filedialog import askopenfilename
 	from Tkinter import font as tkFont
+	from Tkinter.messagebox import showinfo, showerror
 except ImportError:
 	import tkinter as tk
 	from tkinter.filedialog import askopenfilename
 	from tkinter import font as tkFont
+	from tkinter.messagebox import showinfo, showerror
 
 try:
 	import ttk
@@ -218,7 +216,7 @@ class TopLevel:
 			[('selected', _compcolor), ('active',_ana2color)])
 		self.font = tkFont.Font(family='TkDefaultFont')
 
-		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(700*sizeRatio)))
+		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(600*sizeRatio)))
 		# top.minsize(120, 1)
 		# top.maxsize(2564, 1421)
 		top.resizable(0, 0)
@@ -227,14 +225,34 @@ class TopLevel:
 		top.configure(highlightbackground="#d9d9d9")
 		top.configure(highlightcolor="black")
 
+		## Menu Bar
+		menubar = tk.Menu(top, bg=_bgcolor, fg=_fgcolor, tearoff=0)
+		fileMenu = tk.Menu(menubar, tearoff=0)
+		fileMenu.add_command(label="Load ROM", command=setSourceRom)
+		fileMenu.add_separator()
+		fileMenu.add_command(label="Exit", command=root.quit)
+		menubar.add_cascade(label="File", menu=fileMenu)
+		top.config(menu=menubar)
+		helpMenu = tk.Menu(menubar, tearoff=0)
+		helpMenu.add_command(label="View Help...", command=self.showHelpPopup)
+		helpMenu.add_separator()
+		if about_page_text is not None and about_page_text != "":
+			helpMenu.add_command(label="About...", command=self.showAboutPopup)
+		helpMenu.add_command(label="Simple Randomizer Maker", command=self.showSRMPopup)
+		menubar.add_cascade(label="Help", menu=helpMenu)
+		top.config(menu=menubar)
+
 		self.style.map('TCheckbutton',background=
 			[('selected', _bgcolor), ('active', _ana2color)])
 		self.style.map('TRadiobutton',background=
 			[('selected', _bgcolor), ('active', _ana2color)])
 
+		vMult = 700.0/600
+
 		# Rom Input Label
 		self.Label_RomInput = ttk.Label(top)
-		self.Label_RomInput.place(relx=.035, rely=.04, relheight=.05, relwidth=self.getTextLength(rom_name+' ROM'))
+		romTextLength = self.getTextLength(rom_name+' ROM')
+		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(background="#d9d9d9")
 		self.Label_RomInput.configure(foreground="#000000")
 		self.Label_RomInput.configure(font="TkDefaultFont")
@@ -245,7 +263,9 @@ class TopLevel:
 
 		# Rom Input Entry
 		self.Entry_RomInput = ttk.Entry(top)
-		self.Entry_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02, rely=.04, relheight=.05, relwidth=.25)
+		# old relx=.035+self.getTextLength(rom_name+' ROM')-.02
+		# old relwidth=.40
+		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
 		self.Entry_RomInput.configure(state='readonly')
 		self.Entry_RomInput.configure(textvariable=sourceRom)
 		self.Entry_RomInput.configure(background="#000000")
@@ -253,14 +273,15 @@ class TopLevel:
 
 		# Rom Input Button
 		self.Button_RomInput = ttk.Button(top)
-		self.Button_RomInput.place(relx=.035+self.getTextLength(rom_name+' ROM')-.02+.25+.01, rely=.0365, relheight=.057, relwidth=.12)
+		# old relx=.035+self.getTextLength(rom_name+' ROM')-.02+.40+.01
+		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
 		self.Button_RomInput.configure(command=setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
 		self.Button_RomInput.configure(text='Select ROM')
 
 		# Use Settings Radio Button
 		self.RadioButton_UseSettings = ttk.Radiobutton(top)
-		self.RadioButton_UseSettings.place(relx=.035, rely=.11, relheight=.05, relwidth=self.getTextLength('Use Settings'))
+		self.RadioButton_UseSettings.place(relx=.035, rely=.11*vMult, relheight=.05*vMult, relwidth=self.getTextLength('Use Settings'))
 		self.RadioButton_UseSettings.configure(variable=useSeed)
 		self.RadioButton_UseSettings.configure(value="0")
 		self.RadioButton_UseSettings.configure(text='Use Settings')
@@ -270,7 +291,7 @@ class TopLevel:
 
 		# Use Seed Radio Button
 		self.RadioButton_UseSeed = ttk.Radiobutton(top)
-		self.RadioButton_UseSeed.place(relx=.37, rely=.11, relheight=.057, relwidth=self.getTextLength('Use Seed'))
+		self.RadioButton_UseSeed.place(relx=.035-.01+.81-self.getTextLength("W"*(stringLen+1))-self.getTextLength('Use Seed'), rely=.11*vMult, relheight=.057*vMult, relwidth=self.getTextLength('Use Seed'))
 		self.RadioButton_UseSeed.configure(variable=useSeed)
 		self.RadioButton_UseSeed.configure(text='''Use Seed''')
 		self.tooltip_font = "TkDefaultFont"
@@ -278,7 +299,8 @@ class TopLevel:
 
 		# Seed Input Entry
 		self.Entry_SeedInput = ttk.Entry(top)
-		self.Entry_SeedInput.place(relx=.37+self.getTextLength('Use Seed'), rely=.11, relheight=.05, relwidth=self.getTextLength("W"*(6+math.ceil(len(optional_rulesets)/5.0))))
+		# old relx=.37+self.getTextLength('Use Seed')
+		self.Entry_SeedInput.place(relx=.035-.01+.81-self.getTextLength("W"*(stringLen+1)), rely=.11*vMult, relheight=.05*vMult, relwidth=self.getTextLength("W"*(stringLen+1)))
 		self.Entry_SeedInput.configure(state='disabled')
 		self.Entry_SeedInput.configure(textvariable=seedInput)
 		self.Entry_SeedInput.configure(takefocus="")
@@ -286,12 +308,9 @@ class TopLevel:
 		self.Entry_SeedInput.bind('<Key>',keepUpperCharsSeed)
 		self.Entry_SeedInput.bind('<KeyRelease>',keepUpperCharsSeed)
 
-		# self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
-		# top.configure(menu = self.menubar)
-
 		# Frame
 		self.TFrame1 = ttk.Frame(top)
-		self.TFrame1.place(relx=.035, rely=.18, relheight=.51, relwidth=.93) # (35, 119) to (965, 518)
+		self.TFrame1.place(relx=.035, rely=.18*vMult, relheight=.55*vMult, relwidth=.93)
 		self.TFrame1.configure(relief='groove')
 		self.TFrame1.configure(borderwidth="2")
 		self.TFrame1.configure(relief="groove")
@@ -299,11 +318,29 @@ class TopLevel:
 		# Ruleset Check Buttons
 		self.CheckButtons = []
 		self.CheckButtons_tooltips = []
+		numOptRulesets = len(optional_rulesets)
+		if numOptRulesets == 0:
+			yShiftArray = [0]
+		elif numOptRulesets == 1:
+			yShiftArray = [-.045, .045]
+		elif numOptRulesets == 2:
+			yShiftArray = [-.09, 0, .09]
+		elif numOptRulesets == 3:
+			yShiftArray = [-.135, -.045, .045, .135]
+		else:
+			yShiftArray = [-.18, -.09, 0, .09, .18]
+		if numOptRulesets < 5:
+			xShiftArray = [0]
+		elif numOptRulesets < 10:
+			xShiftArray = [-.15, .15]
+		else:
+			xShiftArray = [-.30, 0, .30]
 		optRulesetNum = 0
 		global optRulesetValues
 		for ruleset in optional_rulesets:
 			self.CheckButtons.append(ttk.Checkbutton(top)) # self.TFrame1 to put in frame
-			self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=self.getTextLength(ruleset.name))
+			# self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=(.22+.09*(optRulesetNum%5))*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
+			self.CheckButtons[optRulesetNum].place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
 			self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
 			self.CheckButtons[optRulesetNum].configure(offvalue="0")
 			self.CheckButtons[optRulesetNum].configure(onvalue="1")
@@ -315,7 +352,7 @@ class TopLevel:
 
 		# Number of Seeds Label
 		self.Label_NumSeeds = ttk.Label(top)
-		self.Label_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.22+.09*(optRulesetNum%5), relheight=.05, relwidth=.11)
+		self.Label_NumSeeds.place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.11)
 		self.Label_NumSeeds.configure(background="#d9d9d9")
 		self.Label_NumSeeds.configure(foreground="#000000")
 		self.Label_NumSeeds.configure(font="TkDefaultFont")
@@ -328,7 +365,7 @@ class TopLevel:
 
 		# Number of Seeds Dropdown
 		self.ComboBox_NumSeeds = ttk.Combobox(top)
-		self.ComboBox_NumSeeds.place(relx=.07+.30*(optRulesetNum//5), rely=.27+.09*(optRulesetNum%5), relheight=.05, relwidth=.088)
+		self.ComboBox_NumSeeds.place(relx=.37+xShiftArray[optRulesetNum//5], rely=(.45+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.088)
 		self.value_list = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20',]
 		self.ComboBox_NumSeeds.configure(values=self.value_list)
 		self.ComboBox_NumSeeds.configure(state='readonly')
@@ -336,7 +373,7 @@ class TopLevel:
 
 		# Text Log Check Button
 		self.CheckButton_GenerateTextLog = ttk.Checkbutton(top)
-		self.CheckButton_GenerateTextLog.place(relx=.25, rely=.85, relheight=.05, relwidth=.20)
+		self.CheckButton_GenerateTextLog.place(relx=.25, rely=.90, relheight=.05*vMult, relwidth=.20)
 		self.CheckButton_GenerateTextLog.configure(variable=generateLog)
 		self.CheckButton_GenerateTextLog.configure(takefocus="")
 		self.CheckButton_GenerateTextLog.configure(text='Generate Text Log')
@@ -345,20 +382,21 @@ class TopLevel:
 
 		# Create Rom Button
 		self.Button_CreateRom = ttk.Button(top)
-		self.Button_CreateRom.place(relx=.55, rely=.8465, relheight=.057, relwidth=.144)
+		self.Button_CreateRom.place(relx=.55, rely=.8965, relheight=.057*vMult, relwidth=.144)
 		self.Button_CreateRom.configure(takefocus="")
+		self.Label_NumSeeds.configure(anchor='w')
 		self.Button_CreateRom.configure(text='''Randomize!''')
 
 		# Message
-		self.Label_Message = ttk.Label(top)
-		self.Label_Message.place(relx=.05, rely=.75, relheight=.05, relwidth=.90)
-		self.Label_Message.configure(background="#d9d9d9")
-		self.Label_Message.configure(foreground="#000000")
-		self.Label_Message.configure(font="TkDefaultFont")
-		self.Label_Message.configure(relief="flat")
-		self.Label_Message.configure(anchor='center')
-		self.Label_Message.configure(justify='left')
-		self.Label_Message.configure(textvariable=message)
+		# self.Label_Message = ttk.Label(top)
+		# self.Label_Message.place(relx=.05, rely=.75, relheight=.05, relwidth=.90)
+		# self.Label_Message.configure(background="#d9d9d9")
+		# self.Label_Message.configure(foreground="#000000")
+		# self.Label_Message.configure(font="TkDefaultFont")
+		# self.Label_Message.configure(relief="flat")
+		# self.Label_Message.configure(anchor='center')
+		# self.Label_Message.configure(justify='left')
+		# self.Label_Message.configure(textvariable=message)
 
 		# Other
 		self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
@@ -407,8 +445,21 @@ class TopLevel:
 		for i in range(len(optRulesetValues)):
 			optionalRulesetsList[i] = (optional_rulesets[i].name, int(optRulesetValues[i].get()))
 		results = randomize()
-		message.set(results[1])
-		self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
+		# message.set(results[1])
+		# self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
+		if results[0]:
+			showinfo("Success!", results[1])
+		else:
+			showerror("Error", results[1])
+
+	def showHelpPopup(self):
+		showinfo("About", "PLACEHOLDER")
+
+	def showAboutPopup(self):
+		showinfo("About", about_page_text)
+
+	def showSRMPopup(self):
+		showinfo("Simple Randomizer Maker", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
@@ -571,7 +622,7 @@ def setSourceRom():
 def keepUpperCharsSeed(unused):
 	global seedInput
 	seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
-	seedInput.set(seedInput.get()[:(5+math.ceil(len(optional_rulesets)/5.0))])
+	seedInput.set(seedInput.get()[:stringLen])
 
 def init(top, gui, *args, **kwargs):
 	global w, top_level, root
