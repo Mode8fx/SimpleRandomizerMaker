@@ -7,16 +7,11 @@ from os import path, remove, mkdir
 from time import sleep
 import operator
 
-currRule = 0
 ruleCounter = 0
 
-def increaseRuleCounter():
+def getRuleCounter():
 	global ruleCounter
-	ruleCounter += 1
-
-def setCurrRule(val):
-	global currRule
-	currRule = val
+	return ruleCounter
 
 class Attribute:
 	def __init__(self, name, addresses, number_of_bytes=None, possible_values=None, min_value=None, max_value=None):
@@ -57,127 +52,58 @@ class Attribute:
 			self.resetToFirstValue()
 			return False
 	# allows rules to perform dynamic operations on attribute value; no pointers necessary!
-	def performSpecialOperation(self):
+	def performSpecialOperation(self, ruleNum):
 		if len(self.specialOperators) == 0:
 			return self.value
 		comparedVal = self.value
-		global currRule
 		for i in range(len(self.specialOperators)):
-			if self.ruleOnSpecialOp[i] is currRule:
+			if self.ruleOnSpecialOp[i] == ruleNum:
 				if self.specialVal[i] is not None:
 					if not isinstance(self.specialVal[i], Attribute):
 						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i])
 					else:
-						# if self.value == 4:
-						# 	print("shift")
-						# 	print(currRule)
-						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i].performSpecialOperation())
+						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i].performSpecialOperation(ruleNum))
 				else:
 					func = operator.methodcaller(self.specialOperators[i], comparedVal)
 				comparedVal = func(operator)
-				# if self.value == 4:
-				# 	print("here")
-				# 	print(currRule)
-				# 	print(comparedVal)
-				# 	print(self.specialOperators[i])
-				# 	print(self.specialVal[i])
 		return comparedVal
+	def addSpecialOperator(self, op, val):
+		self.specialOperators.append(op)
+		self.specialVal.append(val)
+		self.ruleOnSpecialOp.append(getRuleCounter())
+		return self
 	def __add__(self, val):
-		global currRule
-		self.specialOperators.append("add")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("add", val)
 	def __sub__(self, val):
-		global currRule
-		self.specialOperators.append("sub")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("sub", val)
 	def __mul__(self, val):
-		global currRule
-		self.specialOperators.append("mul")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("mul", val)
 	def __floordiv__(self, val):
-		global currRule
-		self.specialOperators.append("floordiv")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("floordiv", val)
 	def __truediv__(self, val):
-		global currRule
-		self.specialOperators.append("truediv")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("truediv", val)
 	def __mod__(self, val):
-		global currRule
-		self.specialOperators.append("mod")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("mod", val)
 	def __pow__(self, val):
-		global currRule
-		self.specialOperators.append("pow")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("pow", val)
 	def __lshift__(self, val):
-		global currRule
-		self.specialOperators.append("lshift")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("lshift", val)
 	def __rshift__(self, val):
-		global currRule
-		self.specialOperators.append("rshift")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("rshift", val)
 	def __and__(self, val):
-		global currRule
-		self.specialOperators.append("and")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("and", val)
 	def __xor__(self, val):
-		global currRule
-		self.specialOperators.append("xor")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("xor", val)
 	def __or__(self, val):
-		global currRule
-		self.specialOperators.append("or")
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("or", val)
 	def __neg__(self):
-		global currRule
-		self.specialOperators.append("neg")
-		self.specialVal.append(None)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("neg", None)
 	def __pos__(self):
-		global currRule
-		self.specialOperators.append("pos")
-		self.specialVal.append(None)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("pos", None)
 	def __abs__(self):
-		global currRule
-		self.specialOperators.append("abs")
-		self.specialVal.append(None)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("abs", None)
 	def __invert__(self):
-		global currRule
-		self.specialOperators.append("invert")
-		self.specialVal.append(None)
-		self.ruleOnSpecialOp.append(currRule)
-		return self
+		return self.addSpecialOperator("invert", None)
 
 ruleTypesDict = {
 	"=" : "eq",
@@ -214,45 +140,42 @@ class Rule:
 		self.right_side = right_side
 		global ruleCounter
 		self.ruleNum = ruleCounter
-		increaseRuleCounter()
-		currRule = self.ruleNum
+		ruleCounter += 1
 	def rulePasses(self):
-		# try:
-		if self.rule_type == "eq" and self.right_side is None:
-			if not isinstance(self.left_side, list):
+		try:
+			if self.rule_type == "eq" and self.right_side is None:
+				if not isinstance(self.left_side, list):
+					return True
+				for i in range(len(self.left_side)-1):
+					for j in range(i+1, len(self.left_side)):
+						left = self.setSide(self.left_side[i])
+						right = self.setSide(self.left_side[j])
+						if left != right:
+							return False
 				return True
-			for i in range(len(self.left_side)-1):
-				for j in range(i+1, len(self.left_side)):
-					left = self.setSide(self.left_side[i])
-					right = self.setSide(self.left_side[j])
-					if left != right:
-						return False
-			return True
-		if self.rule_type == "ne" and self.right_side is None:
-			if not isinstance(self.left_side, list):
+			if self.rule_type == "ne" and self.right_side is None:
+				if not isinstance(self.left_side, list):
+					return True
+				for i in range(len(self.left_side)-1):
+					for j in range(i+1, len(self.left_side)):
+						left = self.setSide(self.left_side[i])
+						right = self.setSide(self.left_side[j])
+						if left == right:
+							return False
 				return True
-			for i in range(len(self.left_side)-1):
-				for j in range(i+1, len(self.left_side)):
-					left = self.setSide(self.left_side[i])
-					right = self.setSide(self.left_side[j])
-					if left == right:
-						return False
-			return True
-		left = self.setSide(self.left_side)
-		right = self.setSide(self.right_side)
-		if not isinstance(right, Attribute):
-			func = operator.methodcaller(self.rule_type, left, right)
-		else:
-			func = operator.methodcaller(self.rule_type, left, right)
-		return func(operator)
-		# except:
-		# 	print("Something went wrong. Failed to verify rule.")
-		# 	return False
+			left = self.setSide(self.left_side)
+			right = self.setSide(self.right_side)
+			if not isinstance(right, Attribute):
+				func = operator.methodcaller(self.rule_type, left, right)
+			else:
+				func = operator.methodcaller(self.rule_type, left, right)
+			return func(operator)
+		except:
+			print("Something went wrong. Failed to verify rule.")
+			return False
 	def setSide(self, side):
 		if isinstance(side, Attribute):
-			global currRule
-			currRule = self.ruleNum
-			return side.performSpecialOperation()
+			return side.performSpecialOperation(self.ruleNum)
 		else:
 			return side
 
