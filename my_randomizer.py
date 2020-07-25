@@ -73,6 +73,7 @@ optional_rulesets = [
 		description="All enemies are guaranteed to give an ability.",
 		rules=[
 			Rule(
+				description="All Enemies Give An Ability",
 				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")].count(0),
 				rule_type="==",
 				right_side=0,
@@ -85,6 +86,7 @@ optional_rulesets = [
 		description="All enemies give different abilities.",
 		rules=[
 			Rule(
+				description="All Unique",
 				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
 				rule_type="!=",
 				right_side=None,
@@ -116,6 +118,7 @@ optional_rulesets = [
 		description="At least one enemy gives the UFO ability (ability #14).",
 		rules=[
 			Rule(
+				description="At Least 1 UFO",
 				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")].count(0x0E),
 				rule_type=">=",
 				right_side=1,
@@ -128,36 +131,43 @@ optional_rulesets = [
 		description="All enemies are guaranteed to give different abilities from what they usually give.",
 		rules=[
 			Rule(
+				description="Waddle Dee is different",
 				left_side=value("Waddle Dee"),
 				rule_type="!=",
 				right_side=0,
 			),
 			Rule(
+				description="Droppy is different",
 				left_side=value("Droppy"),
 				rule_type="!=",
 				right_side=0,
 			),
 			Rule(
+				description="Leap is different",
 				left_side=value("Leap"),
 				rule_type="!=",
 				right_side=0,
 			),
 			Rule(
+				description="Big Waddle Dee is different",
 				left_side=value("Big Waddle Dee"),
 				rule_type="!=",
 				right_side=0,
 			),
 			Rule(
+				description="Flamer is different",
 				left_side=value("Flamer"),
 				rule_type="!=",
 				right_side=3,
 			),
 			Rule(
+				description="Sword Knight is different",
 				left_side=value("Sword Knight"),
 				rule_type="!=",
 				right_side=0x12,
 			),
 			Rule(
+				description="Cupie is different",
 				left_side=value("Cupie"),
 				rule_type="!=",
 				right_side=0x13,
@@ -170,39 +180,46 @@ optional_rulesets = [
 		description="All enemies give either Smash, Fighting, Stone, Cutter, or Hammer.",
 		rules=[
 			Rule(
-				left_side=value("Waddle Dee") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Waddle Dee is smashing",
+				left_side=value("Waddle Dee"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Droppy") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Droppy is smashing",
+				left_side=value("Droppy"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Leap") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Leap is smashing",
+				left_side=value("Leap"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Big Waddle Dee") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Big Waddle Dee is smashing",
+				left_side=value("Big Waddle Dee"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Flamer") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Flamer is smashing",
+				left_side=value("Flamer"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Sword Knight") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Sword Knight is smashing",
+				left_side=value("Sword Knight"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 			Rule(
-				left_side=value("Cupie") in [0x16, 0x14, 0x8, 0x6, 0x11],
+				description="Cupie is smashing",
+				left_side=value("Cupie"),
 				rule_type="==",
-				right_side=1,
+				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 		],
 		must_be_disabled=["All Master", "At Least 1 UFO"],

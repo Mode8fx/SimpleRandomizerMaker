@@ -69,6 +69,17 @@ def randomize():
 				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
 					myRules.append(rule)
 		random.seed(currSeed)
+		myRules.sort(key=getNumRelatedAttributes)
+		print("size before attribute optimization: ")
+		before = [len(att.possible_values) for att in attributes]
+		print(before)
+		optimizeAttributes(myRules)
+		print("size after attribute optimization: ")
+		after = [len(att.possible_values) for att in attributes]
+		print(after)
+		for i in range(len(before)):
+			print(after[i]/before[i])
+		sys.exit()
 		# initialize attributes
 		for att in attributes:
 			att.prepare()
@@ -93,6 +104,29 @@ def randomize():
 		else:
 			return generatedRom
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
+
+def getNumRelatedAttributes(rule):
+	return len(rule.relatedAttributes)
+
+def optimizeAttributes(ruleset):
+	for rule in ruleset:
+		newPossibleValues = []
+		for i in range(len(rule.relatedAttributes)):
+			rule.relatedAttributes[i].resetToFirstValue()
+			newPossibleValues.append([False] * len(rule.relatedAttributes[i].possible_values))
+		nextValueSet = True
+		while nextValueSet:
+			if rule.rulePasses(): # you could also check if all current values are True, then skip the rule check (but I think this would be less efficient)
+				for i in range(len(rule.relatedAttributes)):
+					newPossibleValues[i][rule.relatedAttributes[i].index] = True
+			nextValueSet = False
+			for att in rule.relatedAttributes:
+				if att.setToNextValue():
+					nextValueSet = True
+					break
+		for i in range(len(rule.relatedAttributes)):
+			rule.relatedAttributes[i].possible_values = newPossibleValues[i]
+			rule.relatedAttributes[i].resetToFirstValue()
 
 def getFromListByName(arr, name):
 	for a in arr:

@@ -119,15 +119,12 @@ ruleTypesDict = {
 	"<" : "lt",
 	"<=" : "le",
 	"=<" : "le",
-}
-
-invertedRuleTypesDict = {
-	"eq" : "eq",
-	"ne" : "ne",
-	"gt" : "lt",
-	"ge" : "le",
-	"lt" : "gt",
-	"le" : "ge",
+	"in" : "in",
+	"is in" : "eq",
+	"is one of" : "eq",
+	"not in" : "eq",
+	"is not in" : "ne",
+	"is not one of" : "ne",
 }
 
 class Rule:
@@ -141,17 +138,36 @@ class Rule:
 		global ruleCounter
 		self.ruleNum = ruleCounter
 		ruleCounter += 1
+		self.relatedAttributes = []
+		self.storeRelatedAttributes(self.left_side)
+		self.storeRelatedAttributes(self.right_side)
+		# print(self.description)
+		# print([att.name for att in self.relatedAttributes])
+	def storeRelatedAttributes(self, att):
+		if isinstance(att, Attribute):
+			self.relatedAttributes.append(att)
+			for val in att.specialVal:
+				self.storeRelatedAttributes(val)
+		elif isinstance(att, list):
+			for a in att:
+				self.storeRelatedAttributes(a)
 	def rulePasses(self):
 		try:
 			if self.rule_type == "eq" and self.right_side is None:
 				if not isinstance(self.left_side, list):
 					return True
+				left = self.setSide(self.left_side[0])
 				for i in range(0, len(self.left_side)):
-					left = self.setSide(self.left_side[0])
 					right = self.setSide(self.left_side[i])
 					if left != right:
 						return False
 				return True
+			if self.rule_type == "eq" and isinstance(self.right_side, list):
+				left = self.setSide(self.left_side)
+				right = self.right_side
+				for i in range(len(right)):
+					right[i] = setSide(right[i])
+				return left in right
 			if self.rule_type == "ne" and self.right_side is None:
 				if not isinstance(self.left_side, list):
 					return True
@@ -162,12 +178,15 @@ class Rule:
 						if left == right:
 							return False
 				return True
+			if self.rule_type == "ne" and isinstance(self.right_side, list):
+				left = self.setSide(self.left_side)
+				right = self.right_side
+				for i in range(len(right)):
+					right[i] = setSide(right[i])
+				return not left in right
 			left = self.setSide(self.left_side)
 			right = self.setSide(self.right_side)
-			if not isinstance(right, Attribute):
-				func = operator.methodcaller(self.rule_type, left, right)
-			else:
-				func = operator.methodcaller(self.rule_type, left, right)
+			func = operator.methodcaller(self.rule_type, left, right)
 			return func(operator)
 		except:
 			print("Something went wrong. Failed to verify rule.")
