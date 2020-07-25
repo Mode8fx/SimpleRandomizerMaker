@@ -12,6 +12,11 @@ except:
 	import sys
 	sys.exit()
 
+"""
+TODO:
+- It's way too freaking slow, don't brute force all possible values
+"""
+
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
 	mainFolder = path.dirname(sys.executable) # EXE (executable) file
@@ -114,7 +119,8 @@ def generateRom():
 	global sourceRom
 	global seedString
 
-	newRom = path.join(outputFolder, path.splitext(path.basename(sourceRom.get()))[0]+"-"+seedString+"."+rom_file_format)
+	romName, romExt = path.splitext(path.basename(sourceRom.get()))
+	newRom = path.join(outputFolder, romName+"-"+seedString+romExt)
 	if not path.isdir(outputFolder):
 		mkdir(outputFolder)
 	shutil.copyfile(sourceRom.get(), newRom)
@@ -225,8 +231,8 @@ class TopLevel:
 		self.font = tkFont.Font(family='TkDefaultFont')
 
 		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(600*sizeRatio)))
-		# top.minsize(120, 1)
-		# top.maxsize(2564, 1421)
+		top.minsize(int(1000*sizeRatio), int(600*sizeRatio))
+		# top.maxsize(2000, 600)
 		top.resizable(1, 1)
 		top.title(program_name)
 		top.configure(background="#d9d9d9")
@@ -236,7 +242,7 @@ class TopLevel:
 		## Menu Bar
 		menubar = tk.Menu(top, bg=_bgcolor, fg=_fgcolor, tearoff=0)
 		fileMenu = tk.Menu(menubar, tearoff=0)
-		fileMenu.add_command(label="Load ROM...", command=setSourceRom)
+		fileMenu.add_command(label="Load ROM...", command=self.setSourceRom)
 		fileMenu.add_separator()
 		fileMenu.add_command(label="Exit", command=root.quit)
 		menubar.add_cascade(label="File", menu=fileMenu)
@@ -283,7 +289,7 @@ class TopLevel:
 		self.Button_RomInput = ttk.Button(top)
 		# old relx=.035+self.getTextLength(rom_name+' ROM')-.02+.40+.01
 		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
-		self.Button_RomInput.configure(command=setSourceRom)
+		self.Button_RomInput.configure(command=self.setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
 		self.Button_RomInput.configure(text='Load ROM')
 
@@ -309,12 +315,12 @@ class TopLevel:
 		self.Entry_SeedInput = ttk.Entry(top)
 		# old relx=.37+self.getTextLength('Use Seed')
 		self.Entry_SeedInput.place(relx=.035-.01+.81-self.getTextLength("W"*(stringLen+1)), rely=.11*vMult, relheight=.05*vMult, relwidth=self.getTextLength("W"*(stringLen+1)))
-		self.Entry_SeedInput.configure(state='disabled')
+		self.Entry_SeedInput.configure(state='normal')
 		self.Entry_SeedInput.configure(textvariable=seedInput)
 		self.Entry_SeedInput.configure(takefocus="")
 		self.Entry_SeedInput.configure(cursor="ibeam")
-		self.Entry_SeedInput.bind('<Key>',keepUpperCharsSeed)
-		self.Entry_SeedInput.bind('<KeyRelease>',keepUpperCharsSeed)
+		self.Entry_SeedInput.bind('<Key>',self.keepUpperCharsSeed)
+		self.Entry_SeedInput.bind('<KeyRelease>',self.keepUpperCharsSeed)
 
 		# Frame
 		self.TFrame1 = ttk.Frame(top)
@@ -351,7 +357,7 @@ class TopLevel:
 				break
 			self.CheckButtons.append(ttk.Checkbutton(top)) # self.TFrame1 to put in frame
 			# self.CheckButtons[optRulesetNum].place(relx=.07+.30*(optRulesetNum//5), rely=(.22+.09*(optRulesetNum%5))*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
-			self.CheckButtons[optRulesetNum].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name))
+			self.CheckButtons[optRulesetNum].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(ruleset.name)+.03)
 			self.CheckButtons[optRulesetNum].configure(variable=optRulesetValues[optRulesetNum])
 			self.CheckButtons[optRulesetNum].configure(offvalue="0")
 			self.CheckButtons[optRulesetNum].configure(onvalue="1")
@@ -399,7 +405,7 @@ class TopLevel:
 		self.Label_NumSeeds.configure(anchor='w')
 		self.Button_CreateRom.configure(text='''Randomize!''')
 
-		# Message
+		# Message (unused)
 		# self.Label_Message = ttk.Label(top)
 		# self.Label_Message.place(relx=.05, rely=.75, relheight=.05, relwidth=.90)
 		# self.Label_Message.configure(background="#d9d9d9")
@@ -433,13 +439,11 @@ class TopLevel:
 
 	def prepareSettingsAndSeed(self, unused=None):
 		if useSeed.get()=="1":
-			self.Entry_SeedInput.configure(state="normal")
 			self.Label_NumSeeds.configure(state="disabled")
 			self.ComboBox_NumSeeds.configure(state="disabled")
 			for button in self.CheckButtons:
 				button.configure(state="disabled")
 		else:
-			self.Entry_SeedInput.configure(state="disabled")
 			self.Label_NumSeeds.configure(state="normal")
 			self.ComboBox_NumSeeds.configure(state="readonly")
 			for button in self.CheckButtons:
@@ -458,6 +462,20 @@ class TopLevel:
 					optRulesetValues[i].set("0")
 					currCheckButton.configure(state="disabled")
 					break
+
+	def setSourceRom(self):
+		global sourceRom
+		if rom_file_format is None or rom_file_format == "":
+			sourceRom.set(askopenfilename())
+		else:
+			sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
+
+	def keepUpperCharsSeed(self, unused):
+		global seedInput
+		seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
+		seedInput.set(seedInput.get()[:stringLen])
+		useSeed.set("1")
+		self.prepareSettingsAndSeed()
 
 	def attemptRandomize(self):
 		global optionalRulesetsList
@@ -639,16 +657,7 @@ def initVars():
 	generateLog.set("1")
 	for val in optRulesetValues:
 		val.set("0")
-	message.set("Welcome to the Amazing Mirror Randomizer! Move your mouse over a label to learn more about it.")
-
-def setSourceRom():
-	global sourceRom
-	sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
-
-def keepUpperCharsSeed(unused):
-	global seedInput
-	seedInput.set(''.join(ch.upper() for ch in seedInput.get() if ch.isalpha() or ch.isdigit()))
-	seedInput.set(seedInput.get()[:stringLen])
+	message.set("Move your mouse over a label to learn more about it.")
 
 def init(top, gui, *args, **kwargs):
 	global w, top_level, root

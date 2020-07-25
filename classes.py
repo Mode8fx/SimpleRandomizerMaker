@@ -146,12 +146,11 @@ class Rule:
 			if self.rule_type == "eq" and self.right_side is None:
 				if not isinstance(self.left_side, list):
 					return True
-				for i in range(len(self.left_side)-1):
-					for j in range(i+1, len(self.left_side)):
-						left = self.setSide(self.left_side[i])
-						right = self.setSide(self.left_side[j])
-						if left != right:
-							return False
+				for i in range(0, len(self.left_side)):
+					left = self.setSide(self.left_side[0])
+					right = self.setSide(self.left_side[i])
+					if left != right:
+						return False
 				return True
 			if self.rule_type == "ne" and self.right_side is None:
 				if not isinstance(self.left_side, list):

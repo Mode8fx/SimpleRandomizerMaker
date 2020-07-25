@@ -1,7 +1,7 @@
 # Simple Randomizer Maker
 This is a program that allows you to easily create your own game randomizer with little to no coding.
 
-## How?
+## How It Works
 All you need are the ROM addresses of whatever you want to change, along with possible values for those addresses, and the maker will do everything else for you, from the actual randomization to the GUI. You can make address values completely random, or you can set rules that they must follow (like if you want certain values to change according to other values).
 
 ## Features
@@ -17,7 +17,7 @@ All you need are the ROM addresses of whatever you want to change, along with po
 ## Example Functions
 I recommend you look at the included tutorial, but the short version is that this maker works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
 
-`"My Attribute" : Attribute(
+`Attribute(
 	name="My Attribute",
 	addresses=[0x456, 0xABC],
 	number_of_bytes=1,
@@ -27,7 +27,7 @@ I recommend you look at the included tutorial, but the short version is that thi
 ),
 Rule(
 	description="My Attribute 2 + My Attribute 3 is at least 20",
-	left_side=attributes["My Attribute 2"] + attributes["My Attribute 3"],
+	left_side=value("My Attribute 2") + value("My Attribute 3"),
 	rule_type=">=",
 	right_side=20,
 ),`

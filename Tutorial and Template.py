@@ -1,8 +1,14 @@
 # This is a randomizer file for the Simple Randomizer Maker.
 # This file must be named my_randomizer.py in order to work.
 
-global attributes
 from classes import *
+
+def value(name):
+	for att in attributes:
+		if att.name == name:
+			return att
+	print("This attribute does not exist: "+name)
+	return None
 
 ########################
 # EDIT BELOW THIS LINE #
@@ -14,9 +20,10 @@ program_name = "My Randomizer"
 # The rom doesn't have to have this exact name, it's just to guide the user.
 rom_name = "My Game (USA, Europe) ROM"
 # The file format of the ROM ("nes", "gba", etc).
-rom_file_format = "gba"
-# Any text you want to put on the "About..." page on the menu bar
-# (or you can leave it blank).
+# If you want to allow any file type, leave it as ""
+rom_file_format = ""
+# Any text you want to put on the "About..." page on the menu bar.
+# If you don't want an About page, leave it as ""
 about_page_text = ""
 
 """
@@ -164,7 +171,7 @@ optional_rulesets = [
 			Rule(
 				description="The first Attribute is an even number, the other two are odd",
 				left_side=[(value("My Attribute 1")%2 == 0), (value("My Attribute 2")%2 == 1), (value("My Attribute 3")%2 == 1)],
-				rule_type="=",
+				rule_type="==",
 				right_side=None,
 			),
 		],
