@@ -66,7 +66,7 @@ def randomize():
 		random.seed(currSeed)
 		# initialize attributes
 		for att in attributes:
-			attributes[att].prepare()
+			att.prepare()
 		if not enforceRuleset(myRules):
 			if useSeed.get() == "1":
 				print("Invalid seed")
@@ -76,13 +76,13 @@ def randomize():
 				return (False, "No combination of values satisfies the given combination of rules.")
 
 		for att in attributes:
-			print(attributes[att].name+": "+str(attributes[att].value))
+			print(att.name+": "+str(att.value))
 
 		generatedRom = generateRom()
 		if generateLog.get() == "1":
 			generateTextLog()
 		for att in attributes:
-			attributes[att].resetToDefault()
+			att.resetToDefault()
 		if generatedRom[0]:
 			numSeedsGenerated += 1
 		else:
@@ -100,7 +100,7 @@ def enforceRuleset(ruleset):
 		if not ruleset[ruleNum].rulePasses():
 			nextValueSet = False
 			for att in attributes:
-				if attributes[att].setToNextValue():
+				if att.setToNextValue():
 					nextValueSet = True
 					break
 			if not nextValueSet:
@@ -121,8 +121,8 @@ def generateRom():
 	try:
 		file = open(newRom, "r+b")
 		for att in attributes:
-			for address in attributes[att].addresses:
-				writeToAddress(file, address, attributes[att].value, attributes[att].number_of_bytes)
+			for address in att.addresses:
+				writeToAddress(file, address, att.value, att.number_of_bytes)
 		file.close()
 		print("Succesfully generated ROM with seed "+seedString)
 		return (True, "")
@@ -140,7 +140,7 @@ def generateTextLog():
 	file = open(newLog, "w")
 	file.writelines(program_name+"\nSeed: "+seedString+"\n\nValues:\n")
 	for att in attributes:
-		file.writelines(attributes[att].name+": "+str(attributes[att].value)+"\n")
+		file.writelines(att.name+": "+str(att.value)+"\n")
 	file.close()
 
 #######

@@ -3,6 +3,11 @@
 
 from classes import *
 
+def value(name):
+	for att in attributes:
+		if att.name == name:
+			return att
+
 ########################
 # EDIT BELOW THIS LINE #
 ########################
@@ -41,10 +46,10 @@ max_value: (semi-optional) The maximum possible value
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Attributes!
+template, MAKE SURE YOU DELETE THESE ATTRIBUTES!
 """
-attributes = {
-	"My Attribute 1" : Attribute(
+attributes = [
+	Attribute(
 		name="My Attribute 1",
 		addresses=0x0123,
 		number_of_bytes=1,
@@ -52,7 +57,7 @@ attributes = {
 		min_value=0,
 		max_value=100,
 	),
-	"My Attribute 2" : Attribute(
+	Attribute(
 		name="My Attribute 2",
 		addresses=[0x456, 0xABC],
 		number_of_bytes=1,
@@ -60,7 +65,7 @@ attributes = {
 		min_value=None,
 		max_value=None,
 	),
-	"My Attribute 3" : Attribute(
+	Attribute(
 		name="My Attribute 3",
 		addresses=[0x147, 0x258, 0x369],
 		number_of_bytes=2,
@@ -68,7 +73,7 @@ attributes = {
 		min_value=None,
 		max_value=None,
 	),
-}
+]
 
 """
 A list of Rules.
@@ -99,18 +104,18 @@ right_side: The right side of the comparison (unused for some rule types).
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Rules!
+template, MAKE SURE YOU DELETE THESE RULES!
 """
 required_rules = [
 	Rule(
 		description="My Attribute 1 + My Attribute 2 is less than 150",
-		left_side=attributes["My Attribute 1"] + attributes["My Attribute 2"],
+		left_side=value("My Attribute 1") + value("My Attribute 2"),
 		rule_type="<",
 		right_side=150,
 	),
 	Rule(
 		description="My Attribute 2 + My Attribute 3 is at least 20",
-		left_side=attributes["My Attribute 3"] + attributes["My Attribute 3"],
+		left_side=value("My Attribute 2") + value("My Attribute 3"),
 		rule_type=">=",
 		right_side=20,
 	),
@@ -133,36 +138,36 @@ must_be_disabled: (optional) An array of Ruleset names. This Ruleset can only
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Rulesets!
+template, MAKE SURE YOU DELETE THESE RULESETS!
 """
 optional_rulesets = [
 	Ruleset(
-		name="My Rules 1",
-		description="Description of My Rules 1",
+		name="My Ruleset 1",
+		description="Description of My Ruleset 1",
 		rules=[
 			Rule(
 				description="My Attribute 1 and My Attribute 2 are not equal",
-				left_side=[attributes["My Attribute 1"], attributes["My Attribute 2"]],
+				left_side=[value("My Attribute 1"), value("My Attribute 2")],
 				rule_type="!=",
 				right_side=None,
 			),
 			Rule(
 				description="My Attribute 1 has complex requirements",
-				left_side=attributes["My Attribute 1"],
+				left_side=value("My Attribute 1"),
 				rule_type="<",
-				right_side=(attributes["My Attribute 2"]+5) - (attributes["My Attribute 3"]/4),
+				right_side=(value("My Attribute 2")+5) - (value("My Attribute 3")/4),
 			),
 		],
 		must_be_enabled=None,
 		must_be_disabled=None,
 	),
 	Ruleset(
-		name="My Rules 2",
-		description="Description of My Rules 2",
+		name="My Ruleset 2",
+		description="Description of My Ruleset 2",
 		rules=[
 			Rule(
 				description="The first Attribute is an even number, the other two are odd",
-				left_side=[(attributes["My Attribute 1"]%2 == 0), (attributes["My Attribute 2"]%2 == 1), (attributes["My Attribute 3"]%2 == 1)],
+				left_side=[(value("My Attribute 1")%2 == 0), (value("My Attribute 2")%2 == 1), (value("My Attribute 3")%2 == 1)],
 				rule_type="=",
 				right_side=None,
 			),
@@ -170,8 +175,8 @@ optional_rulesets = [
 	),
 	Ruleset(
 		name="Special Ruleset",
-		description="This can only be enabled if My Rules 1 is enabled and My Rules 2 is disabled.",
-		must_be_enabled=["My Rules 1"],
-		must_be_disabled=["My Rules 2"],
+		description="This can only be enabled if My Ruleset 1 is enabled and My Ruleset 2 is disabled.",
+		must_be_enabled=["My Ruleset 1"],
+		must_be_disabled=["My Ruleset 2"],
 	),
 ]
