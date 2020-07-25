@@ -51,19 +51,18 @@ golden_mushroom_price = Attribute(
 """
 
 class Attribute:
-	def __init__(self, name, addresses, description=None, number_of_bytes=None, possible_values=[], min_value=None, max_value=None):
+	def __init__(self, name, addresses, number_of_bytes=None, possible_values=None, min_value=None, max_value=None):
 		self.name = name
-		self.description = description
 		if isinstance(addresses, list):
 			self.addresses = addresses
 		else:
 			self.addresses = [addresses]
 		self.possible_values = possible_values
-		if len(possible_values) == 0:
+		if possible_values is None or len(possible_values) == 0:
 			self.possible_values = list(range(min_value, max_value+1))
 			self.default_possible_values = copy.copy(self.possible_values)
 		else:
-			self.possible_values = [v for v in possible_values if min_value <= v <= max_value]
+			self.possible_values = [v for v in possible_values if (min_value is None or v >= min_value) and (max_value is None or v <= max_value)]
 			self.default_possible_values = copy.copy(self.possible_values)
 		if number_of_bytes is None:
 			self.number_of_bytes = ceil(max(self.possible_values).bit_length() / 8.0)
@@ -177,8 +176,8 @@ ruleTypesDict = {
 }
 
 class Rule:
-	def __init__(self, name, left_side, rule_type, right_side=None, description=None):
-		self.name = name
+	def __init__(self, left_side, rule_type, right_side=None, description=None):
+		self.description = description
 		self.description = description
 		self.left_side = left_side
 		self.rule_type = ruleTypesDict.get(rule_type.lower())
@@ -225,11 +224,15 @@ class Ruleset:
 		self.name = name
 		self.description = description
 		self.rules = rules
-		if isinstance(must_be_enabled, list):
+		if must_be_enabled is None:
+			self.must_be_enabled = []
+		elif isinstance(must_be_enabled, list):
 			self.must_be_enabled = must_be_enabled
 		else:
 			self.must_be_enabled = must_be_enabled
-		if isinstance(must_be_disabled, list):
+		if must_be_disabled is None:
+			self.must_be_disabled = []
+		elif isinstance(must_be_disabled, list):
 			self.must_be_disabled = must_be_disabled
 		else:
 			self.must_be_disabled = must_be_disabled

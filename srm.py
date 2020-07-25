@@ -1,8 +1,16 @@
-from my_randomizer import *
 import copy
 import math
 import shutil
 from gatelib import *
+
+from my_randomizer import *
+
+try:
+	from my_randomizer import *
+except:
+	print("Randomizer file not found. Make sure it is named \"my_randomizer.py\"")
+	import sys
+	sys.exit()
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -67,8 +75,8 @@ def randomize():
 				print("No combination of values satisfies the given combination of rules.")
 				return (False, "No combination of values satisfies the given combination of rules.")
 
-		# for att in attributes:
-		# 	print(attributes[att].name+": "+str(attributes[att].value))
+		for att in attributes:
+			print(attributes[att].name+": "+str(attributes[att].value))
 
 		generatedRom = generateRom()
 		if generateLog.get() == "1":
@@ -228,7 +236,7 @@ class TopLevel:
 		## Menu Bar
 		menubar = tk.Menu(top, bg=_bgcolor, fg=_fgcolor, tearoff=0)
 		fileMenu = tk.Menu(menubar, tearoff=0)
-		fileMenu.add_command(label="Load ROM", command=setSourceRom)
+		fileMenu.add_command(label="Load ROM...", command=setSourceRom)
 		fileMenu.add_separator()
 		fileMenu.add_command(label="Exit", command=root.quit)
 		menubar.add_cascade(label="File", menu=fileMenu)
@@ -251,7 +259,7 @@ class TopLevel:
 
 		# Rom Input Label
 		self.Label_RomInput = ttk.Label(top)
-		romTextLength = self.getTextLength(rom_name+' ROM')
+		romTextLength = self.getTextLength(rom_name)
 		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(background="#d9d9d9")
 		self.Label_RomInput.configure(foreground="#000000")
@@ -259,7 +267,7 @@ class TopLevel:
 		self.Label_RomInput.configure(relief="flat")
 		self.Label_RomInput.configure(anchor='w')
 		self.Label_RomInput.configure(justify='left')
-		self.Label_RomInput.configure(text=rom_name+' ROM')
+		self.Label_RomInput.configure(text=rom_name)
 
 		# Rom Input Entry
 		self.Entry_RomInput = ttk.Entry(top)
@@ -277,7 +285,7 @@ class TopLevel:
 		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
 		self.Button_RomInput.configure(command=setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
-		self.Button_RomInput.configure(text='Select ROM')
+		self.Button_RomInput.configure(text='Load ROM')
 
 		# Use Settings Radio Button
 		self.RadioButton_UseSettings = ttk.Radiobutton(top)

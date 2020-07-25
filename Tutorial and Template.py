@@ -41,7 +41,7 @@ max_value: (semi-optional) The maximum possible value
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Attributes!
+template, MAKE SURE YOU DELETE THESE ATTRIBUTES!
 """
 attributes = {
 	"My Attribute 1" : Attribute(
@@ -99,7 +99,7 @@ right_side: The right side of the comparison (unused for some rule types).
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Rules!
+template, MAKE SURE YOU DELETE THESE RULES!
 """
 required_rules = [
 	Rule(
@@ -110,7 +110,7 @@ required_rules = [
 	),
 	Rule(
 		description="My Attribute 2 + My Attribute 3 is at least 20",
-		left_side=attributes["My Attribute 3"] + attributes["My Attribute 3"],
+		left_side=attributes["My Attribute 2"] + attributes["My Attribute 3"],
 		rule_type=">=",
 		right_side=20,
 	),
@@ -133,7 +133,7 @@ must_be_disabled: (optional) An array of Ruleset names. This Ruleset can only
 If you choose not to use one of the optional variables, set its value to None
 
 A more detailed example can be found below. If you're using this file as a
-template, make sure you delete these Rulesets!
+template, MAKE SURE YOU DELETE THESE RULESETS!
 """
 optional_rulesets = [
 	Ruleset(
