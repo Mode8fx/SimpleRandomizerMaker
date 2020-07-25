@@ -166,7 +166,7 @@ class Rule:
 				left = self.setSide(self.left_side)
 				right = self.right_side
 				for i in range(len(right)):
-					right[i] = setSide(right[i])
+					right[i] = self.setSide(right[i])
 				return left in right
 			if self.rule_type == "ne" and self.right_side is None:
 				if not isinstance(self.left_side, list):
@@ -182,7 +182,7 @@ class Rule:
 				left = self.setSide(self.left_side)
 				right = self.right_side
 				for i in range(len(right)):
-					right[i] = setSide(right[i])
+					right[i] = self.setSide(right[i])
 				return not left in right
 			left = self.setSide(self.left_side)
 			right = self.setSide(self.right_side)

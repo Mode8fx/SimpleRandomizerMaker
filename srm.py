@@ -77,9 +77,13 @@ def randomize():
 		print("size after attribute optimization: ")
 		after = [len(att.possible_values) for att in attributes]
 		print(after)
+		totalFactor = 1.0
 		for i in range(len(before)):
-			print(after[i]/before[i])
-		sys.exit()
+			currFactor = after[i]/before[i]
+			print(currFactor)
+			totalFactor *= currFactor
+		print(totalFactor)
+		# sys.exit()
 		# initialize attributes
 		for att in attributes:
 			att.prepare()
@@ -125,7 +129,12 @@ def optimizeAttributes(ruleset):
 					nextValueSet = True
 					break
 		for i in range(len(rule.relatedAttributes)):
-			rule.relatedAttributes[i].possible_values = newPossibleValues[i]
+			rule.relatedAttributes[i].possible_values = list(val for val in rule.relatedAttributes[i].possible_values if newPossibleValues[i])
+			newVals = []
+			for j in range(len(rule.relatedAttributes[i].possible_values)):
+				if newPossibleValues[i][j] == True:
+					newVals.append(rule.relatedAttributes[i].possible_values[j])
+			rule.relatedAttributes[i].possible_values = newVals
 			rule.relatedAttributes[i].resetToFirstValue()
 
 def getFromListByName(arr, name):
