@@ -158,31 +158,31 @@ class Rule:
 			for a in att:
 				self.storeRelatedAttributes(a)
 	def rulePasses(self):
-		# try:
-		if self.rule_type == "eq" and self.right_side is not None:
-			left = self.setSide(self.left_side)
-			right = []
-			for att in self.asList(self.right_side):
-				right.append(self.setSide(att))
-			return left in right
-		elif self.rule_type == "count":
-			left = self.asList(self.left_side)
-			newLeft = []
-			for i in range(len(left)):
-				newLeft.append(self.setSide(left[i]))
-			left = newLeft
-			count = left.count(self.right_side[0])
-			rule_type = ruleTypesDict.get(self.right_side[1].lower())
-			func = operator.methodcaller(rule_type, count, self.right_side[2])
-			return func(operator)
-		else:
-			left = self.setSide(self.left_side)
-			right = self.setSide(self.right_side)
-			func = operator.methodcaller(self.rule_type, left, right)
-			return func(operator)
-		# except:
-		# 	print("Something went wrong. Failed to verify rule.")
-		# 	return False
+		try:
+			if self.rule_type == "eq" and self.right_side is not None:
+				left = self.setSide(self.left_side)
+				right = []
+				for att in self.asList(self.right_side):
+					right.append(self.setSide(att))
+				return left in right
+			elif self.rule_type == "count":
+				left = self.asList(self.left_side)
+				newLeft = []
+				for i in range(len(left)):
+					newLeft.append(self.setSide(left[i]))
+				left = newLeft
+				count = left.count(self.right_side[0])
+				rule_type = ruleTypesDict.get(self.right_side[1].lower())
+				func = operator.methodcaller(rule_type, count, self.right_side[2])
+				return func(operator)
+			else:
+				left = self.setSide(self.left_side)
+				right = self.setSide(self.right_side)
+				func = operator.methodcaller(self.rule_type, left, right)
+				return func(operator)
+		except:
+			print("Something went wrong. Failed to verify rule.")
+			return False
 	def simplifyRule(self, rulesArray):
 		newDescription = "Generated "+self.rule_type
 		if self.rule_type == "eq" and self.right_side is None:
