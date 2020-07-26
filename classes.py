@@ -31,6 +31,8 @@ class Attribute:
 			self.number_of_bytes = ceil(max(self.possible_values).bit_length() / 8.0)
 		else:
 			self.number_of_bytes = number_of_bytes
+		self.index = 0
+		self.value = self.possible_values[0]
 		self.specialOperators = []
 		self.specialVal = []
 		self.ruleOnSpecialOp = []
@@ -119,17 +121,20 @@ ruleTypesDict = {
 	"<" : "lt",
 	"<=" : "le",
 	"=<" : "le",
-	"in" : "in",
+	"in" : "eq",
 	"is in" : "eq",
 	"is one of" : "eq",
 	"not in" : "eq",
 	"is not in" : "ne",
 	"is not one of" : "ne",
+	"count" : "count",
 }
 
 class Rule:
-	def __init__(self, left_side, rule_type, right_side=None, description=None):
+	def __init__(self, left_side, rule_type, right_side=None, description=""):
 		self.description = description
+		if self.description is None:
+			self.description = ""
 		self.left_side = left_side
 		self.rule_type = ruleTypesDict.get(rule_type.lower())
 		if self.rule_type is None:
@@ -141,6 +146,7 @@ class Rule:
 		self.relatedAttributes = []
 		self.storeRelatedAttributes(self.left_side)
 		self.storeRelatedAttributes(self.right_side)
+		self.temp = 0
 		# print(self.description)
 		# print([att.name for att in self.relatedAttributes])
 	def storeRelatedAttributes(self, att):
@@ -152,45 +158,54 @@ class Rule:
 			for a in att:
 				self.storeRelatedAttributes(a)
 	def rulePasses(self):
-		try:
-			if self.rule_type == "eq" and self.right_side is None:
-				if not isinstance(self.left_side, list):
-					return True
-				left = self.setSide(self.left_side[0])
-				for i in range(0, len(self.left_side)):
-					right = self.setSide(self.left_side[i])
-					if left != right:
-						return False
-				return True
-			if self.rule_type == "eq" and isinstance(self.right_side, list):
-				left = self.setSide(self.left_side)
-				right = self.right_side
-				for i in range(len(right)):
-					right[i] = self.setSide(right[i])
-				return left in right
-			if self.rule_type == "ne" and self.right_side is None:
-				if not isinstance(self.left_side, list):
-					return True
-				for i in range(len(self.left_side)-1):
-					for j in range(i+1, len(self.left_side)):
-						left = self.setSide(self.left_side[i])
-						right = self.setSide(self.left_side[j])
-						if left == right:
-							return False
-				return True
-			if self.rule_type == "ne" and isinstance(self.right_side, list):
-				left = self.setSide(self.left_side)
-				right = self.right_side
-				for i in range(len(right)):
-					right[i] = self.setSide(right[i])
-				return not left in right
+		# try:
+		if self.rule_type == "eq" and self.right_side is not None:
+			left = self.setSide(self.left_side)
+			right = []
+			for att in self.asList(self.right_side):
+				right.append(self.setSide(att))
+			return left in right
+		elif self.rule_type == "count":
+			left = self.asList(self.left_side)
+			newLeft = []
+			for i in range(len(left)):
+				newLeft.append(self.setSide(left[i]))
+			left = newLeft
+			count = left.count(self.right_side[0])
+			rule_type = ruleTypesDict.get(self.right_side[1].lower())
+			func = operator.methodcaller(rule_type, count, self.right_side[2])
+			return func(operator)
+		else:
 			left = self.setSide(self.left_side)
 			right = self.setSide(self.right_side)
 			func = operator.methodcaller(self.rule_type, left, right)
 			return func(operator)
-		except:
-			print("Something went wrong. Failed to verify rule.")
-			return False
+		# except:
+		# 	print("Something went wrong. Failed to verify rule.")
+		# 	return False
+	def simplifyRule(self, rulesArray):
+		newDescription = "Generated "+self.rule_type
+		if self.rule_type == "eq" and self.right_side is None:
+			for i in range(1, len(self.left_side)):
+				newRule = Rule(description=newDescription, left_side=self.left_side[0], rule_type="==", right_side=self.left_side[i])
+				rulesArray.append(newRule)
+		elif self.rule_type == "ne" and self.right_side is None:
+			for i in range(len(self.left_side)-1):
+				for j in range(i+1, len(self.left_side)):
+					newRule = Rule(description=newDescription, left_side=self.left_side[i], rule_type="!=", right_side=self.left_side[j])
+					rulesArray.append(newRule)
+		elif self.rule_type in ["ne","gt","ge","lt","le"]:
+			for lVal in self.asList(self.left_side):
+				for rVal in self.asList(self.right_side):
+					newRule = Rule(description=newDescription, left_side=lVal, rule_type=self.rule_type, right_side=rVal)
+					rulesArray.append(newRule)
+		else:
+			rulesArray.append(self)
+	def asList(self, side):
+		if isinstance(side, list):
+			return side
+		else:
+			return [side]
 	def setSide(self, side):
 		if isinstance(side, Attribute):
 			return side.performSpecialOperation(self.ruleNum)

@@ -69,25 +69,17 @@ def randomize():
 				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
 					myRules.append(rule)
 		random.seed(currSeed)
-		myRules.sort(key=getNumRelatedAttributes)
-		print("size before attribute optimization: ")
-		before = [len(att.possible_values) for att in attributes]
-		print(before)
+		random.shuffle(attributes)
+		simplifiedRules = []
+		for rule in myRules:
+			rule.simplifyRule(simplifiedRules)
+		myRules = simplifiedRules
+		myRules.sort(key=getNumCombinations)
 		optimizeAttributes(myRules)
-		print("size after attribute optimization: ")
-		after = [len(att.possible_values) for att in attributes]
-		print(after)
-		totalFactor = 1.0
-		for i in range(len(before)):
-			currFactor = after[i]/before[i]
-			print(currFactor)
-			totalFactor *= currFactor
-		print(totalFactor)
-		# sys.exit()
 		# initialize attributes
-		for att in attributes:
-			att.prepare()
-		if not enforceRuleset(myRules):
+		shuffleAllAttributes()
+		print("Generating values...")
+		if not (shotgunApproach(myRules) or enforceRuleset(myRules)):
 			if useSeed.get() == "1":
 				print("Invalid seed")
 				return (False, "Invalid seed.")
@@ -109,41 +101,76 @@ def randomize():
 			return generatedRom
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
-def getNumRelatedAttributes(rule):
-	return len(rule.relatedAttributes)
+def shuffleAllAttributes():
+	for att in attributes:
+		att.prepare()
+
+def getNumCombinations(rule):
+	num = 1
+	for att in rule.relatedAttributes:
+		num *= len(att.possible_values)
+	return num
 
 def optimizeAttributes(ruleset):
+	numAllCombinations = 1
+	for att in attributes:
+		numAllCombinations *= len(att.possible_values)
 	for rule in ruleset:
-		newPossibleValues = []
-		for i in range(len(rule.relatedAttributes)):
-			rule.relatedAttributes[i].resetToFirstValue()
-			newPossibleValues.append([False] * len(rule.relatedAttributes[i].possible_values))
-		nextValueSet = True
-		while nextValueSet:
-			if rule.rulePasses(): # you could also check if all current values are True, then skip the rule check (but I think this would be less efficient)
+		numRuleCombinations = getNumCombinations(rule)
+		# only optimize an attribute if it would take a negligible amount of time
+		if numRuleCombinations/numAllCombinations < 0.05:
+			print("Optimizing for rule "+rule.description)
+			newPossibleValues = []
+			for i in range(len(rule.relatedAttributes)):
+				rule.relatedAttributes[i].resetToFirstValue()
+				newPossibleValues.append([False] * len(rule.relatedAttributes[i].possible_values))
+			nextValueSet = True
+			while nextValueSet:
+				if rule.rulePasses(): # you could also check if all current values are True, then skip the rule check (but I think this would be less efficient)
+					for i in range(len(rule.relatedAttributes)):
+						newPossibleValues[i][rule.relatedAttributes[i].index] = True
+				nextValueSet = False
 				for i in range(len(rule.relatedAttributes)):
-					newPossibleValues[i][rule.relatedAttributes[i].index] = True
-			nextValueSet = False
-			for att in rule.relatedAttributes:
-				if att.setToNextValue():
-					nextValueSet = True
-					break
-		for i in range(len(rule.relatedAttributes)):
-			rule.relatedAttributes[i].possible_values = list(val for val in rule.relatedAttributes[i].possible_values if newPossibleValues[i])
-			newVals = []
-			for j in range(len(rule.relatedAttributes[i].possible_values)):
-				if newPossibleValues[i][j] == True:
-					newVals.append(rule.relatedAttributes[i].possible_values[j])
-			rule.relatedAttributes[i].possible_values = newVals
-			rule.relatedAttributes[i].resetToFirstValue()
+					if rule.relatedAttributes[i].setToNextValue():
+						nextValueSet = True
+						break
+			for i in range(len(rule.relatedAttributes)):
+				# rule.relatedAttributes[i].possible_values = list(val for val in rule.relatedAttributes[i].possible_values if newPossibleValues[i][rule.relatedAttributes[i].index])
+				newVals = []
+				for j in range(len(rule.relatedAttributes[i].possible_values)):
+					if newPossibleValues[i][j] == True:
+						newVals.append(rule.relatedAttributes[i].possible_values[j])
+				rule.relatedAttributes[i].possible_values = newVals
+				rule.relatedAttributes[i].resetToFirstValue()
+	numAllCombinationsNew = 1
+	for att in attributes:
+		numAllCombinationsNew *= len(att.possible_values)
+	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
 
 def getFromListByName(arr, name):
 	for a in arr:
 		if a.name == name:
 			return a
 
+# attempt 50 completely random combinations before attempting the normal approach
+def shotgunApproach(ruleset):
+	ruleNum = 0
+	numAttempts = 0
+
+	while ruleNum < len(ruleset):
+		if not ruleset[ruleNum].rulePasses():
+			shuffleAllAttributes()
+			numAttempts += 1
+			if numAttempts >= 50:
+				return False
+			ruleNum = 0
+		else:
+			ruleNum += 1
+	return True
+
 def enforceRuleset(ruleset):
 	ruleNum = 0
+
 	while ruleNum < len(ruleset):
 		if not ruleset[ruleNum].rulePasses():
 			nextValueSet = False

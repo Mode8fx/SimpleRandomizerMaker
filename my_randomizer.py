@@ -74,12 +74,11 @@ optional_rulesets = [
 		rules=[
 			Rule(
 				description="All Enemies Give An Ability",
-				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")].count(0),
-				rule_type="==",
-				right_side=0,
+				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
+				rule_type="count",
+				right_side=(0, "==", 0),
 			),
 		],
-		must_be_disabled="All Master",
 	),
 	Ruleset(
 		name="All Unique",
@@ -92,7 +91,7 @@ optional_rulesets = [
 				right_side=None,
 			),
 		],
-		must_be_disabled="All Master",
+		must_be_disabled=["All Master", "Smashing!"],
 	),
 	Ruleset(
 		name="All Master",
@@ -111,7 +110,7 @@ optional_rulesets = [
 				right_side=None,
 			),
 		],
-		must_be_disabled=["All Unique", "At Least 1 UFO"],
+		must_be_disabled=["All Unique", "At Least 1 UFO", "Smashing!"],
 	),
 	Ruleset(
 		name="At Least 1 UFO",
@@ -119,12 +118,12 @@ optional_rulesets = [
 		rules=[
 			Rule(
 				description="At Least 1 UFO",
-				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")].count(0x0E),
-				rule_type=">=",
-				right_side=1,
+				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
+				rule_type="count",
+				right_side=(0x0E, ">=", 1),
 			),
 		],
-		must_be_disabled="All Master",
+		must_be_disabled=["All Master", "Smashing!"],
 	),
 	Ruleset(
 		name="All Different From Original",
@@ -173,7 +172,6 @@ optional_rulesets = [
 				right_side=0x13,
 			),
 		],
-		must_be_disabled="All Master",
 	),
 	Ruleset(
 		name="Smashing!",
@@ -222,6 +220,6 @@ optional_rulesets = [
 				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 		],
-		must_be_disabled=["All Master", "At Least 1 UFO"],
+		must_be_disabled=["All Master", "At Least 1 UFO", "All Unique"],
 	),
 ]
