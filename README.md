@@ -25,6 +25,7 @@ I recommend you look at the included tutorial, but the short version is that thi
 	min_value=None,
 	max_value=None,
 ),`
+
 `Rule(
 	description="My Attribute 2 + My Attribute 3 is at least 20",
 	left_side=value("My Attribute 2") + value("My Attribute 3"),
