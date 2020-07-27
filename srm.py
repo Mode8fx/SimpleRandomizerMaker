@@ -94,6 +94,8 @@ def randomize():
 			return (False, errorMessage)
 		# initialize attributes
 		shuffleAllAttributes()
+		for rule in myRules:
+			rule.relatedAttributes.sort(key=getShuffledAttributeNum)
 		print("Generating values...")
 		if not (shotgunApproach(myRules) or enforceRuleset(myRules)):
 			errorMessage = ""
@@ -180,11 +182,6 @@ def optimizeAttributes(ruleset):
 	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
 	return True
 
-def getFromListByName(arr, name):
-	for a in arr:
-		if a.name == name:
-			return a
-
 # attempt 50 completely random combinations before attempting the normal approach
 def shotgunApproach(ruleset):
 	ruleNum = 0
@@ -214,15 +211,44 @@ def enforceRuleset(ruleset):
 			if timeout > 0 and time() > endTime:
 				timedOut = True
 				return False
-			nextValueSet = False
-			for att in attributes:
-				if att.setToNextValue():
-					nextValueSet = True
+
+			# brute force constraint satisfaction across all attributes
+			# nextValueSet = False
+			# for att in attributes:
+			# 	if att.setToNextValue():
+			# 		nextValueSet = True
+			# 		break
+			# if not nextValueSet:
+			# 	return False
+			# ruleNum = 0
+			# currNumCombinations += 1
+
+			# backtracking constraint satisfaction across related attributes only
+			onePassed = False
+			for att in ruleset[ruleNum].relatedAttributes:
+				nestedRuleNum = 0
+				nestedPass = True
+				att.setToNextValue()
+				while nestedRuleNum < ruleNum:
+					if not ruleset[nestedRuleNum].rulePasses():
+						nestedPass = False
+						break
+					nestedRuleNum += 1
+				if not nestedPass:
+					att.setToPreviousValue()
+				else:
+					onePassed = True
 					break
-			if not nextValueSet:
-				return False
-			ruleNum = 0
+			if not onePassed:
+				nextValueSet = False
+				for att in ruleset[ruleNum].relatedAttributes:
+					if att.setToNextValue():
+						nextValueSet = True
+						break
+				if not nextValueSet:
+					return False
 			currNumCombinations += 1
+
 		else:
 			ruleNum += 1
 	return True
@@ -271,8 +297,20 @@ def resetAttributes(printAttributes=False):
 			print(att.name+": "+str(att.value))
 	attributes = copy.copy(originalAttributes)
 
+def getFromListByName(arr, name):
+	for a in arr:
+		if a.name == name:
+			return a
+
 def getAttributeNum(att):
 	return att.attributeNum
+
+def getShuffledAttributeNum(att):
+	num = 0
+	for a in attributes:
+		if a is att:
+			return num
+		num += 1
 
 #######
 # GUI #
@@ -639,7 +677,7 @@ class TopLevel:
 # the font as an argument.
 # ======================================================
 
-from time import time, localtime, strftime
+from time import localtime, strftime
 
 class ToolTip(tk.Toplevel):
 	"""

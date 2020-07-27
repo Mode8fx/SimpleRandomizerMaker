@@ -45,6 +45,9 @@ class Attribute:
 	def prepare(self):
 		random.shuffle(self.possible_values)
 		self.resetToFirstValue()
+	def setToPreviousValue(self):
+		self.index -= 1
+		self.value = self.possible_values[self.index]
 	def setToNextValue(self):
 		self.index += 1
 		try:

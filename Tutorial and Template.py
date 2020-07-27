@@ -114,7 +114,7 @@ right_side: The right side of the comparison (unused for some rule types).
 	two of them are greater than 100 each, then you would set the following:
 		left_side=[value("Attack"), value("Defense"), value("Speed"), value("Magic")],
 		rule_type = "count",
-		right_side = ("<=", 2, ">", 100)
+		right_side = (">", 100, "<=", 2)
 
 If you choose not to use one of the optional variables, set its value to None
 
@@ -187,10 +187,10 @@ optional_rulesets = [
 				right_side=None,
 			),
 			Rule(
-				description="At most, only two attributes can be less than 70",
+				description="The number of attributes that can be less than 70 is at most 2",
 				left_side=[value("My Attribute 1"), value("My Attribute 2"), value("My Attribute 3")],
 				rule_type="count",
-				right_side=("<=", 2, "<", 70),
+				right_side=("<", 70, "<=", 2),
 			),
 		],
 	),
