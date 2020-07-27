@@ -1,10 +1,6 @@
-import copy
-import math
 import shutil
 from time import time
 from gatelib import *
-
-from my_randomizer import *
 
 try:
 	from my_randomizer import *
@@ -25,7 +21,7 @@ else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
-stringLen = 5+math.ceil(len(optional_rulesets)/5.0)
+stringLen = 5+ceil(len(optional_rulesets)/5.0)
 
 timedOut = False
 numAllCombinations = 1
@@ -41,6 +37,8 @@ def randomize():
 	global endTime
 	global numAllCombinations
 	global currNumCombinations
+	global attributes
+	global originalAttributes
 
 	if not path.isfile(sourceRom.get()):
 		return (False, "Invalid ROM input.")
@@ -48,6 +46,7 @@ def randomize():
 	numOfSeeds = int(numSeeds.get())
 	numSeedsGenerated = 0
 	for seedNum in range(numOfSeeds):
+		originalAttributes = copy.copy(attributes)
 		if useSeed.get() == "1":
 			seedString = seedInput.get()
 			try:
@@ -76,9 +75,9 @@ def randomize():
 			if ruleset[1] == 1:
 				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
 					myRules.append(rule)
-		random.seed(currSeed)
 		startTime = time()
 		endTime = startTime + timeout
+		random.seed(currSeed)
 		random.shuffle(attributes)
 		simplifiedRules = []
 		for rule in myRules:
@@ -91,6 +90,7 @@ def randomize():
 			errorMessage = "The program timed out (seed generation took longer than "+str(timeout)+" seconds).\
 			\n\nEstimated time for current combination of rules: unknown."
 			print(errorMessage)
+			resetAttributes()
 			return (False, errorMessage)
 		# initialize attributes
 		shuffleAllAttributes()
@@ -105,12 +105,11 @@ def randomize():
 			else:
 				errorMessage = "No combination of values satisfies the given combination of rules."
 			print(errorMessage)
+			resetAttributes()
 			return (False, errorMessage)
 
-		for att in attributes:
-			print(att.name+": "+str(att.value))
-
 		generatedRom = generateRom()
+		resetAttributes(True)
 		if generateLog.get() == "1":
 			generateTextLog()
 		for att in attributes:
@@ -119,6 +118,7 @@ def randomize():
 			numSeedsGenerated += 1
 		else:
 			return generatedRom
+	resetAttributes()
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
 def shuffleAllAttributes():
@@ -260,6 +260,19 @@ def generateTextLog():
 	for att in attributes:
 		file.writelines(att.name+": "+str(att.value)+"\n")
 	file.close()
+
+def resetAttributes(printAttributes=False):
+	global attributes
+	global originalAttributes
+
+	attributes.sort(key=getAttributeNum)
+	if printAttributes:
+		for att in attributes:
+			print(att.name+": "+str(att.value))
+	attributes = copy.copy(originalAttributes)
+
+def getAttributeNum(att):
+	return att.attributeNum
 
 #######
 # GUI #
@@ -597,6 +610,7 @@ class TopLevel:
 		for i in range(len(optRulesetValues)):
 			optionalRulesetsList[i] = (optional_rulesets[i].name, int(optRulesetValues[i].get()))
 		results = randomize()
+		print("\n")
 		# message.set(results[1])
 		# self.Label_Message.configure(foreground="#0000FF" if results[0] else "#FF0000")
 		if results[0]:

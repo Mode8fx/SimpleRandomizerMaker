@@ -7,11 +7,8 @@ from os import path, remove, mkdir
 from time import sleep
 import operator
 
+attributeCounter = 0
 ruleCounter = 0
-
-def getRuleCounter():
-	global ruleCounter
-	return ruleCounter
 
 class Attribute:
 	def __init__(self, name, addresses, number_of_bytes=None, possible_values=None, min_value=None, max_value=None):
@@ -36,6 +33,9 @@ class Attribute:
 		self.specialOperators = []
 		self.specialVal = []
 		self.ruleOnSpecialOp = []
+		global attributeCounter
+		self.attributeNum = attributeCounter
+		attributeCounter += 1
 	def resetToFirstValue(self):
 		self.index = 0
 		self.value = self.possible_values[0]
@@ -70,9 +70,11 @@ class Attribute:
 				comparedVal = func(operator)
 		return comparedVal
 	def addSpecialOperator(self, op, val):
+		global ruleCounter
+
 		self.specialOperators.append(op)
 		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(getRuleCounter())
+		self.ruleOnSpecialOp.append(ruleCounter)
 		return self
 	def __add__(self, val):
 		return self.addSpecialOperator("add", val)
