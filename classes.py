@@ -171,9 +171,20 @@ class Rule:
 				for i in range(len(left)):
 					newLeft.append(self.setSide(left[i]))
 				left = newLeft
-				count = left.count(self.right_side[0])
-				rule_type = ruleTypesDict.get(self.right_side[1].lower())
-				func = operator.methodcaller(rule_type, count, self.right_side[2])
+				if self.right_side[0] in ["=","=="]:
+					count = sum(map(lambda x : x==self.right_side[1], left))
+				elif self.right_side[0] == "!=":
+					count = sum(map(lambda x : x!=self.right_side[1], left))
+				elif self.right_side[0] == ">":
+					count = sum(map(lambda x : x>self.right_side[1], left))
+				elif self.right_side[0] == ">=":
+					count = sum(map(lambda x : x>=self.right_side[1], left))
+				elif self.right_side[0] == "<":
+					count = sum(map(lambda x : x<self.right_side[1], left))
+				elif self.right_side[0] == "<=":
+					count = sum(map(lambda x : x<=self.right_side[1], left))
+				rule_type = ruleTypesDict.get(self.right_side[2].lower())
+				func = operator.methodcaller(rule_type, count, self.right_side[3])
 				return func(operator)
 			else:
 				left = self.setSide(self.left_side)

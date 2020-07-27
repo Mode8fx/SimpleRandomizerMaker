@@ -18,6 +18,7 @@ program_name = "Amazing Mirror Randomizer"
 rom_name = "Kirby & The Amazing Mirror (USA)"
 rom_file_format = "gba"
 about_page_text = "This is a sample randomizer for Kirby & The Amazing Mirror that changes the abilities given by a few enemies (specifically, the ones in the first area of the game)."
+timeout = 10
 
 attributes = [
 	Attribute(
@@ -76,7 +77,7 @@ optional_rulesets = [
 				description="All Enemies Give An Ability",
 				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
 				rule_type="count",
-				right_side=(0, "==", 0),
+				right_side=("==", 0, "==", 0),
 			),
 		],
 	),
@@ -120,7 +121,7 @@ optional_rulesets = [
 				description="At Least 1 UFO",
 				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
 				rule_type="count",
-				right_side=(0x0E, ">=", 1),
+				right_side=("==", 0x0E, ">=", 1),
 			),
 		],
 		must_be_disabled=["All Master", "Smashing!"],

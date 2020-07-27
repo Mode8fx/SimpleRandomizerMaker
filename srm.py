@@ -1,6 +1,7 @@
 import copy
 import math
 import shutil
+from time import time
 from gatelib import *
 
 from my_randomizer import *
@@ -26,6 +27,10 @@ sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
 stringLen = 5+math.ceil(len(optional_rulesets)/5.0)
 
+timedOut = False
+numAllCombinations = 1
+currNumCombinations = 0
+
 def main():
 	vp_start_gui()
 
@@ -33,6 +38,9 @@ def randomize():
 	global sourceRom
 	global currSeed
 	global seedString
+	global endTime
+	global numAllCombinations
+	global currNumCombinations
 
 	if not path.isfile(sourceRom.get()):
 		return (False, "Invalid ROM input.")
@@ -69,23 +77,35 @@ def randomize():
 				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
 					myRules.append(rule)
 		random.seed(currSeed)
+		startTime = time()
+		endTime = startTime + timeout
 		random.shuffle(attributes)
 		simplifiedRules = []
 		for rule in myRules:
 			rule.simplifyRule(simplifiedRules)
 		myRules = simplifiedRules
 		myRules.sort(key=getNumCombinations)
-		optimizeAttributes(myRules)
+		setNumAllCombinations()
+		result = optimizeAttributes(myRules)
+		if not result:
+			errorMessage = "The program timed out (seed generation took longer than "+str(timeout)+" seconds).\
+			\n\nEstimated time for current combination of rules: unknown."
+			print(errorMessage)
+			return (False, errorMessage)
 		# initialize attributes
 		shuffleAllAttributes()
 		print("Generating values...")
 		if not (shotgunApproach(myRules) or enforceRuleset(myRules)):
-			if useSeed.get() == "1":
-				print("Invalid seed")
-				return (False, "Invalid seed.")
+			errorMessage = ""
+			if timedOut:
+				errorMessage = "The program timed out (seed generation took longer than "+str(timeout)+" seconds).\
+				\n\nEstimated time for current combination of rules given your computer's speed: up to "+str(round(numAllCombinations*timeout/currNumCombinations, 1))+" seconds."
+			elif useSeed.get() == "1":
+				errorMessage = "Invalid seed."
 			else:
-				print("No combination of values satisfies the given combination of rules.")
-				return (False, "No combination of values satisfies the given combination of rules.")
+				errorMessage = "No combination of values satisfies the given combination of rules."
+			print(errorMessage)
+			return (False, errorMessage)
 
 		for att in attributes:
 			print(att.name+": "+str(att.value))
@@ -111,10 +131,19 @@ def getNumCombinations(rule):
 		num *= len(att.possible_values)
 	return num
 
-def optimizeAttributes(ruleset):
+def setNumAllCombinations():
+	global numAllCombinations
+
 	numAllCombinations = 1
 	for att in attributes:
 		numAllCombinations *= len(att.possible_values)
+	return numAllCombinations
+
+def optimizeAttributes(ruleset):
+	global endTime
+	global timedOut
+
+	setNumAllCombinations()
 	for rule in ruleset:
 		numRuleCombinations = getNumCombinations(rule)
 		# only optimize an attribute if it would take a negligible amount of time
@@ -126,6 +155,9 @@ def optimizeAttributes(ruleset):
 				newPossibleValues.append([False] * len(rule.relatedAttributes[i].possible_values))
 			nextValueSet = True
 			while nextValueSet:
+				if timeout > 0 and time() > endTime:
+					timedOut = True
+					return False
 				if rule.rulePasses(): # you could also check if all current values are True, then skip the rule check (but I think this would be less efficient)
 					for i in range(len(rule.relatedAttributes)):
 						newPossibleValues[i][rule.relatedAttributes[i].index] = True
@@ -146,6 +178,7 @@ def optimizeAttributes(ruleset):
 	for att in attributes:
 		numAllCombinationsNew *= len(att.possible_values)
 	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
+	return True
 
 def getFromListByName(arr, name):
 	for a in arr:
@@ -169,10 +202,18 @@ def shotgunApproach(ruleset):
 	return True
 
 def enforceRuleset(ruleset):
+	global endTime
+	global timedOut
+	global currNumCombinations
+
 	ruleNum = 0
+	currNumCombinations = 0
 
 	while ruleNum < len(ruleset):
 		if not ruleset[ruleNum].rulePasses():
+			if timeout > 0 and time() > endTime:
+				timedOut = True
+				return False
 			nextValueSet = False
 			for att in attributes:
 				if att.setToNextValue():
@@ -181,6 +222,7 @@ def enforceRuleset(ruleset):
 			if not nextValueSet:
 				return False
 			ruleNum = 0
+			currNumCombinations += 1
 		else:
 			ruleNum += 1
 	return True

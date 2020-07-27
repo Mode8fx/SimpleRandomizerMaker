@@ -25,6 +25,11 @@ rom_file_format = ""
 # Any text you want to put on the "About..." page on the menu bar.
 # If you don't want an About page, leave it as ""
 about_page_text = ""
+# The number of seconds you want to wait per seed before the randomizer times
+# out. If you don't want a timeout, leave it as 0.
+# It is recommended that you at least set a timeout during testing so you can
+# know how long it takes to create a seed.
+timeout = 10
 
 """
 A list of Attributes.
@@ -33,17 +38,17 @@ enemy health, base stats, and so on. An Attribute has the following variables:
 
 name: The name of the Attribute.
 addresses: The memory address(es) of the Attribute. These addresses must
-	be in an array (example: addresses=[0x01234, 0x56789, 0xABCDE]).
+	be in an array (EXAMPLE: addresses=[0x01234, 0x56789, 0xABCDE]).
 number_of_bytes: (optional) The number of bytes taken up by each of these
 	addresses. If you don't know what this means, leave it as None
 	(the program will attempt to guess).
 possible_values: (semi-optional) An array of possible values for this
 	Attribute. The addresses will be set to one of these values
-	(example: possible_values=[1, 4, 21, 83, 106]). An Attribute must use
+	(EXAMPLE: possible_values=[1, 4, 21, 83, 106]). An Attribute must use
 	either possible_value or both min_value and max_value (see below).
 min_value: (semi-optional) The minimum possible value.
 max_value: (semi-optional) The maximum possible value
-	(example: setting min_value to 5 and max_value to 10
+	(EXAMPLE: setting min_value to 5 and max_value to 10
 	will make the possible values [5,6,7,8,9,10]).
 
 If you choose not to use one of the optional variables, set its value to None
@@ -92,17 +97,24 @@ description: (optional) A description of the Rule.
 left_side: The left side of the comparison (see examples below).
 rule_type: The type of comparison. Possible comparisons are
 	"=" (or "=="), "!=", ">", ">=", "<", and "<="
+	There is also the "count" comparison, which lets you count how many
+	attributes fulfill a certain requirement (see EXAMPLE 3 below).
 right_side: The right side of the comparison (unused for some rule types).
-	example 1: If you want to set a requirement that a Super Potion must cost
-	at least as much as (two Poitons + 100), then you would set the following:
-		left_side=attributes["Super Poiton"],
-		rule_type=">="
-		right_side=attributes["Potion"]*2+100
-	example 2: If you want to guarantee that a Potion, Elixir, and Revive all
+	EXAMPLE 1: If you want to set a requirement that a Super Potion must cost
+	at least as much as (two Potions + 100), then you would set the following:
+		left_side=value("Super Poiton"),
+		rule_type=">=",
+		right_side=value("Potion")*2+100,
+	EXAMPLE 2: If you want to guarantee that a Potion, Elixir, and Revive all
 	cost the same amount, then you would set the following:
-		left_side=[attributes["Potion"], attributes["Elixir"], attributes["Revive"]]
-		rule_type="="
-		right_side=None
+		left_side=[value("Potion"), value("Elixir"), value("Revive")],
+		rule_type="=",
+		right_side=None,
+	EXAMPLE 3: If you have four stats and you want to guarantee that at most
+	two of them are greater than 100 each, then you would set the following:
+		left_side=[value("Attack"), value("Defense"), value("Speed"), value("Magic")],
+		rule_type = "count",
+		right_side = ("<=", 2, ">", 100)
 
 If you choose not to use one of the optional variables, set its value to None
 
