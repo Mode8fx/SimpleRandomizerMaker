@@ -7,15 +7,16 @@ All you need are the ROM addresses of whatever you want to change, along with po
 ## Features
 - Create a randomizer with (basically) no coding
 - Add optional rulesets to make your randomizer more complex (while keeping it easy to develop)
+- Utilizes backtracking constraint satisfaction and attribute/rule optimization for fast generation
 - Dynamic GUI that changes according to settings and number of options
 - Built-in seed support with verification to check for invalid seeds
-- Generate up to 20 unique seeds at once
+- Generates up to 20 unique seeds at once
 - Supports multi-byte addresses
-- Optionally generate a text log of all randomized values
-- Includes detailed tutorial+template plus a sample randomizer
+- Optionally generates a text log of all randomized values
+- Includes detailed tutorial plus two sample randomizers
 
 ## Example Functions
-I recommend you look at the included tutorial, but the short version is that this maker works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
+I recommend you look at the included tutorial and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
 
 `Attribute(
 	name="My Attribute",
@@ -31,4 +32,18 @@ I recommend you look at the included tutorial, but the short version is that thi
 	left_side=value("My Attribute 2") + value("My Attribute 3"),
 	rule_type=">=",
 	right_side=20,
+),`
+
+`Rule(
+	description="My Attribute 1 must be one of these values",
+	left_side=value("My Attribute 1"),
+	rule_type="==",
+	right_side=[1, 4, 6, 13, 18],
+),`
+
+`Rule(
+	description="These three attributes have to be different",
+	left_side=[value("My Attribute 1"), value("My Attribute 2"), value("My Attribute 3")],
+	rule_type="!=",
+	right_side=None,
 ),`

@@ -3,15 +3,15 @@ from time import time
 from gatelib import *
 
 try:
-	from my_randomizer import *
+	from randomizer import *
 except:
-	print("Randomizer file not found. Make sure it is named \"my_randomizer.py\"")
+	print("Randomizer file not found. Make sure it is named \"randomizer.py\"")
 	import sys
 	sys.exit()
 
 """
 TODO:
-- It's way too freaking slow, don't brute force all possible values
+- In-statement assertions (like value("A")==5) don't work; split the two sides into a tuple?
 """
 
 # the same folder where this program is stored
@@ -21,7 +21,7 @@ else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
-stringLen = 5+ceil(len(optional_rulesets)/5.0)
+stringLen = 5+ceil(len(Optional_Rulesets)/5.0)
 
 timedOut = False
 numAllCombinations = 1
@@ -37,7 +37,7 @@ def randomize():
 	global endTime
 	global numAllCombinations
 	global currNumCombinations
-	global attributes
+	global Attributes
 	global originalAttributes
 
 	if not path.isfile(sourceRom.get()):
@@ -46,7 +46,7 @@ def randomize():
 	numOfSeeds = int(numSeeds.get())
 	numSeedsGenerated = 0
 	for seedNum in range(numOfSeeds):
-		originalAttributes = copy.copy(attributes)
+		originalAttributes = copy.copy(Attributes)
 		if useSeed.get() == "1":
 			seedString = seedInput.get()
 			try:
@@ -70,15 +70,15 @@ def randomize():
 			genSeed = random.randint(0, maxVal)
 			currSeed = (settingsSeed*(maxVal+1)) + genSeed
 			seedString = str(dec_to_base(currSeed, 36)).upper().zfill(stringLen)
-		myRules = copy.copy(required_rules)
+		myRules = copy.copy(Required_Rules)
 		for ruleset in optionalRulesetsList:
 			if ruleset[1] == 1:
-				for rule in getFromListByName(optional_rulesets, ruleset[0]).rules:
+				for rule in getFromListByName(Optional_Rulesets, ruleset[0]).rules:
 					myRules.append(rule)
 		startTime = time()
-		endTime = startTime + timeout
+		endTime = startTime + Timeout
 		random.seed(currSeed)
-		random.shuffle(attributes)
+		random.shuffle(Attributes)
 		simplifiedRules = []
 		for rule in myRules:
 			rule.simplifyRule(simplifiedRules)
@@ -87,25 +87,28 @@ def randomize():
 		setNumAllCombinations()
 		result = optimizeAttributes(myRules)
 		if not result:
-			errorMessage = "The program timed out (seed generation took longer than "+str(timeout)+" seconds).\
-			\n\nEstimated time for current combination of rules: unknown."
+			errorMessage = "The program timed out (seed generation took longer than "+str(Timeout)+" seconds)."
+			# \n\nEstimated time for current combination of rules: unknown."
 			print(errorMessage)
 			resetAttributes()
 			return (False, errorMessage)
-		# initialize attributes
+		# initialize Attributes
 		shuffleAllAttributes()
 		for rule in myRules:
 			rule.relatedAttributes.sort(key=getShuffledAttributeNum)
 		print("Generating values...")
-		if not (shotgunApproach(myRules) or enforceRuleset(myRules)):
+		if not (shotgunApproach(myRules)
+			or ((not Slow_Mode) and enforceRulesetBacktracking(myRules))
+			or (Slow_Mode and enforceRulesetBruteForce(myRules))):
 			errorMessage = ""
 			if timedOut:
-				errorMessage = "The program timed out (seed generation took longer than "+str(timeout)+" seconds).\
-				\n\nEstimated time for current combination of rules given your computer's speed: up to "+str(round(numAllCombinations*timeout/currNumCombinations, 1))+" seconds."
+				errorMessage = "The program timed out (seed generation took longer than "+str(Timeout)+" seconds)."
+				# The next line only works for brute force, not backtracking
+				# \n\nEstimated time for current combination of rules given your computer's speed: up to "+str(round(numAllCombinations*Timeout/currNumCombinations, 1))+" seconds."
 			elif useSeed.get() == "1":
 				errorMessage = "Invalid seed."
 			else:
-				errorMessage = "No combination of values satisfies the given combination of rules."
+				errorMessage = "No combination of values satisfies the given combination of rules. Maybe it's just a bad seed?"
 			print(errorMessage)
 			resetAttributes()
 			return (False, errorMessage)
@@ -114,7 +117,7 @@ def randomize():
 		resetAttributes(True)
 		if generateLog.get() == "1":
 			generateTextLog()
-		for att in attributes:
+		for att in Attributes:
 			att.resetToDefault()
 		if generatedRom[0]:
 			numSeedsGenerated += 1
@@ -124,7 +127,7 @@ def randomize():
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
 def shuffleAllAttributes():
-	for att in attributes:
+	for att in Attributes:
 		att.prepare()
 
 def getNumCombinations(rule):
@@ -137,7 +140,7 @@ def setNumAllCombinations():
 	global numAllCombinations
 
 	numAllCombinations = 1
-	for att in attributes:
+	for att in Attributes:
 		numAllCombinations *= len(att.possible_values)
 	return numAllCombinations
 
@@ -149,15 +152,14 @@ def optimizeAttributes(ruleset):
 	for rule in ruleset:
 		numRuleCombinations = getNumCombinations(rule)
 		# only optimize an attribute if it would take a negligible amount of time
-		if numRuleCombinations/numAllCombinations < 0.05:
-			print("Optimizing for rule "+rule.description)
+		if numRuleCombinations < 150000: # 150,000 combinations is what my 3.5 year old laptop checks in about half a second
 			newPossibleValues = []
 			for i in range(len(rule.relatedAttributes)):
 				rule.relatedAttributes[i].resetToFirstValue()
 				newPossibleValues.append([False] * len(rule.relatedAttributes[i].possible_values))
 			nextValueSet = True
 			while nextValueSet:
-				if timeout > 0 and time() > endTime:
+				if Timeout > 0 and time() > endTime:
 					timedOut = True
 					return False
 				if rule.rulePasses(): # you could also check if all current values are True, then skip the rule check (but I think this would be less efficient)
@@ -177,7 +179,7 @@ def optimizeAttributes(ruleset):
 				rule.relatedAttributes[i].possible_values = newVals
 				rule.relatedAttributes[i].resetToFirstValue()
 	numAllCombinationsNew = 1
-	for att in attributes:
+	for att in Attributes:
 		numAllCombinationsNew *= len(att.possible_values)
 	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
 	return True
@@ -198,7 +200,8 @@ def shotgunApproach(ruleset):
 			ruleNum += 1
 	return True
 
-def enforceRuleset(ruleset):
+# backtracking constraint satisfaction across related Attributes only
+def enforceRulesetBacktracking(ruleset):
 	global endTime
 	global timedOut
 	global currNumCombinations
@@ -208,22 +211,9 @@ def enforceRuleset(ruleset):
 
 	while ruleNum < len(ruleset):
 		if not ruleset[ruleNum].rulePasses():
-			if timeout > 0 and time() > endTime:
+			if Timeout > 0 and time() > endTime:
 				timedOut = True
 				return False
-
-			# brute force constraint satisfaction across all attributes
-			# nextValueSet = False
-			# for att in attributes:
-			# 	if att.setToNextValue():
-			# 		nextValueSet = True
-			# 		break
-			# if not nextValueSet:
-			# 	return False
-			# ruleNum = 0
-			# currNumCombinations += 1
-
-			# backtracking constraint satisfaction across related attributes only
 			onePassed = False
 			for att in ruleset[ruleNum].relatedAttributes:
 				nestedRuleNum = 0
@@ -248,7 +238,33 @@ def enforceRuleset(ruleset):
 				if not nextValueSet:
 					return False
 			currNumCombinations += 1
+		else:
+			ruleNum += 1
+	return True
 
+# brute force constraint satisfaction across all Attributes
+def enforceRulesetBruteForce(ruleset):
+	global endTime
+	global timedOut
+	global currNumCombinations
+
+	ruleNum = 0
+	currNumCombinations = 0
+
+	while ruleNum < len(ruleset):
+		if not ruleset[ruleNum].rulePasses():
+			if Timeout > 0 and time() > endTime:
+				timedOut = True
+				return False
+			nextValueSet = False
+			for att in Attributes:
+				if att.setToNextValue():
+					nextValueSet = True
+					break
+			if not nextValueSet:
+				return False
+			ruleNum = 0
+			currNumCombinations += 1
 		else:
 			ruleNum += 1
 	return True
@@ -264,7 +280,7 @@ def generateRom():
 	shutil.copyfile(sourceRom.get(), newRom)
 	try:
 		file = open(newRom, "r+b")
-		for att in attributes:
+		for att in Attributes:
 			for address in att.addresses:
 				writeToAddress(file, address, att.value, att.number_of_bytes)
 		file.close()
@@ -282,20 +298,20 @@ def generateTextLog():
 
 	newLog = path.join(outputFolder, path.splitext(path.basename(sourceRom.get()))[0]+"-"+seedString+".txt")
 	file = open(newLog, "w")
-	file.writelines(program_name+"\nSeed: "+seedString+"\n\nValues:\n")
-	for att in attributes:
+	file.writelines(Program_Name+"\nSeed: "+seedString+"\n\nValues:\n")
+	for att in Attributes:
 		file.writelines(att.name+": "+str(att.value)+"\n")
 	file.close()
 
 def resetAttributes(printAttributes=False):
-	global attributes
+	global Attributes
 	global originalAttributes
 
-	attributes.sort(key=getAttributeNum)
+	Attributes.sort(key=getAttributeNum)
 	if printAttributes:
-		for att in attributes:
+		for att in Attributes:
 			print(att.name+": "+str(att.value))
-	attributes = copy.copy(originalAttributes)
+	Attributes = copy.copy(originalAttributes)
 
 def getFromListByName(arr, name):
 	for a in arr:
@@ -307,7 +323,7 @@ def getAttributeNum(att):
 
 def getShuffledAttributeNum(att):
 	num = 0
-	for a in attributes:
+	for a in Attributes:
 		if a is att:
 			return num
 		num += 1
@@ -397,7 +413,7 @@ class TopLevel:
 		top.minsize(int(1000*sizeRatio), int(600*sizeRatio))
 		# top.maxsize(2000, 600)
 		top.resizable(1, 1)
-		top.title(program_name)
+		top.title(Program_Name)
 		top.configure(background="#d9d9d9")
 		top.configure(highlightbackground="#d9d9d9")
 		top.configure(highlightcolor="black")
@@ -413,7 +429,7 @@ class TopLevel:
 		helpMenu = tk.Menu(menubar, tearoff=0)
 		helpMenu.add_command(label="View Help...", command=self.showHelpPopup)
 		helpMenu.add_separator()
-		if about_page_text is not None and about_page_text != "":
+		if About_Page_Text is not None and About_Page_Text != "":
 			helpMenu.add_command(label="About...", command=self.showAboutPopup)
 		helpMenu.add_command(label="Simple Randomizer Maker", command=self.showSRMPopup)
 		menubar.add_cascade(label="Help", menu=helpMenu)
@@ -428,7 +444,7 @@ class TopLevel:
 
 		# Rom Input Label
 		self.Label_RomInput = ttk.Label(top)
-		romTextLength = self.getTextLength(rom_name)
+		romTextLength = self.getTextLength(Rom_Name)
 		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(background="#d9d9d9")
 		self.Label_RomInput.configure(foreground="#000000")
@@ -436,11 +452,11 @@ class TopLevel:
 		self.Label_RomInput.configure(relief="flat")
 		self.Label_RomInput.configure(anchor='w')
 		self.Label_RomInput.configure(justify='left')
-		self.Label_RomInput.configure(text=rom_name)
+		self.Label_RomInput.configure(text=Rom_Name)
 
 		# Rom Input Entry
 		self.Entry_RomInput = ttk.Entry(top)
-		# old relx=.035+self.getTextLength(rom_name+' ROM')-.02
+		# old relx=.035+self.getTextLength(Rom_Name+' ROM')-.02
 		# old relwidth=.40
 		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
 		self.Entry_RomInput.configure(state='readonly')
@@ -450,7 +466,7 @@ class TopLevel:
 
 		# Rom Input Button
 		self.Button_RomInput = ttk.Button(top)
-		# old relx=.035+self.getTextLength(rom_name+' ROM')-.02+.40+.01
+		# old relx=.035+self.getTextLength(Rom_Name+' ROM')-.02+.40+.01
 		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
 		self.Button_RomInput.configure(command=self.setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
@@ -495,7 +511,7 @@ class TopLevel:
 		# Ruleset Check Buttons
 		self.CheckButtons = []
 		self.CheckButtons_tooltips = []
-		numOptRulesets = len(optional_rulesets)
+		numOptRulesets = len(Optional_Rulesets)
 		if numOptRulesets == 0:
 			yShiftArray = [0]
 		elif numOptRulesets == 1:
@@ -514,7 +530,7 @@ class TopLevel:
 			xShiftArray = [-.30, 0, .30]
 		optRulesetNum = 0
 		global optRulesetValues
-		for ruleset in optional_rulesets:
+		for ruleset in Optional_Rulesets:
 			if optRulesetNum >= 14:
 				print("Warning: You can only have up to 14 optional rulesets. Ignoring the rest.")
 				break
@@ -583,7 +599,7 @@ class TopLevel:
 		self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
 		self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
 		self.Button_CreateRom.configure(command=self.attemptRandomize)
-		for i in range(min(len(optional_rulesets), 13)):
+		for i in range(min(len(Optional_Rulesets), 13)):
 			self.CheckButtons[i].configure(command=self.prepareSettingsFromDependencies)
 		self.prepareSettingsFromDependencies()
 
@@ -594,8 +610,8 @@ class TopLevel:
 		lower = 5 * (num//5)
 		upper = lower + 5
 		sizeArr = []
-		for i in range(lower, min(upper, len(optional_rulesets))):
-			sizeArr.append(self.getTextLength(optional_rulesets[i].name)-.03)
+		for i in range(lower, min(upper, len(Optional_Rulesets))):
+			sizeArr.append(self.getTextLength(Optional_Rulesets[i].name)-.03)
 		if len(sizeArr) == 0:
 			return self.getTextLength("# of Seeds")-.03
 		return max(sizeArr)
@@ -619,19 +635,19 @@ class TopLevel:
 			currCheckButton.configure(state="normal")
 			for j in range(len(self.CheckButtons)):
 				currRulesetVal = optRulesetValues[j].get()
-				currRulesetName = optional_rulesets[j].name
-				if ((currRulesetVal == "1") and (currRulesetName in optional_rulesets[i].must_be_disabled)
-					) or ((currRulesetVal == "0") and (currRulesetName in optional_rulesets[i].must_be_enabled)):
+				currRulesetName = Optional_Rulesets[j].name
+				if ((currRulesetVal == "1") and (currRulesetName in Optional_Rulesets[i].must_be_disabled)
+					) or ((currRulesetVal == "0") and (currRulesetName in Optional_Rulesets[i].must_be_enabled)):
 					optRulesetValues[i].set("0")
 					currCheckButton.configure(state="disabled")
 					break
 
 	def setSourceRom(self):
 		global sourceRom
-		if rom_file_format is None or rom_file_format == "":
+		if Rom_File_Format is None or Rom_File_Format == "":
 			sourceRom.set(askopenfilename())
 		else:
-			sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+rom_file_format)]))
+			sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+Rom_File_Format)]))
 
 	def keepUpperCharsSeed(self, unused):
 		global seedInput
@@ -646,7 +662,7 @@ class TopLevel:
 
 		optionalRulesetsList = [("", 0)] * len(optRulesetValues)
 		for i in range(len(optRulesetValues)):
-			optionalRulesetsList[i] = (optional_rulesets[i].name, int(optRulesetValues[i].get()))
+			optionalRulesetsList[i] = (Optional_Rulesets[i].name, int(optRulesetValues[i].get()))
 		results = randomize()
 		print("\n")
 		# message.set(results[1])
@@ -664,7 +680,7 @@ class TopLevel:
 			\nGenerated ROMs will be placed in an \"output\" folder, which will be in the same folder as this program.")
 
 	def showAboutPopup(self):
-		showinfo("About", about_page_text)
+		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
 		showinfo("Simple Randomizer Maker v1.0", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
@@ -800,7 +816,7 @@ def set_Tk_var():
 	sourceRom = tk.StringVar()
 	global optRulesetValues
 	optRulesetValues = []
-	for i in range(len(optional_rulesets)):
+	for i in range(len(Optional_Rulesets)):
 		optRulesetValues.append(tk.StringVar())
 	global numSeeds
 	numSeeds = tk.StringVar()

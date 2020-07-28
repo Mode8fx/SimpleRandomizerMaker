@@ -135,6 +135,16 @@ ruleTypesDict = {
 	"count" : "count",
 }
 
+ruleTypesOtherDict = {
+	"eq" : "==",
+	"ne" : "!=",
+	"gt" : ">",
+	"ge" : ">=",
+	"lt" : "<",
+	"le" : "<=",
+	"count" : "count",
+}
+
 class Rule:
 	def __init__(self, left_side, rule_type, right_side=None, description=""):
 		self.description = description
@@ -156,7 +166,8 @@ class Rule:
 		# print([att.name for att in self.relatedAttributes])
 	def storeRelatedAttributes(self, att):
 		if isinstance(att, Attribute):
-			self.relatedAttributes.append(att)
+			if not att in self.relatedAttributes:
+				self.relatedAttributes.append(att)
 			for val in att.specialVal:
 				self.storeRelatedAttributes(val)
 		elif isinstance(att, list):
@@ -200,7 +211,7 @@ class Rule:
 			print("Something went wrong. Failed to verify rule.")
 			return False
 	def simplifyRule(self, rulesArray):
-		newDescription = "Generated "+self.rule_type
+		newDescription = "Generated "+ruleTypesOtherDict.get(self.rule_type)
 		if self.rule_type == "eq" and self.right_side is None:
 			for i in range(1, len(self.left_side)):
 				newRule = Rule(description=newDescription, left_side=self.left_side[0], rule_type="==", right_side=self.left_side[i])

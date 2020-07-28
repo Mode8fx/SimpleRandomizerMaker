@@ -1,10 +1,10 @@
 # This is a randomizer file for the Simple Randomizer Maker.
-# This file must be named my_randomizer.py in order to work.
+# This file must be named randomizer.py in order to work.
 
 from classes import *
 
 def value(name):
-	for att in attributes:
+	for att in Attributes:
 		if att.name == name:
 			return att
 	print("This attribute does not exist: "+name)
@@ -14,13 +14,14 @@ def value(name):
 # EDIT BELOW THIS LINE #
 ########################
 
-program_name = "Amazing Mirror Randomizer"
-rom_name = "Kirby & The Amazing Mirror (USA)"
-rom_file_format = "gba"
-about_page_text = "This is a sample randomizer for Kirby & The Amazing Mirror that changes the abilities given by a few enemies (specifically, the ones in the first area of the game)."
-timeout = 10
+Program_Name = "Amazing Mirror Randomizer"
+Rom_Name = "Kirby & The Amazing Mirror (USA)"
+Rom_File_Format = "gba"
+About_Page_Text = "This is a sample randomizer for Kirby & The Amazing Mirror that changes the abilities given by a few enemies (specifically, the ones in the first area of the game)."
+Timeout = 10
+Slow_Mode = False
 
-attributes = [
+Attributes = [
 	Attribute(
 		name="Waddle Dee",
 		addresses=[0x35164E, 0x351B76],
@@ -35,40 +36,40 @@ attributes = [
 	),
 	Attribute(
 		name="Leap",
-		addresses=0x3517B6,
+		addresses=[0x3517B6],
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Big Waddle Dee",
-		addresses=0x3517E6,
+		addresses=[0x3517E6],
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Flamer",
-		addresses=0x351816,
+		addresses=[0x351816],
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Sword Knight",
-		addresses=0x3518BE,
+		addresses=[0x3518BE],
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Cupie",
-		addresses=0x35176E,
+		addresses=[0x35176E],
 		min_value=0,
 		max_value=26,
 	),
 ]
 
-required_rules = [
+Required_Rules = [
 ]
 
-optional_rulesets = [
+Optional_Rulesets = [
 	Ruleset(
 		name="All Enemies Give An Ability",
 		description="All enemies are guaranteed to give an ability.",
@@ -222,5 +223,18 @@ optional_rulesets = [
 			),
 		],
 		must_be_disabled=["All Master", "At Least 1 UFO", "All Unique"],
+	),
+	Ruleset(
+		name="XOR Statement",
+		description="All enemies are guaranteed to give an ability.",
+		rules=[
+			Rule(
+				description="Either Waddle Dee gives Cutter (ability #6), or Droppy gives Throw (ability #10), but not both/neither",
+				left_side=[value("Waddle Dee")==6, value("Droppy")==10],
+				rule_type="count",
+				right_side=("==", True, "==", 1),
+			),
+		],
+		must_be_disabled=["All Master"]
 	),
 ]
