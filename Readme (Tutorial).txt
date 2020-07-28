@@ -252,7 +252,7 @@ optional_rulesets = [
 		rules=[
 			Rule(
 				description="The first Attribute is an even number, the other two are odd",
-				left_side=[(value("My Attribute 1")%2 == 0), (value("My Attribute 2")%2 == 1), (value("My Attribute 3")%2 == 1)],
+				left_side=[(value("My Attribute 1")%2, "==", 0), (value("My Attribute 2")%2, "==", 1), (value("My Attribute 3")%2, "==", 1)],
 				rule_type="==",
 				right_side=None,
 			),
@@ -280,6 +280,13 @@ TIPS
 That's everything you need to know to make your own randomizer! But here are a
 few more tips if you want them:
 
+ADVANCED RULES
+- Look back at Ruleset #2 in the Rulesets section. If you're creative (and have
+  a little bit of coding experience), you can push the boundaries and come up
+  with some interesting rules. You can add OR (or XOR) statements, check if
+  values are divisible by certain numbers, perform bitwise operations on them,
+  and more.
+====================
 NO UNNECESSARY ARRAYS
 - When inputting addresses, left_side, right_side, must_be_enabled, or
   must_be_disabled, you don't have to use an array if you are only using one
@@ -308,12 +315,6 @@ RULE COMPRESSION
   ... will check all of (A > C), (A > D), (B > C), and (B > D). Nested rules
   like this are automatically broken down into smaller rules, so in most
   situations, you won't have to worry about breaking them down yourself.
-====================
-CRAZY RULES
-- Look back at Ruleset #2 in the Rulesets section. If you're creative (and have
-  some coding experience), you can push the boundaries and come up with some
-  interesting rules. You can check if values are divisible by certain numbers,
-  perform bitwise operations on them, and more.
 ====================
 SPEED/TIMEOUT
 - Optimization algorithms are used to speed up seed generation. But if your

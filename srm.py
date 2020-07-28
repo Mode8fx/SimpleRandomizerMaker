@@ -5,7 +5,7 @@ from gatelib import *
 try:
 	from randomizer import *
 except:
-	print("Randomizer file not found. Make sure it is named \"randomizer.py\"")
+	print("Valid randomizer file not found. Make sure it is named \"randomizer.py\" and does not contain any errors.")
 	import sys
 	sys.exit()
 
@@ -85,12 +85,18 @@ def randomize():
 		myRules = simplifiedRules
 		myRules.sort(key=getNumCombinations)
 		setNumAllCombinations()
-		result = optimizeAttributes(myRules)
+		try:
+			result = optimizeAttributes(myRules)
+		except:
+			errorMessage = "At least one of your rules is bad (has no possible solution)."
+			print(errorMessage)
+			resetAttributesAndSeed()
+			return (False, errorMessage)
 		if not result:
 			errorMessage = "The program timed out (seed generation took longer than "+str(Timeout)+" seconds)."
 			# \n\nEstimated time for current combination of rules: unknown."
 			print(errorMessage)
-			resetAttributes()
+			resetAttributesAndSeed()
 			return (False, errorMessage)
 		# initialize Attributes
 		shuffleAllAttributes()
@@ -110,11 +116,11 @@ def randomize():
 			else:
 				errorMessage = "No combination of values satisfies the given combination of rules. Maybe it's just a bad seed?"
 			print(errorMessage)
-			resetAttributes()
+			resetAttributesAndSeed()
 			return (False, errorMessage)
 
 		generatedRom = generateRom()
-		resetAttributes(True)
+		resetAttributesAndSeed(True)
 		if generateLog.get() == "1":
 			generateTextLog()
 		for att in Attributes:
@@ -123,7 +129,7 @@ def randomize():
 			numSeedsGenerated += 1
 		else:
 			return generatedRom
-	resetAttributes()
+	resetAttributesAndSeed()
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
 def shuffleAllAttributes():
@@ -171,7 +177,6 @@ def optimizeAttributes(ruleset):
 						nextValueSet = True
 						break
 			for i in range(len(rule.relatedAttributes)):
-				# rule.relatedAttributes[i].possible_values = list(val for val in rule.relatedAttributes[i].possible_values if newPossibleValues[i][rule.relatedAttributes[i].index])
 				newVals = []
 				for j in range(len(rule.relatedAttributes[i].possible_values)):
 					if newPossibleValues[i][j] == True:
@@ -184,7 +189,7 @@ def optimizeAttributes(ruleset):
 	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
 	return True
 
-# attempt 50 completely random combinations before attempting the normal approach
+# attempt 50 completely random combinations before attempting a normal approach
 def shotgunApproach(ruleset):
 	ruleNum = 0
 	numAttempts = 0
@@ -303,7 +308,7 @@ def generateTextLog():
 		file.writelines(att.name+": "+str(att.value)+"\n")
 	file.close()
 
-def resetAttributes(printAttributes=False):
+def resetAttributesAndSeed(printAttributes=False):
 	global Attributes
 	global originalAttributes
 
@@ -312,6 +317,7 @@ def resetAttributes(printAttributes=False):
 		for att in Attributes:
 			print(att.name+": "+str(att.value))
 	Attributes = copy.copy(originalAttributes)
+	random.seed(time())
 
 def getFromListByName(arr, name):
 	for a in arr:

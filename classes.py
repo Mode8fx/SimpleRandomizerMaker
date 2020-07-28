@@ -61,6 +61,9 @@ class Attribute:
 		if len(self.specialOperators) == 0:
 			return self.value
 		comparedVal = self.value
+		# print(self.specialOperators)
+		# print(self.specialVal)
+		# print(self.ruleOnSpecialOp)
 		for i in range(len(self.specialOperators)):
 			if self.ruleOnSpecialOp[i] == ruleNum:
 				if self.specialVal[i] is not None:
@@ -79,6 +82,18 @@ class Attribute:
 		self.specialVal.append(val)
 		self.ruleOnSpecialOp.append(ruleCounter)
 		return self
+	def duplicateOperations(self, oldRuleNum, newRuleNum):
+		newSO = copy.copy(self.specialOperators)
+		newSV = copy.copy(self.specialVal)
+		newROSO = copy.copy(self.ruleOnSpecialOp)
+		for i in range(len(self.ruleOnSpecialOp)):
+			if self.ruleOnSpecialOp[i] == oldRuleNum:
+				newSO.append(self.specialOperators[i])
+				newSV.append(self.specialVal[i])
+				newROSO.append(newRuleNum)
+		self.specialOperators = newSO
+		self.specialVal = newSV
+		self.ruleOnSpecialOp = newROSO
 	def __add__(self, val):
 		return self.addSpecialOperator("add", val)
 	def __sub__(self, val):
@@ -146,7 +161,7 @@ ruleTypesOtherDict = {
 }
 
 class Rule:
-	def __init__(self, left_side, rule_type, right_side=None, description=""):
+	def __init__(self, left_side, rule_type, right_side=None, description="", oldRuleNum=None):
 		self.description = description
 		if self.description is None:
 			self.description = ""
@@ -157,22 +172,30 @@ class Rule:
 		self.right_side = right_side
 		global ruleCounter
 		self.ruleNum = ruleCounter
+		if oldRuleNum is not None:
+			self.left_side = self.handleMidStatementAssertion(self.left_side, oldRuleNum, self.ruleNum)
+			self.right_side = self.handleMidStatementAssertion(self.right_side, oldRuleNum, self.ruleNum)
 		ruleCounter += 1
 		self.relatedAttributes = []
 		self.storeRelatedAttributes(self.left_side)
 		self.storeRelatedAttributes(self.right_side)
-		self.temp = 0
-		# print(self.description)
-		# print([att.name for att in self.relatedAttributes])
 	def storeRelatedAttributes(self, att):
 		if isinstance(att, Attribute):
 			if not att in self.relatedAttributes:
 				self.relatedAttributes.append(att)
 			for val in att.specialVal:
 				self.storeRelatedAttributes(val)
-		elif isinstance(att, list):
+		elif isinstance(att, list) or isinstance(att, tuple):
 			for a in att:
 				self.storeRelatedAttributes(a)
+	def handleMidStatementAssertion(self, att, oldRuleNum, newRuleNum):
+		if isinstance(att, tuple) and isinstance(att[0], Attribute):
+			att[0].duplicateOperations(oldRuleNum, newRuleNum)
+			return att[0].addSpecialOperator(ruleTypesDict.get(att[1]), att[2])
+		elif isinstance(att, list):
+			for i in range(len(att)):
+				att[i] = self.handleMidStatementAssertion(att[i], oldRuleNum, newRuleNum)
+		return att
 	def rulePasses(self):
 		try:
 			if self.rule_type == "eq" and self.right_side is not None:
@@ -180,6 +203,14 @@ class Rule:
 				right = []
 				for att in self.asList(self.right_side):
 					right.append(self.setSide(att))
+				# if left in right:
+				# 	print("WHOA")
+				# 	print(self.left_side.value)
+				# 	print(self.left_side.specialOperators)
+				# 	print(self.left_side.ruleOnSpecialOp)
+				# 	print(self.right_side.value)
+				# 	print(self.right_side.specialOperators)
+				# 	print(self.right_side.ruleOnSpecialOp)
 				return left in right
 			elif self.rule_type == "count":
 				left = self.asList(self.left_side)
@@ -214,20 +245,21 @@ class Rule:
 		newDescription = "Generated "+ruleTypesOtherDict.get(self.rule_type)
 		if self.rule_type == "eq" and self.right_side is None:
 			for i in range(1, len(self.left_side)):
-				newRule = Rule(description=newDescription, left_side=self.left_side[0], rule_type="==", right_side=self.left_side[i])
+				newRule = Rule(description=newDescription, left_side=self.left_side[0], rule_type="==", right_side=self.left_side[i], oldRuleNum=self.ruleNum)
 				rulesArray.append(newRule)
 		elif self.rule_type == "ne" and self.right_side is None:
 			for i in range(len(self.left_side)-1):
 				for j in range(i+1, len(self.left_side)):
-					newRule = Rule(description=newDescription, left_side=self.left_side[i], rule_type="!=", right_side=self.left_side[j])
+					newRule = Rule(description=newDescription, left_side=self.left_side[i], rule_type="!=", right_side=self.left_side[j], oldRuleNum=self.ruleNum)
 					rulesArray.append(newRule)
 		elif self.rule_type in ["ne","gt","ge","lt","le"]:
 			for lVal in self.asList(self.left_side):
 				for rVal in self.asList(self.right_side):
-					newRule = Rule(description=newDescription, left_side=lVal, rule_type=self.rule_type, right_side=rVal)
+					newRule = Rule(description=newDescription, left_side=lVal, rule_type=self.rule_type, right_side=rVal, oldRuleNum=self.ruleNum)
 					rulesArray.append(newRule)
 		else:
-			rulesArray.append(self)
+			newRule = Rule(description=self.description, left_side=self.left_side, rule_type=self.rule_type, right_side=self.right_side, oldRuleNum=self.ruleNum)
+			rulesArray.append(newRule)
 	def asList(self, side):
 		if isinstance(side, list):
 			return side

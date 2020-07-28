@@ -230,7 +230,7 @@ Optional_Rulesets = [
 		rules=[
 			Rule(
 				description="Either Waddle Dee gives Cutter (ability #6), or Droppy gives Throw (ability #10), but not both/neither",
-				left_side=[value("Waddle Dee")==6, value("Droppy")==10],
+				left_side=[(value("Waddle Dee"), "==", 6), (value("Droppy"), "==", 10)],
 				rule_type="count",
 				right_side=("==", True, "==", 1),
 			),

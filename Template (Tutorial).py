@@ -74,8 +74,8 @@ If you're using this file as a template, MAKE SURE YOU DELETE THESE RULESETS!
 """
 Optional_Rulesets = [
 	Ruleset(
-		name="My Ruleset 1",
-		description="Description of My Ruleset 1",
+		name="Basic Rules",
+		description="A set of basic rules",
 		rules=[
 			Rule(
 				description="My Attribute 1 and My Attribute 2 are not equal",
@@ -84,7 +84,7 @@ Optional_Rulesets = [
 				right_side=None,
 			),
 			Rule(
-				description="My Attribute 1 has complex requirements",
+				description="My Attribute 1 has more requirements",
 				left_side=value("My Attribute 1"),
 				rule_type="<",
 				right_side=(value("My Attribute 2")+5) - (value("My Attribute 3")/4),
@@ -94,12 +94,12 @@ Optional_Rulesets = [
 		must_be_disabled=None,
 	),
 	Ruleset(
-		name="My Ruleset 2",
-		description="Description of My Ruleset 2",
+		name="Advanced Rules",
+		description="A set of advanced rules",
 		rules=[
 			Rule(
 				description="The first Attribute is an even number, the other two are odd",
-				left_side=[(value("My Attribute 1")%2 == 0), (value("My Attribute 2")%2 == 1), (value("My Attribute 3")%2 == 1)],
+				left_side=[(value("My Attribute 1")%2, "==", 0), (value("My Attribute 2")%2, "==", 1), (value("My Attribute 3")%2, "==", 1)],
 				rule_type="==",
 				right_side=None,
 			),
