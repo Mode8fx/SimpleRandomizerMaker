@@ -16,7 +16,7 @@ All you need are the ROM addresses of whatever you want to change, along with po
 - Includes detailed tutorial plus two sample randomizers
 
 ## Example Functions
-I recommend you look at the included tutorial and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
+I recommend you look at the included ![tutorial](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Readme%20(Tutorial).md) and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some examples:
 ```
 Attribute(
 	name="My Attribute",
@@ -53,8 +53,8 @@ Rule(
 ```
 ```
 Rule(
-	description="My Attribute 1 is 5, or My Attribute 2 is 10 (or both)",
-	left_side=[(value("Waddle Dee"), "==", 6), (value("Droppy"), "==", 10)],
+	description="My Attribute 1 is 5, or My Attribute 2 is less than 10 (or both)",
+	left_side=[(value("My Attribute 1"), "==", 5), (value("My Attribute 2"), "<", 10)],
 	rule_type="count",
 	right_side=("==", True, ">=", 1),
 ),
