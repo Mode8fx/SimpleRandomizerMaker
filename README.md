@@ -17,7 +17,6 @@ All you need are the ROM addresses of whatever you want to change, along with po
 
 ## Example Functions
 I recommend you look at the included tutorial and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
-
 ```
 Attribute(
 	name="My Attribute",
@@ -34,9 +33,10 @@ Rule(
 	left_side=value("My Attribute 2") + value("My Attribute 3"),
 	rule_type=">=",
 	right_side=20,
-),`
-
-`Rule(
+),
+```
+```
+Rule(
 	description="My Attribute 1 must be one of these values",
 	left_side=value("My Attribute 1"),
 	rule_type="==",
