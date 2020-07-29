@@ -7,25 +7,25 @@ If you want to edit one of the templates, keep in mind that you need to rename i
 ## Settings
 First, the settings for the randomizer itself:
 
-###### Program Name
+##### Program Name
 - The name of the randomizer.
 
-###### Rom Name
+##### Rom Name
 - The name of the rom that's compatible with the randomizer. The rom doesn't have to have this exact name, it's just to guide the user.
 
-###### ROM File Format
+##### ROM File Format
 - (optional) The file format of the ROM ("nes", "gba", etc).
 - If you want to allow any file type, leave it as ""
 
-###### About Page Text
+##### About Page Text
 - Any text you want to put on the "About..." page on the menu bar.
 - If you don't want an About page, leave it as ""
 
-###### Timeout
+##### Timeout
 - The number of seconds you want to wait per seed before the randomizer times out. If you don't want a timeout, leave it as 0.
 - It is recommended that you at least set a timeout during testing so you can know how long it takes to create a seed.
 
-###### Slow Mode
+##### Slow Mode
 - Setting this to True changes the seed generation to a much slower method. This is a debug setting, so it's recommended that you leave this as False unless you're having trouble getting your randomizer to work.
 
 ## Attribute
@@ -36,31 +36,31 @@ An Attribute is anything you want to change the value for, such as item price, e
 
 An Attribute has the following components:
 
-###### Name
+##### Name
 - The name of the Attribute.
 
-###### Addresses
+##### Addresses
 - The memory address(es) of the Attribute. These addresses must be in an array, meaning you separate them with commas and put them all between brackets.
 `[0x01234, 0x56789, 0xABCDE]`
 - These are hex address, so remember to put 0x in front of each one.
 
-###### Number of Bytes
+##### Number of Bytes
 - (optional) The number of bytes taken up by each of these addresses. If you don't know what this means, leave it as None (the program will attempt to guess).
 
-###### Possible Values
+##### Possible Values
 - (semi-optional) An array of possible values for this Attribute. The addresses will be set to one of these values.
 `[1, 4, 21, 83, 106]`
 - An Attribute must use either Possible Values or both Min Value and Max Value (see below).
 
-###### Min Value
+##### Min Value
 - (semi-optional) The smallest possible value.
 
-###### Max Value
+##### Max Value
 - (semi-optional) The largest possible value. EXAMPLE: setting min_value to 5 and max_value to 10 will make the possible values [5,6,7,8,9,10].
 
 If you choose not to use one of the optional variables, set its value to None
 
-##### Attribute Examples
+#### Attribute Examples
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE ATTRIBUTES!
 
 `Attributes = [
@@ -101,23 +101,23 @@ Rules that you want to always apply are stored in an array called required_rules
 
 A Rule has the following components:
 
-###### Description
+##### Description
 - (optional) A description of the Rule. This isn't actually used for anything, but it can be useful for organizing your Rules.
 
-###### Left Side
+##### Left Side
 - The first part of the rule. If you think of a rule as an equation like "a + b > c", then Left Side is "a + b", Rule Type (see below) is ">", and Right Side (also see below) is "c".
 
-###### Rule Type
+##### Rule Type
 - The type of comparison. Possible comparisons are:
   `"=" (or "=="), "!=", ">", ">=", "<", "<=", and "count"`
 - Most of these are self-explanatory, but the "count" comparison lets you count how many attributes fulfill a certain requirement (see EXAMPLE 3 below).
 
-###### Right Side
+##### Right Side
 - The right side of the comparison (may be unused, depending on the rule).
 
 If you choose not to use one of the optional variables, set its value to None
 
-##### Rule Examples
+#### Rule Examples
 - EXAMPLE 1: If you want to set a requirement that a Super Potion must cost at least as much as (two Potions + 100), then you would set the following:
 `Rule(
 	left_side=value("Super Poiton"),
@@ -166,24 +166,24 @@ Rulesets are stored in an array called optional_rulesets. If you don't want any 
 
 A Ruleset has the following variables:
 
-###### Name
+##### Name
 - The name of the Ruleset.
 
-###### Description
+##### Description
 (optional) A description of the ruleset. This is what appears when you move your mouse over the ruleset.
 
-###### Rules
+##### Rules
 - An array of Rules that are applied if the Ruleset is enabled.
 
-###### Must Be Enabled
+##### Must Be Enabled
 - (optional) An array of Ruleset names. This Ruleset can only be enabled if all of the optional Rulesets in this array are also enabled.
 
-###### Must Be Disabled
+##### Must Be Disabled
 - (optional) An array of Ruleset names. This Ruleset can only be enabled if all of the optional Rulesets in this array are disabled.
 
 If you choose not to use one of the optional variables, set its value to None
 
-##### Ruleset Examples (+ More Rule Examples)
+#### Ruleset Examples (+ More Rule Examples)
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE RULESETS!
 
 `Optional_Rulesets = [
@@ -234,17 +234,17 @@ A code example can be found below. If you're using this file as a template, MAKE
 	),
 ]`
 
-## TIPS
+## Tips
 
 That's everything you need to know to make your own randomizer! But here are a few more tips if you want them:
 
-###### ADVANCED RULES
+##### Advanced Rules
 - Look back at Ruleset #2 in the Rulesets section. If you're creative (and have a little bit of coding experience), you can push the boundaries and come up with some interesting rules. You can add OR (or XOR) statements, check if values are divisible by certain numbers, perform bitwise operations on them, and more.
 - See the Amazing Mirror Template for an example of an XOR statement. If you want to make something like an OR or XOR statement, remember that a statement returns 1 or 0 if it's True or False respectively. For example, this statement:
 `(value("Attribute 1"), ">", 5)`
 ... will be equivalent to 1 if Attribute 1 is greater than 5, or 0 if Attribute 1 is not greater than 5.
 
-###### NO UNNECESSARY ARRAYS
+##### No Unnecessary Arrays
 - When inputting addresses, left_side, right_side, must_be_enabled, or must_be_disabled, you don't have to use an array if you are only using one value.
 
 For example, either of these will work the same:
@@ -255,7 +255,7 @@ addresses = 0x12345`
 `left_side = [value("A")]
 left_side = value("A")`
 
-###### RULE COMPRESSION
+##### Rule Compression
 - For most Rule types (everything except "==" and "count"), you can set the Left Side and Right Side as arrays of multiple values each, and comparisons will be performed on every combination of Left Side and Right Side value. For example, this rule:
 
 `Rule(
@@ -267,9 +267,9 @@ left_side = value("A")`
 
 ... will check all of (A > C), (A > D), (B > C), and (B > D). Nested rules like this are automatically broken down into smaller rules, so in most situations, you won't have to worry about breaking them down yourself.
 
-###### SPEED/TIMEOUT
+##### Speed/Timeout
 - Optimization algorithms are used to speed up seed generation. But if your randomizer is going too slow, see if you have any "count" rules and consider reworking them into something else; "count" doesn't work as well with optimization. If it's still too slow, see if increasing your Timeout by a few seconds solves it.
 
-###### NO SOLUTION?
+##### No Solution?
 - In case you run into a situation where your randomizer gives an error that no possible combination of values was found: Look through your Attributes and Rules again and make sure they can actually generate a solution. That includes making sure two enabled optional rulesets don't conflict with each other. You can also try running the randomizer a few more times; maybe you just got a bad seed. Otherwise, read on.
 - Backtracking constraint satisfaction is used to heavily speed up seed generation. By "heavily", I mean "a rule that used to take ~10 hours to apply now takes less than a second". If your randomizer gives an error that no solution was found, you can try setting Slow_Mode to True; this will make the randomizer use brute force calculation instead, which has a VERY SLIGHT chance of fixing your problem. But again, make sure your Rules/Attributes can actually generate a solution before attempting this.
