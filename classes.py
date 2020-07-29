@@ -9,6 +9,17 @@ import operator
 
 attributeCounter = 0
 ruleCounter = 0
+defaultRuleNum = 0
+
+def setDefaultRuleNum():
+	global defaultRuleNum
+	global ruleCounter
+	defaultRuleNum = ruleCounter
+
+def resetRuleCounter():
+	global ruleCounter
+	global defaultRuleNum
+	ruleCounter = defaultRuleNum
 
 class Attribute:
 	def __init__(self, name, addresses, number_of_bytes=None, possible_values=None, min_value=None, max_value=None):
@@ -20,10 +31,9 @@ class Attribute:
 		self.possible_values = possible_values
 		if possible_values is None or len(possible_values) == 0:
 			self.possible_values = list(range(min_value, max_value+1))
-			self.default_possible_values = copy.copy(self.possible_values)
 		else:
 			self.possible_values = [v for v in possible_values if (min_value is None or v >= min_value) and (max_value is None or v <= max_value)]
-			self.default_possible_values = copy.copy(self.possible_values)
+		self.default_possible_values = copy.copy(self.possible_values)
 		if number_of_bytes is None:
 			self.number_of_bytes = ceil(max(self.possible_values).bit_length() / 8.0)
 		else:
@@ -61,9 +71,6 @@ class Attribute:
 		if len(self.specialOperators) == 0:
 			return self.value
 		comparedVal = self.value
-		# print(self.specialOperators)
-		# print(self.specialVal)
-		# print(self.ruleOnSpecialOp)
 		for i in range(len(self.specialOperators)):
 			if self.ruleOnSpecialOp[i] == ruleNum:
 				if self.specialVal[i] is not None:
@@ -203,14 +210,6 @@ class Rule:
 				right = []
 				for att in self.asList(self.right_side):
 					right.append(self.setSide(att))
-				# if left in right:
-				# 	print("WHOA")
-				# 	print(self.left_side.value)
-				# 	print(self.left_side.specialOperators)
-				# 	print(self.left_side.ruleOnSpecialOp)
-				# 	print(self.right_side.value)
-				# 	print(self.right_side.specialOperators)
-				# 	print(self.right_side.ruleOnSpecialOp)
 				return left in right
 			elif self.rule_type == "count":
 				left = self.asList(self.left_side)
@@ -241,6 +240,15 @@ class Rule:
 		except:
 			print("Something went wrong. Failed to verify rule.")
 			return False
+	# unused
+	def extractAttsFromTuples(self, side):
+		if isinstance(side, list):
+			for i in range(len(side)):
+				if isinstance(side[i], tuple) and isinstance(side[i][0], Attribute):
+					side[i] = side[i][0]
+		elif isinstance(side, tuple) and isinstance(side[0], Attribute):
+			side = side[0]
+		return side
 	def simplifyRule(self, rulesArray):
 		newDescription = "Generated "+ruleTypesOtherDict.get(self.rule_type)
 		if self.rule_type == "eq" and self.right_side is None:

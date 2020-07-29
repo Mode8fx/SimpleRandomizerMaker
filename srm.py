@@ -28,6 +28,7 @@ numAllCombinations = 1
 currNumCombinations = 0
 
 def main():
+	setDefaultRuleNum()
 	vp_start_gui()
 
 def randomize():
@@ -318,6 +319,7 @@ def resetAttributesAndSeed(printAttributes=False):
 			print(att.name+": "+str(att.value))
 	Attributes = copy.copy(originalAttributes)
 	random.seed(time())
+	resetRuleCounter()
 
 def getFromListByName(arr, name):
 	for a in arr:
