@@ -1,5 +1,6 @@
 # Simple Randomizer Maker
 This is a program that allows you to easily create your own game randomizer with little to no coding.
+
 ![](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Screenshot.png?raw=true)
 
 ## How It Works
