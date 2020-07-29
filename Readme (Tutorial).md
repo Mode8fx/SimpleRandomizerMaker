@@ -90,7 +90,6 @@ Attributes = [
 	),
 ]
 ```
-
 ## Rule
 
 This is the second component.
@@ -162,7 +161,6 @@ Required_Rules = [
 	),
 ]
 ```
-
 ## Ruleset
 
 The third and final component is simpler than the other two because it's basically a set of rules, fittingly named a Ruleset.
@@ -193,7 +191,6 @@ If you choose not to use one of the optional variables, set its value to None
 
 #### Ruleset Examples (+ More Rule Examples)
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE RULESETS!
-
 ```
 Optional_Rulesets = [
 	Ruleset(
@@ -243,7 +240,6 @@ Optional_Rulesets = [
 	),
 ]
 ```
-
 ## Tips
 
 That's everything you need to know to make your own randomizer! But here are a few more tips if you want them:
@@ -267,7 +263,6 @@ left_side = value("A")`
 
 ##### Rule Compression
 - For most Rule types (everything except "==" and "count"), you can set the Left Side and Right Side as arrays of multiple values each, and comparisons will be performed on every combination of Left Side and Right Side value. For example, this rule:
-
 ```
 Rule(
 	description="Several comparisons",
@@ -276,7 +271,6 @@ Rule(
 	right_side=[value("C"), value("D")],
 )
 ```
-
 ... will check all of (A > C), (A > D), (B > C), and (B > D). Nested rules like this are automatically broken down into smaller rules, so in most situations, you won't have to worry about breaking them down yourself.
 
 ##### Speed/Timeout
