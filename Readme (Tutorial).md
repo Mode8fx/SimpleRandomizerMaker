@@ -165,7 +165,7 @@ Required_Rules = [
 
 The third and final component is simpler than the other two because it's basically a set of rules, fittingly named a Ruleset.
 
-A Ruleset is a collection of optional Rules that may be enabled or disabled by the user. This is useful if you want to add optional user settings without having to create multiple randomizers.
+A Ruleset is a collection of optional Rules that may be enabled or disabled by the user. This is useful if you want to add optional user settings without having to create multiple randomizers. You can create up to 14 Rulesets, not counting the required Rules above.
 
 Rulesets are stored in an array called optional_rulesets. If you don't want any optional rulesets, keep the array as:
 `Optional_Rulesets = []`

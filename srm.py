@@ -9,11 +9,6 @@ except:
 	import sys
 	sys.exit()
 
-"""
-TODO:
-- In-statement assertions (like value("A")==5) don't work; split the two sides into a tuple?
-"""
-
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
 	mainFolder = path.dirname(sys.executable) # EXE (executable) file
@@ -31,6 +26,7 @@ def main():
 	setDefaultRuleNum()
 	vp_start_gui()
 
+# The main randomize function.
 def randomize():
 	global sourceRom
 	global currSeed
@@ -133,24 +129,8 @@ def randomize():
 	resetAttributesAndSeed()
 	return (True, "Successfully generated "+str(numSeedsGenerated)+" seed"+("s." if numSeedsGenerated != 1 else "."))
 
-def shuffleAllAttributes():
-	for att in Attributes:
-		att.prepare()
-
-def getNumCombinations(rule):
-	num = 1
-	for att in rule.relatedAttributes:
-		num *= len(att.possible_values)
-	return num
-
-def setNumAllCombinations():
-	global numAllCombinations
-
-	numAllCombinations = 1
-	for att in Attributes:
-		numAllCombinations *= len(att.possible_values)
-	return numAllCombinations
-
+# Optimize attributes by checking each rule and attempting to remove any values that are guaranteed to fail.
+# For example, if the rule "value("A")>=5" is enabled, this will remove any value of "A"<5.
 def optimizeAttributes(ruleset):
 	global endTime
 	global timedOut
@@ -190,7 +170,8 @@ def optimizeAttributes(ruleset):
 	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
 	return True
 
-# attempt 50 completely random combinations before attempting a normal approach
+# Attempt 50 completely random combinations before attempting a normal approach.
+# This is useful for overcoming unlucky RNG without negatively affecting anything else.
 def shotgunApproach(ruleset):
 	ruleNum = 0
 	numAttempts = 0
@@ -206,7 +187,7 @@ def shotgunApproach(ruleset):
 			ruleNum += 1
 	return True
 
-# backtracking constraint satisfaction across related Attributes only
+# Backtracking constraint satisfaction across related Attributes only.
 def enforceRulesetBacktracking(ruleset):
 	global endTime
 	global timedOut
@@ -248,7 +229,9 @@ def enforceRulesetBacktracking(ruleset):
 			ruleNum += 1
 	return True
 
-# brute force constraint satisfaction across all Attributes
+# Brute force constraint satisfaction across all Attributes.
+# May work marginally better than backtracking in rare situations (at best),
+# but is significantly slower to the point of sometimes being impractical.
 def enforceRulesetBruteForce(ruleset):
 	global endTime
 	global timedOut
@@ -275,6 +258,7 @@ def enforceRulesetBruteForce(ruleset):
 			ruleNum += 1
 	return True
 
+# Generate a ROM using the determined Attribute values.
 def generateRom():
 	global sourceRom
 	global seedString
@@ -298,6 +282,7 @@ def generateRom():
 		remove(newRom)
 		return (False, "Failed to generate ROM.")
 
+# Generate a text log containing the Attribute values.
 def generateTextLog():
 	global sourceRom
 	global seedString
@@ -308,6 +293,10 @@ def generateTextLog():
 	for att in Attributes:
 		file.writelines(att.name+": "+str(att.value)+"\n")
 	file.close()
+
+def shuffleAllAttributes():
+	for att in Attributes:
+		att.prepare()
 
 def resetAttributesAndSeed(printAttributes=False):
 	global Attributes
@@ -321,6 +310,20 @@ def resetAttributesAndSeed(printAttributes=False):
 	random.seed(time())
 	resetRuleCounter()
 
+def getNumCombinations(rule):
+	num = 1
+	for att in rule.relatedAttributes:
+		num *= len(att.possible_values)
+	return num
+
+def setNumAllCombinations():
+	global numAllCombinations
+
+	numAllCombinations = 1
+	for att in Attributes:
+		numAllCombinations *= len(att.possible_values)
+	return numAllCombinations
+
 def getFromListByName(arr, name):
 	for a in arr:
 		if a.name == name:
@@ -330,11 +333,9 @@ def getAttributeNum(att):
 	return att.attributeNum
 
 def getShuffledAttributeNum(att):
-	num = 0
-	for a in Attributes:
-		if a is att:
-			return num
-		num += 1
+	for i in range(len(Attributes)):
+		if att is Attributes[i]:
+			return i
 
 #######
 # GUI #

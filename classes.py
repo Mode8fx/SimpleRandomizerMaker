@@ -41,8 +41,8 @@ class Attribute:
 		self.index = 0
 		self.value = self.possible_values[0]
 		self.specialOperators = []
-		self.specialVal = []
-		self.ruleOnSpecialOp = []
+		self.specialVals = []
+		self.rulesOnSpecialOp = []
 		global attributeCounter
 		self.attributeNum = attributeCounter
 		attributeCounter += 1
@@ -66,41 +66,42 @@ class Attribute:
 		except:
 			self.resetToFirstValue()
 			return False
-	# allows rules to perform dynamic operations on attribute value; no pointers necessary!
+	# Allows rules to perform dynamic operations on attribute value; no pointers necessary!
 	def performSpecialOperation(self, ruleNum):
 		if len(self.specialOperators) == 0:
 			return self.value
 		comparedVal = self.value
 		for i in range(len(self.specialOperators)):
-			if self.ruleOnSpecialOp[i] == ruleNum:
-				if self.specialVal[i] is not None:
-					if not isinstance(self.specialVal[i], Attribute):
-						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i])
+			if self.rulesOnSpecialOp[i] == ruleNum:
+				if self.specialVals[i] is not None:
+					if not isinstance(self.specialVals[i], Attribute):
+						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVals[i])
 					else:
-						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVal[i].performSpecialOperation(ruleNum))
+						func = operator.methodcaller(self.specialOperators[i], comparedVal, self.specialVals[i].performSpecialOperation(ruleNum))
 				else:
 					func = operator.methodcaller(self.specialOperators[i], comparedVal)
 				comparedVal = func(operator)
 		return comparedVal
+	# Whenever a calculation (arithmetic, comparison, etc) is attempted on an Attribute, store it for use later.
 	def addSpecialOperator(self, op, val):
 		global ruleCounter
 
 		self.specialOperators.append(op)
-		self.specialVal.append(val)
-		self.ruleOnSpecialOp.append(ruleCounter)
+		self.specialVals.append(val)
+		self.rulesOnSpecialOp.append(ruleCounter)
 		return self
 	def duplicateOperations(self, oldRuleNum, newRuleNum):
 		newSO = copy.copy(self.specialOperators)
-		newSV = copy.copy(self.specialVal)
-		newROSO = copy.copy(self.ruleOnSpecialOp)
-		for i in range(len(self.ruleOnSpecialOp)):
-			if self.ruleOnSpecialOp[i] == oldRuleNum:
+		newSV = copy.copy(self.specialVals)
+		newROSO = copy.copy(self.rulesOnSpecialOp)
+		for i in range(len(self.rulesOnSpecialOp)):
+			if self.rulesOnSpecialOp[i] == oldRuleNum:
 				newSO.append(self.specialOperators[i])
-				newSV.append(self.specialVal[i])
+				newSV.append(self.specialVals[i])
 				newROSO.append(newRuleNum)
 		self.specialOperators = newSO
-		self.specialVal = newSV
-		self.ruleOnSpecialOp = newROSO
+		self.specialVals = newSV
+		self.rulesOnSpecialOp = newROSO
 	def __add__(self, val):
 		return self.addSpecialOperator("add", val)
 	def __sub__(self, val):
@@ -190,11 +191,12 @@ class Rule:
 		if isinstance(att, Attribute):
 			if not att in self.relatedAttributes:
 				self.relatedAttributes.append(att)
-			for val in att.specialVal:
+			for val in att.specialVals:
 				self.storeRelatedAttributes(val)
 		elif isinstance(att, list) or isinstance(att, tuple):
 			for a in att:
 				self.storeRelatedAttributes(a)
+	# Used for OR statements and other mid-statement comparisons/assertions
 	def handleMidStatementAssertion(self, att, oldRuleNum, newRuleNum):
 		if isinstance(att, tuple) and isinstance(att[0], Attribute):
 			att[0].duplicateOperations(oldRuleNum, newRuleNum)
@@ -240,15 +242,7 @@ class Rule:
 		except:
 			print("Something went wrong. Failed to verify rule.")
 			return False
-	# unused
-	def extractAttsFromTuples(self, side):
-		if isinstance(side, list):
-			for i in range(len(side)):
-				if isinstance(side[i], tuple) and isinstance(side[i][0], Attribute):
-					side[i] = side[i][0]
-		elif isinstance(side, tuple) and isinstance(side[0], Attribute):
-			side = side[0]
-		return side
+	# Breaks most large rules down into several smaller rules, heavily reducing computation time.
 	def simplifyRule(self, rulesArray):
 		newDescription = "Generated "+ruleTypesOtherDict.get(self.rule_type)
 		if self.rule_type == "eq" and self.right_side is None:
