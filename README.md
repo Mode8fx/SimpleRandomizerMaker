@@ -18,16 +18,18 @@ All you need are the ROM addresses of whatever you want to change, along with po
 ## Example Functions
 I recommend you look at the included tutorial and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some samples:
 
-`Attribute(
+```
+Attribute(
 	name="My Attribute",
 	addresses=[0x456, 0xABC],
 	number_of_bytes=1,
 	possible_values=[1,4,21,83,106],
 	min_value=None,
 	max_value=None,
-),`
-
-`Rule(
+),
+```
+```
+Rule(
 	description="My Attribute 2 + My Attribute 3 is at least 20",
 	left_side=value("My Attribute 2") + value("My Attribute 3"),
 	rule_type=">=",
@@ -39,11 +41,21 @@ I recommend you look at the included tutorial and templates, but the short versi
 	left_side=value("My Attribute 1"),
 	rule_type="==",
 	right_side=[1, 4, 6, 13, 18],
-),`
-
-`Rule(
+),
+```
+```
+Rule(
 	description="These three attributes have to be different",
 	left_side=[value("My Attribute 1"), value("My Attribute 2"), value("My Attribute 3")],
 	rule_type="!=",
 	right_side=None,
-),`
+),
+```
+```
+Rule(
+	description="My Attribute 1 is 5, or My Attribute 2 is 10 (or both)",
+	left_side=[(value("Waddle Dee"), "==", 6), (value("Droppy"), "==", 10)],
+	rule_type="count",
+	right_side=("==", True, ">=", 1),
+),
+```

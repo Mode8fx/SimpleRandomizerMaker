@@ -62,33 +62,34 @@ If you choose not to use one of the optional variables, set its value to None
 
 #### Attribute Examples
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE ATTRIBUTES!
-
-`Attributes = [\
-	Attribute(\
-		name="My Attribute 1",\
-		addresses=[0x0123],\
-		number_of_bytes=1,\
-		possible_values=None,\
-		min_value=0,\
-		max_value=100,\
-	),\
-	Attribute(\
-		name="My Attribute 2",\
-		addresses=[0x456, 0xABC],\
-		number_of_bytes=1,\
-		possible_values=[1, 4, 21, 56, 83, 106, 119],\
-		min_value=None,\
-		max_value=None,\
-	),\
-	Attribute(\
-		name="My Attribute 3",\
-		addresses=[0x147, 0x258, 0x369],\
-		number_of_bytes=2,\
-		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],\
-		min_value=None,\
-		max_value=None,\
-	),\
-]`
+```
+Attributes = [
+	Attribute(
+		name="My Attribute 1",
+		addresses=[0x0123],
+		number_of_bytes=1,
+		possible_values=None,
+		min_value=0,
+		max_value=100,
+	),
+	Attribute(
+		name="My Attribute 2",
+		addresses=[0x456, 0xABC],
+		number_of_bytes=1,
+		possible_values=[1, 4, 21, 56, 83, 106, 119],
+		min_value=None,
+		max_value=None,
+	),
+	Attribute(
+		name="My Attribute 3",
+		addresses=[0x147, 0x258, 0x369],
+		number_of_bytes=2,
+		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
+		min_value=None,
+		max_value=None,
+	),
+]
+```
 
 ## Rule
 
@@ -119,41 +120,48 @@ If you choose not to use one of the optional variables, set its value to None
 
 #### Rule Examples
 - EXAMPLE 1: If you want to set a requirement that a Super Potion must cost at least as much as (two Potions + 100), then you would set the following:
-`Rule(\
-	left_side=value("Super Poiton"),\
-	rule_type=">=",\
-	right_side=value("Potion")*2+100,\
-)`
+```
+Rule(
+	left_side=value("Super Poiton"),
+	rule_type=">=",
+	right_side=value("Potion")*2+100,
+)
+```
 - EXAMPLE 2: If you want to guarantee that a Potion, Elixir, and Revive all cost the same amount, then you would set the following:
-`Rule(\
-	left_side=[value("Potion"), value("Elixir"), value("Revive")],\
-	rule_type="=",\
-	right_side=None,\
-)`
+```
+Rule(
+	left_side=[value("Potion"), value("Elixir"), value("Revive")],
+	rule_type="=",
+	right_side=None,
+)
+```
 - EXAMPLE 3: If you have four stats and you want to guarantee that at most (<=) two of them are greater than (>) 100 each, then you would set the following:
-`Rule(\
-	left_side=[value("Attack"), value("Defense"), value("Speed"), value("Magic")],\
-	rule_type = "count",\
-	right_side = (">", 100, "<=", 2),\
-)`
+```
+Rule(
+	left_side=[value("Attack"), value("Defense"), value("Speed"), value("Magic")],
+	rule_type = "count",
+	right_side = (">", 100, "<=", 2),
+)
+```
 The Right Side represents: (value rule type, value, count rule type, count), and it must be in parentheses.
 
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE RULES!
-
-`Required_Rules = [\
-	Rule(\
-		description="My Attribute 1 + My Attribute 2 is less than 150",\
-		left_side=value("My Attribute 1") + value("My Attribute 2"),\
-		rule_type="<",\
-		right_side=150,\
-	),\
-	Rule(\
-		description="My Attribute 2 + My Attribute 3 is at least 20",\
-		left_side=value("My Attribute 2") + value("My Attribute 3"),\
-		rule_type=">=",\
-		right_side=20,\
-	),\
-]`
+```
+Required_Rules = [
+	Rule(
+		description="My Attribute 1 + My Attribute 2 is less than 150",
+		left_side=value("My Attribute 1") + value("My Attribute 2"),
+		rule_type="<",
+		right_side=150,
+	),
+	Rule(
+		description="My Attribute 2 + My Attribute 3 is at least 20",
+		left_side=value("My Attribute 2") + value("My Attribute 3"),
+		rule_type=">=",
+		right_side=20,
+	),
+]
+```
 
 ## Ruleset
 
@@ -186,53 +194,55 @@ If you choose not to use one of the optional variables, set its value to None
 #### Ruleset Examples (+ More Rule Examples)
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE RULESETS!
 
-`Optional_Rulesets = [\
-	Ruleset(\
-		name="Basic Rules",\
-		description="A set of basic rules",\
-		rules=[\
-			Rule(\
-				description="My Attribute 1 and My Attribute 2 are not equal",\
-				left_side=[value("My Attribute 1"), value("My Attribute 2")],\
-				rule_type="!=",\
-				right_side=None,\
-			),\
-			Rule(\
-				description="My Attribute 1 has more requirements",\
-				left_side=value("My Attribute 1"),\
-				rule_type="<",\
-				right_side=(value("My Attribute 2")+5) - (value("My Attribute 3")/4),\
-			),\
-		],\
-		must_be_enabled=None,\
-		must_be_disabled=None,\
-	),\
-	Ruleset(\
-		name="Advanced Rules",\
-		description="A set of advanced rules",\
-		rules=[\
-			Rule(\
-				description="The first Attribute is an even number, the other two are odd",\
-				left_side=[(value("My Attribute 1")%2, "==", 0), (value("My Attribute 2")%2, "==", 1), (value("My Attribute 3")%2, "==", 1)],\
-				rule_type="==",\
-				right_side=None,\
-			),\
-			Rule(\
-				description="The number of attributes that can be less than 70 is at most 2",\
-				left_side=[value("My Attribute 1"), value("My Attribute 2"), value("My Attribute 3")],\
-				rule_type="count",\
-				right_side=("<", 70, "<=", 2),\
-			),\
-		],\
-	),\
-	Ruleset(\
-		name="Special Ruleset",\
-		description="This can only be enabled if My Ruleset 1 is enabled and My Ruleset 2 is disabled.",\
-		rules=[],\
-		must_be_enabled=["My Ruleset 1"],\
-		must_be_disabled=["My Ruleset 2"],\
-	),\
-]`
+```
+Optional_Rulesets = [
+	Ruleset(
+		name="Basic Rules",
+		description="A set of basic rules",
+		rules=[
+			Rule(
+				description="My Attribute 1 and My Attribute 2 are not equal",
+				left_side=[value("My Attribute 1"), value("My Attribute 2")],
+				rule_type="!=",
+				right_side=None,
+			),
+			Rule(
+				description="My Attribute 1 has more requirements",
+				left_side=value("My Attribute 1"),
+				rule_type="<",
+				right_side=(value("My Attribute 2")+5) - (value("My Attribute 3")/4),
+			),
+		],
+		must_be_enabled=None,
+		must_be_disabled=None,
+	),
+	Ruleset(
+		name="Advanced Rules",
+		description="A set of advanced rules",
+		rules=[
+			Rule(
+				description="The first Attribute is an even number, the other two are odd",
+				left_side=[(value("My Attribute 1")%2, "==", 0), (value("My Attribute 2")%2, "==", 1), (value("My Attribute 3")%2, "==", 1)],
+				rule_type="==",
+				right_side=None,
+			),
+			Rule(
+				description="The number of attributes that can be less than 70 is at most 2",
+				left_side=[value("My Attribute 1"), value("My Attribute 2"), value("My Attribute 3")],
+				rule_type="count",
+				right_side=("<", 70, "<=", 2),
+			),
+		],
+	),
+	Ruleset(
+		name="Special Ruleset",
+		description="This can only be enabled if My Ruleset 1 is enabled and My Ruleset 2 is disabled.",
+		rules=[],
+		must_be_enabled=["My Ruleset 1"],
+		must_be_disabled=["My Ruleset 2"],
+	),
+]
+```
 
 ## Tips
 
@@ -248,22 +258,24 @@ That's everything you need to know to make your own randomizer! But here are a f
 - When inputting addresses, left_side, right_side, must_be_enabled, or must_be_disabled, you don't have to use an array if you are only using one value.
 
 For example, either of these will work the same:
-`addresses = [0x12345]\
+`addresses = [0x12345]
 addresses = 0x12345`
 
 ... or these:
-`left_side = [value("A")]\
+`left_side = [value("A")]
 left_side = value("A")`
 
 ##### Rule Compression
 - For most Rule types (everything except "==" and "count"), you can set the Left Side and Right Side as arrays of multiple values each, and comparisons will be performed on every combination of Left Side and Right Side value. For example, this rule:
 
-`Rule(\
-	description="Several comparisons",\
-	left_side=[value("A"), value("B")],\
-	rule_type=">",\
-	right_side=[value("C"), value("D")],\
-)`
+```
+Rule(
+	description="Several comparisons",
+	left_side=[value("A"), value("B")],
+	rule_type=">",
+	right_side=[value("C"), value("D")],
+)
+```
 
 ... will check all of (A > C), (A > D), (B > C), and (B > D). Nested rules like this are automatically broken down into smaller rules, so in most situations, you won't have to worry about breaking them down yourself.
 
