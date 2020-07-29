@@ -1,5 +1,6 @@
 # Simple Randomizer Maker
 This is a program that allows you to easily create your own game randomizer with little to no coding.
+![](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Screenshot.png?raw=true)
 
 ## How It Works
 All you need are the ROM addresses of whatever you want to change, along with possible values for those addresses, and the maker will do everything else for you, from the actual randomization to the GUI. You can make address values completely random, or you can set rules that they must follow (like if you want certain values to change according to other values).
