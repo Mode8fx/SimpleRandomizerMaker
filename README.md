@@ -18,7 +18,7 @@ All you need are the ROM addresses of whatever you want to change, along with po
 - Includes detailed tutorial plus two sample randomizers
 
 ## Example Functions
-I recommend you look at the ![included tutorial](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Readme%20(Tutorial).md) and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some examples:
+I recommend you look at the [included tutorial](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Readme%20(Tutorial).md) and templates, but the short version is that this program works through three types of objects: Attributes (the things you want to randomize), Rules (requirements that the randomized values must follow), and Rulesets (sets of Rules that are grouped together). Here are some examples:
 ```
 Attribute(
 	name="My Attribute",
