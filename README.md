@@ -61,3 +61,6 @@ Rule(
 	right_side=("==", True, ">=", 1),
 ),
 ```
+
+## Randomizers Made Using SRM
+Let me know if you used this to make your own randomizer, and I'll list it here.
