@@ -1,4 +1,8 @@
 
 *.pyc
+*.spec
 output
 randomizer.py
+__pycache__
+build
+dist

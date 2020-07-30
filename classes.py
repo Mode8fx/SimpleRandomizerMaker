@@ -3,7 +3,6 @@ import random
 import shutil
 import copy
 from math import ceil, floor
-from os import path, remove, mkdir
 from time import sleep
 import operator
 

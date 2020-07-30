@@ -2,7 +2,7 @@
 
 This will explain what you can create for your randomizer and how to do it, through both written documentation and code examples. Or if you'd rather learn by example, there are two templates included that feature everything explained here.
 
-If you want to edit one of the templates, keep in mind that you need to rename it to randomizer.py
+If you want to edit one of the templates, keep in mind that you need to rename it to `randomizer.py`.
 
 ## Settings
 First, the settings for the randomizer itself:
@@ -254,12 +254,16 @@ That's everything you need to know to make your own randomizer! But here are a f
 - When inputting addresses, left_side, right_side, must_be_enabled, or must_be_disabled, you don't have to use an array if you are only using one value.
 
 For example, either of these will work the same:
-`addresses = [0x12345]
-addresses = 0x12345`
+```
+addresses = [0x12345]
+addresses = 0x12345
+```
 
 ... or these:
-`left_side = [value("A")]
-left_side = value("A")`
+```
+left_side = [value("A")]
+left_side = value("A")
+```
 
 ##### Rule Compression
 - For most Rule types (everything except "==" and "count"), you can set the Left Side and Right Side as arrays of multiple values each, and comparisons will be performed on every combination of Left Side and Right Side value. For example, this rule:
@@ -276,6 +280,9 @@ Rule(
 ##### Speed/Timeout
 - Optimization algorithms are used to speed up seed generation. But if your randomizer is going too slow, see if you have any "count" rules and consider reworking them into something else; "count" doesn't work as well with optimization. If it's still too slow, see if increasing your Timeout by a few seconds solves it.
 
+##### Turning Your Randomizer Into An Executable
+- When distributing your newly-created randomizer, all you need to do is package your `randomizer.py` file with a copy of the Simple Randomizer Maker executable. But if you want to combine them into one file instead, you can use a program like PyInstaller to package `srm.py` (the main Simple Randomizer Maker script that the EXE runs) with your randomizer file to make a single executable. If you use PyInstaller, just make sure `srm.py`, `gatelib.py`, `classes.py`, and your `randomizer.py` are all in the same directory, make sure you have SRM's dependencies (and PyInstaller) installed, then open a command window in that directory and run `pyinstaller srm.py --onefile --windowed --hidden-import classes`. Your executable will be saved as `YOUR DIRECTORY/dist/srm.exe`, which you can rename to whatever you want.
+
 ##### No Solution?
 - In case you run into a situation where your randomizer gives an error that no possible combination of values was found: Look through your Attributes and Rules again and make sure they can actually generate a solution. That includes making sure two enabled optional rulesets don't conflict with each other. You can also try running the randomizer a few more times; maybe you just got a bad seed. Otherwise, read on.
-- Backtracking constraint satisfaction is used to heavily speed up seed generation. By "heavily", I mean "a rule that used to take ~10 hours to apply now takes less than a second". If your randomizer gives an error that no solution was found, you can try setting Slow_Mode to True; this will make the randomizer use brute force calculation instead, which has a VERY SLIGHT chance of fixing your problem. But again, make sure your Rules/Attributes can actually generate a solution before attempting this.
+- Backtracking constraint satisfaction is used to heavily speed up seed generation. By "heavily", I mean "a rule that used to take ~10 hours to apply now takes less than a second". If your randomizer gives an error that no solution was found, you can try setting Slow_Mode to True; this will make the randomizer use brute force calculation instead, which has a *very slight* chance of fixing your problem. But again, make sure your Rules/Attributes can actually generate a solution before attempting this.

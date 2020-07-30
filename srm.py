@@ -1,13 +1,8 @@
+import sys
+from os import path, remove, mkdir
 import shutil
 from time import time
 from gatelib import *
-
-try:
-	from randomizer import *
-except:
-	print("Valid randomizer file not found. Make sure it is named \"randomizer.py\" and does not contain any errors.")
-	import sys
-	sys.exit()
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -16,6 +11,32 @@ else:
 	mainFolder = path.dirname(path.realpath(__file__)) # PY (source) file
 sys.path.append(mainFolder)
 outputFolder = path.join(mainFolder, "output")
+
+# GUI imports
+try:
+	import Tkinter as tk
+	from Tkinter.filedialog import askopenfilename
+	from Tkinter import font as tkFont
+	from Tkinter.messagebox import showinfo, showerror
+except ImportError:
+	import tkinter as tk
+	from tkinter.filedialog import askopenfilename
+	from tkinter import font as tkFont
+	from tkinter.messagebox import showinfo, showerror
+try:
+	import ttk
+	py3 = False
+except ImportError:
+	import tkinter.ttk as ttk
+	py3 = True
+
+try:
+	from randomizer import *
+except:
+	tk.Tk().withdraw()
+	showerror("Randomizer Not Found", "Valid randomizer file not found. Make sure it is named \"randomizer.py\" and does not contain any errors.")
+	sys.exit()
+
 stringLen = 5+ceil(len(Optional_Rulesets)/5.0)
 
 timedOut = False
@@ -348,33 +369,13 @@ def getShuffledAttributeNum(att):
 #  in conjunction with Tcl version 8.6
 #	platform: Windows NT
 
-import sys
-
-try:
-	import Tkinter as tk
-	from Tkinter.filedialog import askopenfilename
-	from Tkinter import font as tkFont
-	from Tkinter.messagebox import showinfo, showerror
-except ImportError:
-	import tkinter as tk
-	from tkinter.filedialog import askopenfilename
-	from tkinter import font as tkFont
-	from tkinter.messagebox import showinfo, showerror
-
-try:
-	import ttk
-	py3 = False
-except ImportError:
-	import tkinter.ttk as ttk
-	py3 = True
-
 def vp_start_gui():
 	'''Starting point when module is the main routine.'''
-	global val, w, root, sizeRatio
+	global val, w, root
 	root = tk.Tk()
 	# 1.7 seems to be default scaling
-	size = root.winfo_screenheight()
-	sizeRatio = size/1440
+	# size = root.winfo_screenheight()
+	# sizeRatio = 1080/1440
 	# root.tk.call('tk', 'scaling', 2.0*sizeRatio)
 	set_Tk_var()
 	top = TopLevel(root)
@@ -418,8 +419,8 @@ class TopLevel:
 			[('selected', _compcolor), ('active',_ana2color)])
 		self.font = tkFont.Font(family='TkDefaultFont')
 
-		top.geometry(str(int(1000*sizeRatio))+"x"+str(int(600*sizeRatio)))
-		top.minsize(int(1000*sizeRatio), int(600*sizeRatio))
+		top.geometry(str(750)+"x"+str(450))
+		top.minsize(750, 450)
 		# top.maxsize(2000, 600)
 		top.resizable(1, 1)
 		top.title(Program_Name)
