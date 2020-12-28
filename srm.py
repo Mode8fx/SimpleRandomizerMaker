@@ -46,22 +46,25 @@ currNumCombinations = 0
 currRomIndex = 0
 
 def main():
-	global Rom_Name
+	global Rom_Name, Rom_File_Format
 	if not isinstance(Rom_Name, list):
 		Rom_Name = [Rom_Name]
+	if not isinstance(Rom_File_Format, list):
+		Rom_File_Format = [Rom_File_Format]
 	setDefaultRuleNum()
 	vp_start_gui()
 
 # The main randomize function.
 def randomize():
-	global sourceRom
+	global sourceRoms
 	global currSeed, seedString
 	global endTime
 	global numAllCombinations, currNumCombinations
 	global Attributes, originalAttributes
 
-	if not path.isfile(sourceRom.get()):
-		return (False, "Invalid ROM input.")
+	for sr in sourceRoms:
+		if not path.isfile(sr.get()):
+			return (False, "Invalid ROM input.")
 
 	numOfSeeds = int(numSeeds.get())
 	numSeedsGenerated = 0
@@ -281,34 +284,43 @@ def enforceRulesetBruteForce(ruleset):
 
 # Generate a ROM using the determined Attribute values.
 def generateRom():
-	global sourceRom
+	global sourceRoms
 	global seedString
 
-	romName, romExt = path.splitext(path.basename(sourceRom.get()))
-	newRom = path.join(outputFolder, romName+"-"+seedString+romExt)
-	if not path.isdir(outputFolder):
-		mkdir(outputFolder)
-	shutil.copyfile(sourceRom.get(), newRom)
-	try:
-		file = open(newRom, "r+b")
-		for att in Attributes:
-			for address in att.addresses:
-				writeToAddress(file, address, att.value, att.number_of_bytes)
-		file.close()
-		print("Succesfully generated ROM with seed "+seedString)
-		return (True, "")
-	except:
-		print("Something went wrong. Deleting generated ROM.")
-		file.close()
-		remove(newRom)
-		return (False, "Failed to generate ROM.")
+	allNewRoms = []
+	success = True
+	for sr in sourceRoms:
+		romName, romExt = path.splitext(path.basename(sr.get()))
+		newRom = path.join(outputFolder, romName+"-"+seedString+romExt)
+		allNewRoms.append(newRom)
+		if not path.isdir(outputFolder):
+			mkdir(outputFolder)
+		shutil.copyfile(sr.get(), newRom)
+		try:
+			file = open(newRom, "r+b")
+			for att in Attributes:
+				for address in att.addresses:
+					writeToAddress(file, address, att.value, att.number_of_bytes)
+			file.close()
+			print("Succesfully generated ROM with seed "+seedString)
+			# return (True, "")
+		except:
+			file.close()
+			success = False
+			break
+	if not success:
+		print("Something went wrong. Deleting generated ROMs.")
+		for newRom in allNewRoms:
+			remove(newRom)
+		return (False, "At least one ROM failed to generate.")
+	return (True, "")
 
 # Generate a text log containing the Attribute values.
 def generateTextLog():
-	global sourceRom
+	global sourceRoms
 	global seedString
 
-	newLog = path.join(outputFolder, path.splitext(path.basename(sourceRom.get()))[0]+"-"+seedString+".txt")
+	newLog = path.join(outputFolder, path.splitext(path.basename(sourceRoms[0].get()))[0]+"-"+seedString+".txt")
 	file = open(newLog, "w")
 	file.writelines(Program_Name+"\nSeed: "+seedString+"\n\nValues:\n")
 	for att in Attributes:
@@ -652,14 +664,15 @@ class TopLevel:
 		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(text=Rom_Name[currRomIndex])
 		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
-		self.Entry_RomInput.configure(textvariable=sourceRom)
+		self.Entry_RomInput.configure(textvariable=sourceRoms[currRomIndex])
 
 	def setSourceRom(self):
-		global sourceRom
-		if Rom_File_Format is None or Rom_File_Format == "":
-			sourceRom.set(askopenfilename())
+		global sourceRoms
+		currRFF = Rom_File_Format[currRomIndex % len(Rom_File_Format)]
+		if currRFF is None or currRFF == "":
+			sourceRoms[currRomIndex].set(askopenfilename())
 		else:
-			sourceRom.set(askopenfilename(filetypes=[("ROM files", "*."+Rom_File_Format)]))
+			sourceRoms[currRomIndex].set(askopenfilename(filetypes=[("Files", "*."+currRFF)]))
 
 	def keepUpperCharsSeed(self, unused):
 		global seedInput
@@ -824,8 +837,8 @@ class ToolTip(tk.Toplevel):
 # ===========================================================
 
 def set_Tk_var():
-	global sourceRom
-	sourceRom = tk.StringVar()
+	global sourceRoms
+	sourceRoms = [tk.StringVar()] * len(Rom_Name)
 	global optRulesetValues
 	optRulesetValues = []
 	for i in range(len(Optional_Rulesets)):
