@@ -226,10 +226,10 @@ Optional_Rulesets = [
 	),
 	Ruleset(
 		name="XOR Statement",
-		description="All enemies are guaranteed to give an ability.",
+		description="Either Waddle Dee gives Cutter (ability #6), or Droppy gives Throw (ability #10), but not both/neither.",
 		rules=[
 			Rule(
-				description="Either Waddle Dee gives Cutter (ability #6), or Droppy gives Throw (ability #10), but not both/neither",
+				description="XOR Statement",
 				left_side=[(value("Waddle Dee"), "==", 6), (value("Droppy"), "==", 10)],
 				rule_type="count",
 				right_side=("==", True, "==", 1),

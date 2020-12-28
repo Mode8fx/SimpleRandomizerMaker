@@ -30,6 +30,7 @@ except ImportError:
 	import tkinter.ttk as ttk
 	py3 = True
 
+import classes
 try:
 	from randomizer import *
 except:
@@ -498,7 +499,7 @@ class TopLevel:
 		self.RadioButton_UseSeed.configure(variable=useSeed)
 		self.RadioButton_UseSeed.configure(text='''Use Seed''')
 		self.tooltip_font = "TkDefaultFont"
-		self.RadioButton_UseSeed_tooltip = ToolTip(self.RadioButton_UseSeed, self.tooltip_font, 'Recreate a specific set of changes according to a 10-character seed.')
+		self.RadioButton_UseSeed_tooltip = ToolTip(self.RadioButton_UseSeed, self.tooltip_font, 'Recreate a specific set of changes according to a seed.')
 
 		# Seed Input Entry
 		self.Entry_SeedInput = ttk.Entry(top)
@@ -684,16 +685,16 @@ class TopLevel:
 
 	def showHelpPopup(self):
 		showinfo("Help",
-			"To learn more about an option, move your mouse over it.\
-			\nYou can generate multiple unique ROMs at once by changing the # of seeds.\
-			\nYou can also generate a text log that gives information about a created seed.\
-			\nGenerated ROMs will be placed in an \"output\" folder, which will be in the same folder as this program.")
+			"To learn more about an option, move your mouse over it."
+			+"\n"+limitedString("You can generate multiple unique ROMs at once by changing the # of seeds.", 55, "- ")
+			+"\n"+limitedString("You can also generate a text log that gives information about a created seed.", 55, "- ")
+			+"\n"+limitedString("Generated ROMs will be placed in an \"output\" folder, which will be in the same folder as this program.", 55, "- "))
 
 	def showAboutPopup(self):
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.0", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.1", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).

@@ -6,3 +6,4 @@ randomizer.py
 __pycache__
 build
 dist
+*.bat
