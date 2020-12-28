@@ -43,21 +43,22 @@ stringLen = 5+ceil(len(Optional_Rulesets)/5.0)
 timedOut = False
 numAllCombinations = 1
 currNumCombinations = 0
+currRomIndex = 0
 
 def main():
+	global Rom_Name
+	if not isinstance(Rom_Name, list):
+		Rom_Name = [Rom_Name]
 	setDefaultRuleNum()
 	vp_start_gui()
 
 # The main randomize function.
 def randomize():
 	global sourceRom
-	global currSeed
-	global seedString
+	global currSeed, seedString
 	global endTime
-	global numAllCombinations
-	global currNumCombinations
-	global Attributes
-	global originalAttributes
+	global numAllCombinations, currNumCombinations
+	global Attributes, originalAttributes
 
 	if not path.isfile(sourceRom.get()):
 		return (False, "Invalid ROM input.")
@@ -154,8 +155,7 @@ def randomize():
 # Optimize attributes by checking each rule and attempting to remove any values that are guaranteed to fail.
 # For example, if the rule "value("A")>=5" is enabled, this will remove any value of "A"<5.
 def optimizeAttributes(ruleset):
-	global endTime
-	global timedOut
+	global endTime, timedOut
 
 	setNumAllCombinations()
 	for rule in ruleset:
@@ -211,8 +211,7 @@ def shotgunApproach(ruleset):
 
 # Backtracking constraint satisfaction across related Attributes only.
 def enforceRulesetBacktracking(ruleset):
-	global endTime
-	global timedOut
+	global endTime, timedOut
 	global currNumCombinations
 
 	ruleNum = 0
@@ -455,29 +454,24 @@ class TopLevel:
 
 		# Rom Input Label
 		self.Label_RomInput = ttk.Label(top)
-		romTextLength = self.getTextLength(Rom_Name)
-		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(background="#d9d9d9")
 		self.Label_RomInput.configure(foreground="#000000")
 		self.Label_RomInput.configure(font="TkDefaultFont")
 		self.Label_RomInput.configure(relief="flat")
 		self.Label_RomInput.configure(anchor='w')
 		self.Label_RomInput.configure(justify='left')
-		self.Label_RomInput.configure(text=Rom_Name)
 
 		# Rom Input Entry
 		self.Entry_RomInput = ttk.Entry(top)
-		# old relx=.035+self.getTextLength(Rom_Name+' ROM')-.02
-		# old relwidth=.40
-		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
 		self.Entry_RomInput.configure(state='readonly')
-		self.Entry_RomInput.configure(textvariable=sourceRom)
 		self.Entry_RomInput.configure(background="#000000")
 		self.Entry_RomInput.configure(cursor="ibeam")
 
+		# Rom Input Label and Entry
+		self.setRomInput(vMult)
+
 		# Rom Input Button
 		self.Button_RomInput = ttk.Button(top)
-		# old relx=.035+self.getTextLength(Rom_Name+' ROM')-.02+.40+.01
 		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
 		self.Button_RomInput.configure(command=self.setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
@@ -652,6 +646,13 @@ class TopLevel:
 					optRulesetValues[i].set("0")
 					currCheckButton.configure(state="disabled")
 					break
+
+	def setRomInput(self, vMult):
+		romTextLength = self.getTextLength(Rom_Name[currRomIndex])
+		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
+		self.Label_RomInput.configure(text=Rom_Name[currRomIndex])
+		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
+		self.Entry_RomInput.configure(textvariable=sourceRom)
 
 	def setSourceRom(self):
 		global sourceRom
