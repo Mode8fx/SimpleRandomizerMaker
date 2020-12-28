@@ -27,6 +27,9 @@ class Attribute:
 			self.addresses = addresses
 		else:
 			self.addresses = [addresses]
+		for i in range(len(self.addresses)):
+			if not isinstance(addresses[i], tuple):
+				addresses[i] = (addresses[i], 0)
 		self.possible_values = possible_values
 		if possible_values is None or len(possible_values) == 0:
 			self.possible_values = list(range(min_value, max_value+1))

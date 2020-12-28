@@ -289,18 +289,20 @@ def generateRom():
 
 	allNewRoms = []
 	success = True
-	for sr in sourceRoms:
-		romName, romExt = path.splitext(path.basename(sr.get()))
+	for i in range(len(sourceRoms)):
+		romName, romExt = path.splitext(path.basename(sourceRoms[i].get()))
 		newRom = path.join(outputFolder, romName+"-"+seedString+romExt)
 		allNewRoms.append(newRom)
 		if not path.isdir(outputFolder):
 			mkdir(outputFolder)
-		shutil.copyfile(sr.get(), newRom)
+		shutil.copyfile(sourceRoms[i].get(), newRom)
 		try:
 			file = open(newRom, "r+b")
 			for att in Attributes:
-				for address in att.addresses:
-					writeToAddress(file, address, att.value, att.number_of_bytes)
+				for addressTuple in att.addresses:
+					address, fileNum = addressTuple
+					if fileNum == i:
+						writeToAddress(file, address, att.value, att.number_of_bytes)
 			file.close()
 			print("Succesfully generated ROM with seed "+seedString)
 			# return (True, "")
@@ -414,6 +416,7 @@ def destroy_TopLevel():
 
 class TopLevel:
 	def __init__(self, top=None):
+		global vMult, changeRomVal
 		'''This class configures and populates the toplevel window.
 		   top is the toplevel containing window.'''
 		_bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -479,8 +482,27 @@ class TopLevel:
 		self.Entry_RomInput.configure(background="#000000")
 		self.Entry_RomInput.configure(cursor="ibeam")
 
+		if len(Rom_Name) > 1:
+			btnSize = .035
+			changeRomVal = btnSize*2 + .01
+			# Previous Source Rom Button
+			self.Button_PrevSourceRom = ttk.Button(top)
+			self.Button_PrevSourceRom.place(relx=.035, rely=.0365*vMult, relheight=.057*vMult, relwidth=btnSize)
+			self.Button_PrevSourceRom.configure(command=self.decrementAndSetRomInput)
+			self.Button_PrevSourceRom.configure(takefocus="")
+			self.Button_PrevSourceRom.configure(text='<')
+
+			# Next Source Rom Button
+			self.Button_NextSourceRom = ttk.Button(top)
+			self.Button_NextSourceRom.place(relx=.035+btnSize+.005, rely=.0365*vMult, relheight=.057*vMult, relwidth=btnSize)
+			self.Button_NextSourceRom.configure(command=self.incrementAndSetRomInput)
+			self.Button_NextSourceRom.configure(takefocus="")
+			self.Button_NextSourceRom.configure(text='>')
+		else:
+			changeRomVal = 0
+
 		# Rom Input Label and Entry
-		self.setRomInput(vMult)
+		self.setRomInput()
 
 		# Rom Input Button
 		self.Button_RomInput = ttk.Button(top)
@@ -659,15 +681,30 @@ class TopLevel:
 					currCheckButton.configure(state="disabled")
 					break
 
-	def setRomInput(self, vMult):
+	def decrementAndSetRomInput(self):
+		global currRomIndex
+		currRomIndex -= 1
+		if currRomIndex < 0:
+			currRomIndex += len(Rom_Name)
+		self.setRomInput()
+
+	def incrementAndSetRomInput(self):
+		global currRomIndex
+		currRomIndex += 1
+		if currRomIndex >= len(Rom_Name):
+			currRomIndex -= len(Rom_Name)
+		self.setRomInput()
+
+	def setRomInput(self):
 		romTextLength = self.getTextLength(Rom_Name[currRomIndex])
-		self.Label_RomInput.place(relx=.035, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
+		self.Label_RomInput.place(relx=.035+changeRomVal, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
 		self.Label_RomInput.configure(text=Rom_Name[currRomIndex])
-		self.Entry_RomInput.place(relx=.035+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength)
+		self.Entry_RomInput.place(relx=.035+changeRomVal+romTextLength-.01, rely=.04*vMult, relheight=.05*vMult, relwidth=.81-romTextLength-changeRomVal)
 		self.Entry_RomInput.configure(textvariable=sourceRoms[currRomIndex])
 
 	def setSourceRom(self):
 		global sourceRoms
+		print(Rom_File_Format)
 		currRFF = Rom_File_Format[currRomIndex % len(Rom_File_Format)]
 		if currRFF is None or currRFF == "":
 			sourceRoms[currRomIndex].set(askopenfilename())
@@ -838,7 +875,9 @@ class ToolTip(tk.Toplevel):
 
 def set_Tk_var():
 	global sourceRoms
-	sourceRoms = [tk.StringVar()] * len(Rom_Name)
+	sourceRoms = []
+	for i in range(len(Rom_Name)):
+		sourceRoms.append(tk.StringVar())
 	global optRulesetValues
 	optRulesetValues = []
 	for i in range(len(Optional_Rulesets)):
