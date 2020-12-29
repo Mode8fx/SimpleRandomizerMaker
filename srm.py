@@ -322,7 +322,11 @@ def generateTextLog():
 	global sourceRoms
 	global seedString
 
-	newLog = path.join(outputFolder, path.splitext(path.basename(sourceRoms[0].get()))[0]+"-"+seedString+".txt")
+	if len(Rom_Name) > 1:
+		start = "Log"
+	else:
+		start = path.splitext(path.basename(sourceRoms[0].get()))[0]
+	newLog = path.join(outputFolder, start+"-"+seedString+".txt")
 	file = open(newLog, "w")
 	file.writelines(Program_Name+"\nSeed: "+seedString+"\n\nValues:\n")
 	for att in Attributes:
