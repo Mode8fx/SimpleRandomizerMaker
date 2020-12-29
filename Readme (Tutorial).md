@@ -1,6 +1,6 @@
 # Welcome to the Simple Randomizer Maker tutorial!
 
-This will explain what you can create for your randomizer and how to do it, through both written documentation and code examples. Or if you'd rather learn by example, there are two templates included that feature everything explained here.
+This will explain what you can create for your randomizer and how to do it, through both written documentation and code snippets. Or if you'd rather learn by example, there are two templates included that feature everything explained here.
 
 If you want to edit one of the templates, keep in mind that you need to rename it to `randomizer.py`.
 
@@ -48,7 +48,7 @@ An Attribute has the following components:
 - The memory address(es) of the Attribute. These addresses must be in an array, meaning you separate them with commas and put them all between brackets.
 `[0x01234, 0x56789, 0xABCDE]`
 - These are hex addresses, so remember to put 0x in front of each one.
-- If your game uses multiple files, each address should instead be a tuple (parentheses) containing both the address and the index of which file this address belongs to (1 for the first file, 2 for the second, etc). If unspecififed, the first file is modified.
+- If your game uses multiple files, each address should instead be a tuple (parentheses) containing both the address and the index of which file this address belongs to (1 for the first file, 2 for the second, etc). If unspecified, the first file is modified.
 `[(0x01234, 2), (0x56789, 2), (0xABCDE, 2)]`
 
 ##### Number of Bytes
