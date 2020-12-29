@@ -14,6 +14,7 @@ All you need are the file addresses of whatever you want to change, along with p
 - Built-in seed support with verification to check for invalid seeds
 - Generates up to 20 unique seeds at once
 - Supports multi-byte addresses
+- Supports games that use multiple files
 - Optionally generates a text log of all randomized values
 - Includes detailed tutorial plus two sample randomizers
 
