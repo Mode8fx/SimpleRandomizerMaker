@@ -11,11 +11,16 @@ First, the settings for the randomizer itself:
 - The name of the randomizer.
 
 ##### Rom Name
-- The name of the rom that's compatible with the randomizer. The rom doesn't have to have this exact name, it's just to guide the user.
+- The name of the rom/game that's compatible with the randomizer. The rom doesn't have to have this exact name, it's just there to guide the user.
+`"Kirby & The Amazing Mirror"`
+- If your game uses multiple files (such as some PC or PS1 games), this should be an array containing the names of each file.
+`["Metal Gear Solid (Disc 1)", "Metal Gear Solid (Disc 2)"]`
 
 ##### ROM File Format
 - (optional) The file format of the ROM ("nes", "gba", etc).
 - If you want to allow any file type, leave it as ""
+- If your game uses multiple files of different types (such as some games), this should be an array containing the types of each file, in order.
+`["exe", "bin"]`
 
 ##### About Page Text
 - Any text you want to put on the "About..." page on the menu bar.
@@ -42,7 +47,9 @@ An Attribute has the following components:
 ##### Addresses
 - The memory address(es) of the Attribute. These addresses must be in an array, meaning you separate them with commas and put them all between brackets.
 `[0x01234, 0x56789, 0xABCDE]`
-- These are hex address, so remember to put 0x in front of each one.
+- These are hex addresses, so remember to put 0x in front of each one.
+- If your game uses multiple files, each address should instead be a tuple (parentheses) containing both the address and the index of which file this address belongs to (1 for the first file, 2 for the second, etc). If unspecififed, the first file is modified.
+`[(0x01234, 2), (0x56789, 2), (0xABCDE, 2)]`
 
 ##### Number of Bytes
 - (optional) The number of bytes taken up by each of these addresses. If you don't know what this means, leave it as None (the program will attempt to guess).

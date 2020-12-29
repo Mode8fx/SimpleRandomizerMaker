@@ -301,7 +301,7 @@ def generateRom():
 			for att in Attributes:
 				for addressTuple in att.addresses:
 					address, fileNum = addressTuple
-					if fileNum == i:
+					if fileNum-1 == i:
 						writeToAddress(file, address, att.value, att.number_of_bytes)
 			file.close()
 			print("Succesfully generated ROM with seed "+seedString)
