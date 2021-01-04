@@ -114,6 +114,8 @@ Optional_Rulesets = [
 				right_side=("<", 70, "<=", 2),
 			),
 		],
+		must_be_enabled=None,
+		must_be_disabled=None,
 	),
 	Ruleset(
 		name="Special Ruleset",

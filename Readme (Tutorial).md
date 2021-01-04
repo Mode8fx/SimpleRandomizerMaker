@@ -1,5 +1,7 @@
 # Welcome to the Simple Randomizer Maker tutorial!
 
+I recommend you read this file using [GitHub's reader](https://github.com/GateGuy/SimpleRandomizerMaker/blob/master/Readme%20%28Tutorial%29.md).
+
 This will explain what you can create for your randomizer and how to do it, through both written documentation and code snippets. Or if you'd rather learn by example, there are two templates included that feature everything explained here.
 
 If you want to edit one of the templates, keep in mind that you need to rename it to `randomizer.py`.
@@ -295,7 +297,7 @@ Rule(
 - Optimization algorithms are used to speed up seed generation. But if your randomizer is going too slow, see if you have any "count" rules and consider reworking them into something else; "count" doesn't work as well with optimization. If it's still too slow, see if increasing your Timeout by a few seconds solves it.
 
 ##### Turning Your Randomizer Into An Executable
-- When distributing your newly-created randomizer, all you need to do is package your `randomizer.py` file with a copy of the Simple Randomizer Maker executable. But if you want to combine them into one file instead, you can use a program like PyInstaller to package `srm.py` (the main Simple Randomizer Maker script that the EXE runs) with your randomizer file to make a single executable. If you use PyInstaller, just make sure `srm.py`, `gatelib.py`, `classes.py`, and your `randomizer.py` are all in the same directory, make sure you have SRM's dependencies (and PyInstaller) installed, then open a command window in that directory and run `pyinstaller srm.py --onefile --windowed --hidden-import classes`. Your executable will be saved as `YOUR DIRECTORY/dist/srm.exe`, which you can rename to whatever you want.
+- When distributing your newly-created randomizer, all you need to do is package your `randomizer.py` file with a copy of the Simple Randomizer Maker executable. But if you want to combine them into one file instead, you can use a program like PyInstaller to package `srm.py` (the main Simple Randomizer Maker script that the EXE runs) with your randomizer file to make a single executable. If you use PyInstaller, just make sure `srm.py`, `gatelib.py`, `classes.py`, and your `randomizer.py` are all in the same directory, make sure you have SRM's dependencies (and PyInstaller) installed, then open a command window in that directory and run `pyinstaller srm.py --onefile --windowed --name "NAME"`, where NAME is the name of your randomizer. Your executable will be saved as `YOUR DIRECTORY/dist/NAME.exe`.
 
 ##### No Solution?
 - In case you run into a situation where your randomizer gives an error that no possible combination of values was found: Look through your Attributes and Rules again and make sure they can actually generate a solution. That includes making sure two enabled optional rulesets don't conflict with each other. You can also try running the randomizer a few more times; maybe you just got a bad seed. Otherwise, read on.

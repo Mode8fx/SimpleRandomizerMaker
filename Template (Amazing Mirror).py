@@ -103,6 +103,8 @@ Optional_Rulesets = [
 				right_side=("==", 0, "==", 0),
 			),
 		],
+		must_be_enabled=None,
+		must_be_disabled=None,
 	),
 	Ruleset(
 		name="All Unique",
@@ -115,6 +117,7 @@ Optional_Rulesets = [
 				right_side=None,
 			),
 		],
+		must_be_enabled=None,
 		must_be_disabled=["All Master", "Smashing!"],
 	),
 	Ruleset(
@@ -134,6 +137,7 @@ Optional_Rulesets = [
 				right_side=None,
 			),
 		],
+		must_be_enabled=None,
 		must_be_disabled=["All Unique", "At Least 1 UFO", "Smashing!"],
 	),
 	Ruleset(
@@ -147,6 +151,7 @@ Optional_Rulesets = [
 				right_side=("==", 0x0E, ">=", 1),
 			),
 		],
+		must_be_enabled=None,
 		must_be_disabled=["All Master", "Smashing!"],
 	),
 	Ruleset(
@@ -196,6 +201,8 @@ Optional_Rulesets = [
 				right_side=0x13,
 			),
 		],
+		must_be_enabled=None,
+		must_be_disabled=None,
 	),
 	Ruleset(
 		name="Smashing!",
@@ -244,10 +251,11 @@ Optional_Rulesets = [
 				right_side=[0x16, 0x14, 0x8, 0x6, 0x11],
 			),
 		],
+		must_be_enabled=None,
 		must_be_disabled=["All Master", "At Least 1 UFO", "All Unique"],
 	),
 	Ruleset(
-		name="XOR Statement",
+		name="XOR Statement (move mouse over this)",
 		description="Either Waddle Dee gives Cutter (ability #6), or Droppy gives Throw (ability #10), but not both/neither.",
 		rules=[
 			Rule(
@@ -257,6 +265,7 @@ Optional_Rulesets = [
 				right_side=("==", True, "==", 1),
 			),
 		],
+		must_be_enabled=None,
 		must_be_disabled=["All Master"]
 	),
 ]

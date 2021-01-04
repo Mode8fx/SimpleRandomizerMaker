@@ -193,7 +193,11 @@ def optimizeAttributes(ruleset):
 	numAllCombinationsNew = 1
 	for att in Attributes:
 		numAllCombinationsNew *= len(att.possible_values)
-	print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
+	try:
+		print(str(round((1-(numAllCombinationsNew/numAllCombinations))*100, 3))+"% reduction in seed generation time.")
+	except:
+		print("Something broke. Close the program, reopen, and try again.") # This shouldn't happen
+		return False
 	return True
 
 # Attempt 50 completely random combinations before attempting a normal approach.
@@ -453,7 +457,7 @@ class TopLevel:
 		## Menu Bar
 		menubar = tk.Menu(self.top, bg=_bgcolor, fg=_fgcolor, tearoff=0)
 		fileMenu = tk.Menu(menubar, tearoff=0)
-		fileMenu.add_command(label="Load ROM...", command=self.setSourceRom)
+		fileMenu.add_command(label="Load File...", command=self.setSourceRom)
 		fileMenu.add_separator()
 		fileMenu.add_command(label="Exit", command=root.quit)
 		menubar.add_cascade(label="File", menu=fileMenu)
@@ -517,7 +521,7 @@ class TopLevel:
 		self.Button_RomInput.place(relx=.845, rely=.0365*vMult, relheight=.057*vMult, relwidth=.12)
 		self.Button_RomInput.configure(command=self.setSourceRom)
 		self.Button_RomInput.configure(takefocus="")
-		self.Button_RomInput.configure(text='Load ROM')
+		self.Button_RomInput.configure(text='Load File')
 
 		# Use Settings Radio Button
 		self.RadioButton_UseSettings = ttk.Radiobutton(self.top)
@@ -664,32 +668,18 @@ class TopLevel:
 					currCheckButton.configure(state="disabled")
 					break
 
-	def decrementAndSetRomInput(self):
-		global currRomIndex
-		currRomIndex -= 1
-		if currRomIndex < 0:
-			currRomIndex += len(Rom_Name)
-		self.setRomInput()
-
-	def incrementAndSetRomInput(self):
-		global currRomIndex
-		currRomIndex += 1
-		if currRomIndex >= len(Rom_Name):
-			currRomIndex -= len(Rom_Name)
-		self.setRomInput()
-
 	def decrementAndSetDisplayedRulesets(self):
 		global currRulesetPage
 		currRulesetPage -= 1
 		if currRulesetPage < 0:
-			currRulesetPage += len(Optional_Rulesets) // 15
+			currRulesetPage = len(Optional_Rulesets) // 15
 		self.setDisplayedRulesets()
 
 	def incrementAndSetDisplayedRulesets(self):
 		global currRulesetPage
 		currRulesetPage += 1
-		if currRulesetPage >= len(Optional_Rulesets) // 15:
-			currRulesetPage -= len(Optional_Rulesets) // 15
+		if currRulesetPage > len(Optional_Rulesets) // 15:
+			currRulesetPage = 0
 		self.setDisplayedRulesets()
 
 	def setDisplayedRulesets(self):
@@ -703,12 +693,12 @@ class TopLevel:
 		optRulesetNum = 0
 		for i in range(len(Optional_Rulesets)):
 			if firstIndex <= i < lastIndex:
-				self.CheckButtons[optRulesetNum].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
+				self.CheckButtons[i].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
 				optRulesetNum += 1
 			else:
-				self.CheckButtons[optRulesetNum].place(relx=10, rely=10, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
+				self.CheckButtons[i].place(relx=10, rely=10, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
 
-		if optRulesetNum <= 15:
+		if optRulesetNum < 15:
 			# Number of Seeds Label
 			seedX = .475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5]
 			self.Label_NumSeeds.place(relx=seedX, rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=.11)
@@ -719,6 +709,20 @@ class TopLevel:
 			self.ComboBox_NumSeeds.place(relx=10, rely=10, relheight=.05*vMult, relwidth=.088)
 		self.prepareSettingsAndSeed()
 
+	def decrementAndSetRomInput(self):
+		global currRomIndex
+		currRomIndex -= 1
+		if currRomIndex < 0:
+			currRomIndex = len(Rom_Name) - 1
+		self.setRomInput()
+
+	def incrementAndSetRomInput(self):
+		global currRomIndex
+		currRomIndex += 1
+		if currRomIndex >= len(Rom_Name):
+			currRomIndex = 0
+		self.setRomInput()
+
 	def setRomInput(self):
 		romTextLength = self.getTextLength(Rom_Name[currRomIndex])
 		self.Label_RomInput.place(relx=.035+changeRomVal, rely=.04*vMult, relheight=.05*vMult, relwidth=romTextLength)
@@ -728,7 +732,6 @@ class TopLevel:
 
 	def setSourceRom(self):
 		global sourceRoms
-		print(Rom_File_Format)
 		currRFF = Rom_File_Format[currRomIndex % len(Rom_File_Format)]
 		if currRFF is None or currRFF == "":
 			sourceRoms[currRomIndex].set(askopenfilename())
