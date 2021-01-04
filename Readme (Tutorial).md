@@ -54,6 +54,10 @@ An Attribute has the following components:
 ##### Number of Bytes
 - (optional) The number of bytes taken up by each of these addresses. If you don't know what this means, leave it as None (the program will attempt to guess).
 
+##### Is Little Endian
+- (optional) If True, the game uses a little-endian system, meaning bytes are read - and should be written - in reverse order. If you don't know what this means, leave it as False.
+- If your created randomizer produces unexpected results (the correct attributes are changed to the wrong values), it could be because the system uses little-endian.
+
 ##### Possible Values
 - (semi-optional) An array of possible values for this Attribute. The addresses will be set to one of these values.
 `[1, 4, 21, 83, 106]`
@@ -75,6 +79,7 @@ Attributes = [
 		name="My Attribute 1",
 		addresses=[0x0123],
 		number_of_bytes=1,
+		is_little_endian=False,
 		possible_values=None,
 		min_value=0,
 		max_value=100,
@@ -83,6 +88,7 @@ Attributes = [
 		name="My Attribute 2",
 		addresses=[0x456, 0xABC],
 		number_of_bytes=1,
+		is_little_endian=False,
 		possible_values=[1, 4, 21, 56, 83, 106, 119],
 		min_value=None,
 		max_value=None,
@@ -91,6 +97,7 @@ Attributes = [
 		name="My Attribute 3",
 		addresses=[0x147, 0x258, 0x369],
 		number_of_bytes=2,
+		is_little_endian=False,
 		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
 		min_value=None,
 		max_value=None,

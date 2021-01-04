@@ -261,6 +261,8 @@ def dec_to_base(num,base):  #Maximum base - 36
 		The value that will be written to this address.
 	numBytes : int
 		The number of bytes that this value will take up.
+	isLittleEndian : bool
+		If True, bytes are written in reverse order.
 
 	Retruns
 	-------
@@ -269,27 +271,36 @@ def dec_to_base(num,base):  #Maximum base - 36
 	Examples
 	--------
 	Example 1
-		writeToAddress(file.exe, 0x12345, 0x41, 1) will write the following value:
+		writeToAddress(file.exe, 0x12345, 0x41, 1, False) will write the following value:
 		0x12345 = 41
 	Example 2
-		writeToAddress(file.exe, 0x12345, 0x6D18, 2) will write the following values:
+		writeToAddress(file.exe, 0x12345, 0x6D18, 2, False) will write the following values:
 		0x12345 = 6D
 		0x12346 = 18
 	Example 3
-		writeToAddress(file.exe, 0x12345, 0x1C, 2) will write the following values:
+		writeToAddress(file.exe, 0x12345, 0x1C, 2, False) will write the following values:
 		0x12345 = 00
 		0x12346 = 1C
+	Example 4
+		writeToAddress(file.exe, 0x12345, 0x003119, 3, True) will write the following values:
+		0x12345 = 19
+		0x12346 = 31
+		0x12347 = 00
 """
-def writeToAddress(file, address, val, numBytes=1):
+def writeToAddress(file, address, val, numBytes=1, isLittleEndian=False):
 	if val.bit_length() > numBytes*8:
 		print("Given value is greater than "+str(numBytes)+" bytes.")
 		return False
-	address += (numBytes-1)
+	if not isLittleEndian:
+		address += (numBytes-1)
+		increment = -1
+	else:
+		increment = 1
 	for i in range(numBytes):
 		file.seek(address)
 		currByte = val & 0xFF
 		file.write(bytes([currByte]))
-		address -= 1
+		address += increment
 		val = val>>8
 	return True
 
@@ -813,7 +824,7 @@ def splitStringIntoParts(string, numParts=2, reverse=False):
 	decimalPlaces : int
 		The number of decimal places to round to.
 
-	Retruns
+	Returns
 	-------
 	str
 		The number of the most significant data size, along with the data size itself.
@@ -849,6 +860,52 @@ def simplifyNumBytes(numBytes, decimalPlaces=2):
 	if num == int(num):
 		num = int(num)
 	return str(num)+" YB"
+
+#########
+# OTHER #
+#########
+
+"""
+	Returns an array of a given number of values spaced out by another given value, with offset as the average.
+	Optionally, a fixed number of decimal places can be defined (to fix float rounding issues).
+
+	Parameters
+	----------
+	numValues : int
+		The number of values to be spaced out.
+	spaceSize : float
+		The size of the space.
+	offset : float
+		The average of all values.
+
+	Returns
+	-------
+	array
+		The spaced out array.
+
+	Examples
+	--------
+	Input 1
+		3, 10, 0
+	Output 1
+		[-10, 0, 10]
+	Input 2
+		4, 8, 0
+	Output 2
+		[-12, -4, 4, 12]
+	Input 3
+		3, 10, 2
+	Output 3
+		[-8, 2, 12]
+"""
+def spaceOut(numValues, spaceSize, offset=0, numDecimalPlaces=None):
+	evenNumOfValues = (numValues%2 == 0)
+	if numDecimalPlaces is None:
+		return [spaceSize*(i-math.floor(numValues/2) + (0.5 if evenNumOfValues else 0)) + offset for i in range(numValues)]
+	array = []
+	for i in range(numValues):
+		array.append(round(spaceSize*(i-math.floor(numValues/2) + (0.5 if evenNumOfValues else 0)) + offset, numDecimalPlaces))
+	return array
 
 """
 SOURCES

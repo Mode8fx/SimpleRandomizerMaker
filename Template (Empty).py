@@ -1,5 +1,6 @@
 # This is a randomizer file for the Simple Randomizer Maker.
 # This file must be named randomizer.py in order to work.
+# For more information on what each variable means, see "Readme (Tutorial).md"
 
 from classes import *
 

@@ -1,5 +1,6 @@
 # This is a randomizer file for the Simple Randomizer Maker.
 # This file must be named randomizer.py in order to work.
+# For more information on what each variable means, see "Readme (Tutorial).md"
 
 from classes import *
 
@@ -25,42 +26,63 @@ Attributes = [
 	Attribute(
 		name="Waddle Dee",
 		addresses=[0x35164E, 0x351B76],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Droppy",
 		addresses=[0x351AFE, 0x3527D6],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Leap",
 		addresses=[0x3517B6],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Big Waddle Dee",
 		addresses=[0x3517E6],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Flamer",
 		addresses=[0x351816],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Sword Knight",
 		addresses=[0x3518BE],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),
 	Attribute(
 		name="Cupie",
 		addresses=[0x35176E],
+		number_of_bytes=1,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
 	),

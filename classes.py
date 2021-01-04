@@ -21,7 +21,7 @@ def resetRuleCounter():
 	ruleCounter = defaultRuleNum
 
 class Attribute:
-	def __init__(self, name, addresses, number_of_bytes=None, possible_values=None, min_value=None, max_value=None):
+	def __init__(self, name, addresses, number_of_bytes=None, is_little_endian=False, possible_values=None, min_value=None, max_value=None):
 		self.name = name
 		if isinstance(addresses, list):
 			self.addresses = addresses
@@ -40,6 +40,7 @@ class Attribute:
 			self.number_of_bytes = ceil(max(self.possible_values).bit_length() / 8.0)
 		else:
 			self.number_of_bytes = number_of_bytes
+		self.is_little_endian = is_little_endian
 		self.index = 0
 		self.value = self.possible_values[0]
 		self.specialOperators = []
@@ -154,7 +155,7 @@ ruleTypesDict = {
 	"in" : "eq",
 	"is in" : "eq",
 	"is one of" : "eq",
-	"not in" : "eq",
+	"not in" : "ne",
 	"is not in" : "ne",
 	"is not one of" : "ne",
 	"count" : "count",

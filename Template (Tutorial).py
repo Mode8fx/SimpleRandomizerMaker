@@ -1,5 +1,6 @@
 # This is a randomizer file for the Simple Randomizer Maker.
 # This file must be named randomizer.py in order to work.
+# For more information on what each variable means, see "Readme (Tutorial).md"
 
 from classes import *
 
@@ -29,7 +30,8 @@ Attributes = [
 		name="My Attribute 1",
 		addresses=[0x0123],
 		number_of_bytes=1,
-		possible_values=None,
+		is_little_endian=False,
+		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=100,
 	),
@@ -37,17 +39,19 @@ Attributes = [
 		name="My Attribute 2",
 		addresses=[0x456, 0xABC],
 		number_of_bytes=1,
+		is_little_endian=False,
 		possible_values=[1, 4, 21, 56, 83, 106, 119],
-		min_value=None,
-		max_value=None,
+		min_value=None, # unused since possible_values is used
+		max_value=None, # unused since possible_values is used
 	),
 	Attribute(
 		name="My Attribute 3",
 		addresses=[0x147, 0x258, 0x369],
 		number_of_bytes=2,
+		is_little_endian=False,
 		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
-		min_value=None,
-		max_value=None,
+		min_value=None, # unused since possible_values is used
+		max_value=None, # unused since possible_values is used
 	),
 ]
 
