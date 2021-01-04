@@ -286,12 +286,12 @@ class Ruleset:
 		elif isinstance(must_be_enabled, list):
 			self.must_be_enabled = must_be_enabled
 		else:
-			self.must_be_enabled = must_be_enabled
+			self.must_be_enabled = [must_be_enabled]
 		if must_be_disabled is None:
 			self.must_be_disabled = []
 		elif isinstance(must_be_disabled, list):
 			self.must_be_disabled = must_be_disabled
 		else:
-			self.must_be_disabled = must_be_disabled
+			self.must_be_disabled = [must_be_disabled]
 	def addRule(rule):
 		self.rules.append(rule)
