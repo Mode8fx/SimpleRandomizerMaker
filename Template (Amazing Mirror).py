@@ -31,6 +31,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Droppy",
@@ -40,6 +41,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Leap",
@@ -49,6 +51,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Big Waddle Dee",
@@ -58,6 +61,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Flamer",
@@ -67,6 +71,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Sword Knight",
@@ -76,6 +81,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="Cupie",
@@ -85,6 +91,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=26,
+		min_max_interval=1,
 	),
 ]
 

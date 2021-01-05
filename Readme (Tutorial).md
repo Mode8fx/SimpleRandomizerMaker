@@ -71,6 +71,9 @@ An Attribute has the following components:
 ##### Max Value
 - (semi-optional) The largest possible value. EXAMPLE: setting min_value to 5 and max_value to 10 will make the possible values [5,6,7,8,9,10].
 
+##### Min-Max Interval
+- (semi-optional) If using Min Value and Max Value, this is the interval. EXAMPLE: setting min_value=20, max_value=65, and min_max_interval=10 will make the possible values [20,30,40,50,60].
+
 If you choose not to use one of the optional variables, set its value to None
 
 #### Attribute Examples
@@ -85,6 +88,7 @@ Attributes = [
 		possible_values=None,
 		min_value=0,
 		max_value=100,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="My Attribute 2",
@@ -94,6 +98,7 @@ Attributes = [
 		possible_values=[1, 4, 21, 56, 83, 106, 119],
 		min_value=None,
 		max_value=None,
+		min_max_interval=None
 	),
 	Attribute(
 		name="My Attribute 3",
@@ -103,6 +108,7 @@ Attributes = [
 		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
 		min_value=None,
 		max_value=None,
+		min_max_interval=None
 	),
 ]
 ```

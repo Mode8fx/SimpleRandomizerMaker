@@ -21,7 +21,7 @@ def resetRuleCounter():
 	ruleCounter = defaultRuleNum
 
 class Attribute:
-	def __init__(self, name, addresses, number_of_bytes=None, is_little_endian=False, possible_values=None, min_value=None, max_value=None):
+	def __init__(self, name, addresses, number_of_bytes=None, is_little_endian=False, possible_values=None, min_value=None, max_value=None, min_max_interval=1):
 		self.name = name
 		if isinstance(addresses, list):
 			self.addresses = addresses
@@ -32,7 +32,14 @@ class Attribute:
 				addresses[i] = (addresses[i], 1)
 		self.possible_values = possible_values
 		if possible_values is None or len(possible_values) == 0:
-			self.possible_values = list(range(min_value, max_value+1))
+			# self.possible_values = list(range(min_value, max_value+1))
+			self.possible_values = []
+			if min_max_interval is None:
+				min_max_interval = 1
+			i = min_value
+			while i <= max_value:
+				self.possible_values.append(i)
+				i += min_max_interval
 		else:
 			self.possible_values = [v for v in possible_values if (min_value is None or v >= min_value) and (max_value is None or v <= max_value)]
 		self.default_possible_values = copy.copy(self.possible_values)

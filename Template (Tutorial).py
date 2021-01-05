@@ -34,6 +34,7 @@ Attributes = [
 		possible_values=None, # unused since min_value and max_value are used
 		min_value=0,
 		max_value=100,
+		min_max_interval=1,
 	),
 	Attribute(
 		name="My Attribute 2",
@@ -43,6 +44,7 @@ Attributes = [
 		possible_values=[1, 4, 21, 56, 83, 106, 119],
 		min_value=None, # unused since possible_values is used
 		max_value=None, # unused since possible_values is used
+		min_max_interval=None, # unused since possible_values is used
 	),
 	Attribute(
 		name="My Attribute 3",
@@ -52,6 +54,7 @@ Attributes = [
 		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
 		min_value=None, # unused since possible_values is used
 		max_value=None, # unused since possible_values is used
+		min_max_interval=None, # unused since possible_values is used
 	),
 ]
 
