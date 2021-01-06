@@ -334,8 +334,14 @@ def generateTextLog():
 	newLog = path.join(outputFolder, start+"-"+seedString+".txt")
 	file = open(newLog, "w")
 	file.writelines(Program_Name+"\nSeed: "+seedString+"\n\nValues:\n")
+	maxNameLen = max([len(att.name) for att in Attributes])
+	maxIntLen = max([len(str(att.value)) for att in Attributes])
+	maxHexLen = max([len(str(hex(att.value))) for att in Attributes])-2
 	for att in Attributes:
-		file.writelines(att.name+": "+str(att.value)+"\n")
+		nameStr = att.name.ljust(maxNameLen)
+		intStr = str(att.value).rjust(maxIntLen)
+		hexStr = "[0x"+str(hex(att.value))[2:].rjust(maxHexLen, "0").upper()+"]"
+		file.writelines(nameStr+": "+intStr+" "+hexStr+"\n")
 	file.close()
 
 def shuffleAllAttributes():
@@ -348,8 +354,14 @@ def resetAttributesAndSeed(printAttributes=False):
 
 	Attributes.sort(key=getAttributeNum)
 	if printAttributes:
+		maxNameLen = max([len(att.name) for att in Attributes])
+		maxIntLen = max([len(str(att.value)) for att in Attributes])
+		maxHexLen = max([len(str(hex(att.value))) for att in Attributes])-2
 		for att in Attributes:
-			print(att.name+": "+str(att.value))
+			nameStr = att.name.ljust(maxNameLen)
+			intStr = str(att.value).rjust(maxIntLen)
+			hexStr = "[0x"+str(hex(att.value))[2:].rjust(maxHexLen, "0").upper()+"]"
+			print(nameStr+": "+intStr+" "+hexStr)
 	Attributes = copy.copy(originalAttributes)
 	random.seed(time())
 	resetRuleCounter()

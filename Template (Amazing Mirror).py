@@ -11,6 +11,40 @@ def value(name):
 	print("This attribute does not exist: "+name)
 	return None
 
+"""
+Ability Values:
+
+00 - Nothing
+01 - Fire
+02 - Ice
+03 - Burning
+04 - Wheel
+05 - Parasol
+06 - Cutter
+07 - Beam
+08 - Stone
+09 - Bomb
+0A - Throw
+0B - Sleep
+0C - Cook
+0D - Laser
+0E - UFO
+0F - Spark
+10 - Tornado
+11 - Hammer
+12 - Sword
+13 - Cupid
+14 - Fighter
+15 - Magic
+16 - Smash
+17 - Mini
+18 - Crash
+19 - Missile
+1A - Master
+
+The remaining values are either some sort of bug/crash, mix (like when you inhale two abilities at one), or duplicate.
+"""
+
 ########################
 # EDIT BELOW THIS LINE #
 ########################
@@ -100,20 +134,6 @@ Required_Rules = [
 
 Optional_Rulesets = [
 	Ruleset(
-		name="All Enemies Give An Ability",
-		description="All enemies are guaranteed to give an ability.",
-		rules=[
-			Rule(
-				description="All Enemies Give An Ability",
-				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
-				rule_type="count",
-				right_side=("==", 0, "==", 0),
-			),
-		],
-		must_be_enabled=None,
-		must_be_disabled=None,
-	),
-	Ruleset(
 		name="All Unique",
 		description="All enemies give different abilities.",
 		rules=[
@@ -146,6 +166,20 @@ Optional_Rulesets = [
 		],
 		must_be_enabled=None,
 		must_be_disabled=["All Unique", "At Least 1 UFO", "Smashing!"],
+	),
+	Ruleset(
+		name="All Enemies Give An Ability",
+		description="All enemies are guaranteed to give an ability.",
+		rules=[
+			Rule(
+				description="All Enemies Give An Ability",
+				left_side=[value("Waddle Dee"), value("Droppy"), value("Leap"), value("Big Waddle Dee"), value("Flamer"), value("Sword Knight"), value("Cupie")],
+				rule_type="count",
+				right_side=("==", 0, "==", 0),
+			),
+		],
+		must_be_enabled=None,
+		must_be_disabled=None,
 	),
 	Ruleset(
 		name="At Least 1 UFO",
