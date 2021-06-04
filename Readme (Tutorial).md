@@ -6,6 +6,8 @@ This will explain what you can create for your randomizer and how to do it, thro
 
 If you want to edit one of the templates, keep in mind that you need to rename it to `randomizer.py`.
 
+Also, even though this tutorial will usually refer to games as "ROMs", the game you use for this randomizer doesn't have to be a single ROM file; for example, it could be a PC game made up of multiple files.
+
 ## Settings
 First, the settings for the randomizer itself:
 
@@ -21,8 +23,14 @@ First, the settings for the randomizer itself:
 ##### ROM File Format
 - (optional) The file format of the ROM ("nes", "gba", etc).
 - If you want to allow any file type, leave it as ""
-- If your game uses multiple files of different types (such as some games), this should be an array containing the types of each file, in order.
+- If your game uses multiple files of different types, this should be an array containing the types of each file, in order.
 `["exe", "bin"]`
+
+##### ROM Hash
+- (optional) The CRC32 hash (checksum) of the ROM. If the user attempts to input a ROM that does not match this hash, it will be rejected. This ensures that the user has the correct ROM before attempting to randomize it.
+- If you do not want to verify the ROM's hash, leave it as None.
+- If your game uses multiple files, this should be an array containing the types of each file, in order.
+`["02468ace", "13579bdf"]`
 
 ##### About Page Text
 - Any text you want to put on the "About..." page on the menu bar.

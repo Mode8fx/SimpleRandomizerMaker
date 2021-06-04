@@ -3,6 +3,7 @@ from os import path, remove, mkdir
 import shutil
 from time import time
 from gatelib import *
+import binascii
 
 # the same folder where this program is stored
 if getattr(sys, 'frozen', False):
@@ -47,13 +48,28 @@ currRomIndex = 0
 currRulesetPage = 0
 
 def main():
-	global Rom_Name, Rom_File_Format
-	if not isinstance(Rom_Name, list):
-		Rom_Name = [Rom_Name]
-	if not isinstance(Rom_File_Format, list):
-		Rom_File_Format = [Rom_File_Format]
+	initRomInfoVars()
 	setDefaultRuleNum()
 	vp_start_gui()
+
+def initRomInfoVars():
+	global Rom_Name, Rom_File_Format, Rom_Hash
+
+	try:
+		if not isinstance(Rom_Name, list):
+			Rom_Name = [Rom_Name]
+	except:
+		Rom_Name = ["ROM"]
+	try:
+		if not isinstance(Rom_File_Format, list):
+			Rom_File_Format = [Rom_File_Format]
+	except:
+		Rom_File_Format = [""]
+	try:
+		if not isinstance(Rom_Hash, list):
+			Rom_Hash = [Rom_Hash]
+	except:
+		Rom_Hash = [None]
 
 # The main randomize function.
 def randomize():
@@ -226,36 +242,20 @@ def enforceRulesetBacktracking(ruleset):
 	currNumCombinations = 0
 
 	while ruleNum < len(ruleset):
-		if not ruleset[ruleNum].rulePasses():
-			if Timeout > 0 and time() > endTime:
-				timedOut = True
-				return False
-			onePassed = False
-			for att in ruleset[ruleNum].relatedAttributes:
-				nestedRuleNum = 0
-				nestedPass = True
-				att.setToNextValue()
-				while nestedRuleNum < ruleNum:
-					if not ruleset[nestedRuleNum].rulePasses():
-						nestedPass = False
-						break
-					nestedRuleNum += 1
-				if not nestedPass:
-					att.setToPreviousValue()
-				else:
-					onePassed = True
-					break
-			if not onePassed:
-				nextValueSet = False
-				for att in ruleset[ruleNum].relatedAttributes:
-					if att.setToNextValue():
-						nextValueSet = True
-						break
-				if not nextValueSet:
+		passedCurrRuleBatch = True
+		for nestedRuleNum in range(ruleNum+1):
+			if not ruleset[nestedRuleNum].rulePasses():
+				passedCurrRuleBatch = False
+				break
+		if not passedCurrRuleBatch:
+			currNumRelated = len(ruleset[ruleNum].relatedAttributes) - 1
+			while not ruleset[ruleNum].relatedAttributes[currNumRelated].setToNextValue():
+				currNumRelated -= 1
+				if currNumRelated < 0:
 					return False
-			currNumCombinations += 1
 		else:
 			ruleNum += 1
+		currNumCombinations += 1
 	return True
 
 # Brute force constraint satisfaction across all Attributes.
@@ -749,6 +749,14 @@ class TopLevel:
 			sourceRoms[currRomIndex].set(askopenfilename())
 		else:
 			sourceRoms[currRomIndex].set(askopenfilename(filetypes=[("Files", "*."+currRFF)]))
+		with open(sourceRoms[currRomIndex].get(), "rb") as inputFile:
+			fileBytes = inputFile.read()
+		currHash = Rom_Hash[currRomIndex % len(Rom_Hash)]
+		if (currHash is not None) and (currHash != ""):
+			fileHash = str(hex(binascii.crc32(fileBytes)))[2:].zfill(8).upper()
+			if currHash.upper() != fileHash:
+				showerror("Incorrect File", "Incorrect file; CRC32 does not match expected hash.\n\nExpected: "+currHash.upper()+"\nGot: "+fileHash)
+				sourceRoms[currRomIndex].set("")
 
 	def keepUpperCharsSeed(self, unused):
 		global seedInput

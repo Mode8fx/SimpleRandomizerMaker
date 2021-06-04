@@ -18,6 +18,7 @@ def value(name):
 Program_Name = "My Randomizer"
 Rom_Name = "My Game (USA, Europe) ROM"
 Rom_File_Format = ""
+Rom_Hash = None
 About_Page_Text = ""
 Timeout = 10
 Slow_Mode = False

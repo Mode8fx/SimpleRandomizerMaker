@@ -52,6 +52,7 @@ The remaining values are either some sort of bug/crash, mix (like when you inhal
 Program_Name = "Amazing Mirror Randomizer"
 Rom_Name = "Kirby & The Amazing Mirror (USA)"
 Rom_File_Format = "gba"
+Rom_Hash = "9f2a3048"
 About_Page_Text = "This is a sample randomizer for Kirby & The Amazing Mirror that changes the abilities given by a few enemies (specifically, the ones in the first area of the game)."
 Timeout = 10
 Slow_Mode = False

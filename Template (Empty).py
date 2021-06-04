@@ -18,6 +18,7 @@ def value(name):
 Program_Name = "My Randomizer"
 Rom_Name = "Rom Name"
 Rom_File_Format = "gba" # File format (nes, gba, etc.)
+Rom_Hash = None
 About_Page_Text = "This is the text that will show on the About page."
 Timeout = 10
 Slow_Mode = False
