@@ -21,7 +21,7 @@ def resetRuleCounter():
 	ruleCounter = defaultRuleNum
 
 class Attribute:
-	def __init__(self, name, addresses, number_of_bytes=None, is_little_endian=False, possible_values=None, min_value=None, max_value=None, min_max_interval=1):
+	def __init__(self, name, addresses, number_of_bytes=None, is_little_endian=False, possible_values=None, min_value=None, max_value=None, min_max_interval=1, lock_if_enabled=None, lock_unless_enabled=None):
 		self.name = name
 		if isinstance(addresses, list):
 			self.addresses = addresses
@@ -36,6 +36,9 @@ class Attribute:
 			self.possible_values = []
 			if min_max_interval is None:
 				min_max_interval = 1
+			attArraySize = (max_value - min_value) / min_max_interval * sys.getsizeof(int())
+			if attArraySize > (1048576*50): # 50 MB
+				print("At least one of the provided attributes has a very large number of possible values. This may (or may not) make the program run slow.")
 			i = min_value
 			while i <= max_value:
 				self.possible_values.append(i)
@@ -48,6 +51,25 @@ class Attribute:
 		else:
 			self.number_of_bytes = number_of_bytes
 		self.is_little_endian = is_little_endian
+		if lock_if_enabled is None:
+			self.lock_if_enabled = []
+		elif isinstance(lock_if_enabled, list):
+			self.lock_if_enabled = lock_if_enabled
+		else:
+			self.lock_if_enabled = [lock_if_enabled]
+		for i in range(len(self.lock_if_enabled)):
+			if not isinstance(self.lock_if_enabled[i], tuple):
+				self.lock_if_enabled[i] = tuple([self.lock_if_enabled[i]])
+		if lock_unless_enabled is None:
+			self.lock_unless_enabled = []
+		elif isinstance(lock_unless_enabled, list):
+			self.lock_unless_enabled = lock_unless_enabled
+		else:
+			self.lock_unless_enabled = [lock_unless_enabled]
+		for i in range(len(self.lock_unless_enabled)):
+			if not isinstance(self.lock_unless_enabled[i], tuple):
+				self.lock_unless_enabled[i] = tuple([self.lock_unless_enabled[i]])
+
 		self.index = 0
 		self.value = self.possible_values[0]
 		self.specialOperators = []

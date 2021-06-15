@@ -115,6 +115,34 @@ def randomize():
 			if ruleset[1] == 1:
 				for rule in getFromListByName(Optional_Rulesets, ruleset[0]).rules:
 					myRules.append(rule)
+		enabledRulesetsByName = [ruleset[0] for ruleset in optionalRulesetsList if ruleset[1] == 1]
+		for att in Attributes:
+			lockFlag = False
+			for rulesetGroup in att.lock_if_enabled:
+				if arrayOverlap(rulesetGroup, enabledRulesetsByName) == len(rulesetGroup):
+					lockFlag = True
+					break
+			if not lockFlag:
+				if len(att.lock_unless_enabled) > 0:
+					lockFlag = True
+					for rulesetGroup in att.lock_unless_enabled:
+						if arrayOverlap(rulesetGroup, enabledRulesetsByName) == len(rulesetGroup):
+							lockFlag = False
+							break
+			if lockFlag:
+				with open(sourceRoms[att.addresses[0][1] - 1].get(), "rb") as tempFile:
+					tempFile.seek(att.addresses[0][0])
+					defaultValue = 0
+					for i in range(att.number_of_bytes):
+						defaultValue += ord(tempFile.read(1)) * (256**i) # little endian by default
+					if not att.is_little_endian:
+						defaultValue = swapEndianness(defaultValue, att.number_of_bytes)
+				myRules.append(Rule(
+					description="Lock: "+att.name,
+					left_side=value(att.name),
+					rule_type="==",
+					right_side=defaultValue
+					))
 		startTime = time()
 		endTime = startTime + Timeout
 		random.seed(currSeed)
@@ -749,14 +777,15 @@ class TopLevel:
 			sourceRoms[currRomIndex].set(askopenfilename())
 		else:
 			sourceRoms[currRomIndex].set(askopenfilename(filetypes=[("Files", "*."+currRFF)]))
-		with open(sourceRoms[currRomIndex].get(), "rb") as inputFile:
-			fileBytes = inputFile.read()
-		currHash = Rom_Hash[currRomIndex % len(Rom_Hash)]
-		if (currHash is not None) and (currHash != ""):
-			fileHash = str(hex(binascii.crc32(fileBytes)))[2:].zfill(8).upper()
-			if currHash.upper() != fileHash:
-				showerror("Incorrect File", "Incorrect file; CRC32 does not match expected hash.\n\nExpected: "+currHash.upper()+"\nGot: "+fileHash)
-				sourceRoms[currRomIndex].set("")
+		if sourceRoms[currRomIndex].get() != "":
+			with open(sourceRoms[currRomIndex].get(), "rb") as inputFile:
+				fileBytes = inputFile.read()
+			currHash = Rom_Hash[currRomIndex % len(Rom_Hash)]
+			if (currHash is not None) and (currHash != ""):
+				fileHash = str(hex(binascii.crc32(fileBytes)))[2:].zfill(8).upper()
+				if currHash.upper() != fileHash:
+					showerror("Incorrect File", "Incorrect file; CRC32 does not match expected hash.\n\nExpected: "+currHash.upper()+"\nGot: "+fileHash)
+					sourceRoms[currRomIndex].set("")
 
 	def keepUpperCharsSeed(self, unused):
 		global seedInput

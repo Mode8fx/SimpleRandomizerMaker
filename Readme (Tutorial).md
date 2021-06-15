@@ -84,6 +84,14 @@ An Attribute has the following components:
 
 If you choose not to use one of the optional variables, set its value to None
 
+##### Lock If Enabled
+- (optional) A list of Rulesets (see the Rulesets section for more information about these); if any of these rulesets are enabled, the attribute will be locked to its original value and will not be randomized. A tuple can also be provided so that the lock will only occur if all rulesets in the tuple are enabled.
+- For example, if `lock_if_enabled=["My Ruleset 1", ("My Ruleset 2", "My Ruleset 3")]`, then the attribute will be locked if either ("My Ruleset 1" is enabled) or (both "My Ruleset 2" and "My Ruleset 3" are enabled).
+
+##### Lock Unless Enabled
+- (optional) The inverse of "Lock If Enabled" (see above). A list of Rulesets (see the Rulesets section for more information about these); the attribute will be locked to its original value and will not be randomized, *unless* any of these rulesets are enabled. A tuple can also be provided so that all rulesets in the tuple must be enabled in order to unlock the attribute.
+- For example, if `lock_unless_enabled=["My Ruleset 1", ("My Ruleset 2", "My Ruleset 3")]`, then the attribute will be locked unless either ("My Ruleset 1" is enabled) or (both "My Ruleset 2" and "My Ruleset 3" are enabled).
+
 #### Attribute Examples
 A code example can be found below. If you're using this file as a template, MAKE SURE YOU DELETE THESE ATTRIBUTES!
 ```
@@ -97,6 +105,8 @@ Attributes = [
 		min_value=0,
 		max_value=100,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="My Attribute 2",
@@ -106,7 +116,9 @@ Attributes = [
 		possible_values=[1, 4, 21, 56, 83, 106, 119],
 		min_value=None,
 		max_value=None,
-		min_max_interval=None
+		min_max_interval=None,
+		lock_if_enabled="My Ruleset 3",
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="My Attribute 3",
@@ -116,7 +128,9 @@ Attributes = [
 		possible_values=[0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
 		min_value=None,
 		max_value=None,
-		min_max_interval=None
+		min_max_interval=None,
+		lock_if_enabled=None,
+		lock_unless_enabled=["My Ruleset 1", "My Ruleset 2", "My Ruleset 3"],
 	),
 ]
 ```

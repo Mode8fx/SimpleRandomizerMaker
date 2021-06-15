@@ -36,6 +36,8 @@ Attributes = [
 		min_value=0,
 		max_value=100,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="My Attribute 2",
@@ -46,6 +48,8 @@ Attributes = [
 		min_value=None, # unused since possible_values is used
 		max_value=None, # unused since possible_values is used
 		min_max_interval=None, # unused since possible_values is used
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="My Attribute 3",
@@ -56,6 +60,8 @@ Attributes = [
 		min_value=None, # unused since possible_values is used
 		max_value=None, # unused since possible_values is used
 		min_max_interval=None, # unused since possible_values is used
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 ]
 
@@ -123,9 +129,9 @@ Optional_Rulesets = [
 	),
 	Ruleset(
 		name="Special Ruleset",
-		description="This can only be enabled if My Ruleset 1 is enabled and My Ruleset 2 is disabled.",
+		description="This can only be enabled if Basic Rules is enabled and Advanced Rules is disabled.",
 		rules=[],
-		must_be_enabled=["My Ruleset 1"],
-		must_be_disabled=["My Ruleset 2"],
+		must_be_enabled=["Basic Rules"],
+		must_be_disabled=["Advanced Rules"],
 	),
 ]

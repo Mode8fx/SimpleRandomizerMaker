@@ -67,6 +67,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Droppy",
@@ -77,6 +79,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Leap",
@@ -87,6 +91,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Big Waddle Dee",
@@ -97,6 +103,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Flamer",
@@ -107,6 +115,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Sword Knight",
@@ -117,6 +127,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 	Attribute(
 		name="Cupie",
@@ -127,6 +139,8 @@ Attributes = [
 		min_value=0,
 		max_value=26,
 		min_max_interval=1,
+		lock_if_enabled=None,
+		lock_unless_enabled=None,
 	),
 ]
 

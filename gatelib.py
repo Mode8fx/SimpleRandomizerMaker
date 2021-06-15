@@ -264,7 +264,7 @@ def dec_to_base(num,base):  #Maximum base - 36
 	isLittleEndian : bool
 		If True, bytes are written in reverse order.
 
-	Retruns
+	Returns
 	-------
 	False if the value is too large to be written within the given number of bytes; True otherwise.
 
@@ -303,6 +303,30 @@ def writeToAddress(file, address, val, numBytes=1, isLittleEndian=False):
 		address += increment
 		val = val>>8
 	return True
+
+"""
+	Swaps the endianness (byte order) of a number.
+
+	Parameters
+	----------
+	num : int
+		The number whose order will be swapped.
+	numBytes : int
+		The number of bytes that this number takes up.
+
+	Returns
+	-------
+	The modified number with swapped endianness.
+
+	Example
+	-------
+	swapEndianness(0x012345) will return: 0x452301
+"""
+def swapEndianness(num, numBytes):
+	num2 = 0
+	for i in range(1, numBytes + 1):
+	    num2 += (num>>(8*(i-1)) & 0xFF)*(256**(numBytes - i))
+	return num2
 
 """
 	From https://gist.github.com/jacobtomlinson/9031697
