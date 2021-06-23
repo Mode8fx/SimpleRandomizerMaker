@@ -286,7 +286,7 @@ class Rule:
 				for j in range(i+1, len(self.left_side)):
 					newRule = Rule(description=newDescription, left_side=self.left_side[i], rule_type="!=", right_side=self.left_side[j], oldRuleNum=self.ruleNum)
 					rulesArray.append(newRule)
-		elif self.rule_type in ["ne","gt","ge","lt","le"]:
+		elif self.rule_type in ["eq","ne","gt","ge","lt","le"]:
 			for lVal in self.asList(self.left_side):
 				for rVal in self.asList(self.right_side):
 					newRule = Rule(description=newDescription, left_side=lVal, rule_type=self.rule_type, right_side=rVal, oldRuleNum=self.ruleNum)

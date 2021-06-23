@@ -137,6 +137,8 @@ def randomize():
 						defaultValue += ord(tempFile.read(1)) * (256**i) # little endian by default
 					if not att.is_little_endian:
 						defaultValue = swapEndianness(defaultValue, att.number_of_bytes)
+				if not (defaultValue in att.possible_values):
+					att.possible_values.append(defaultValue)
 				myRules.append(Rule(
 					description="Lock: "+att.name,
 					left_side=value(att.name),
@@ -819,7 +821,7 @@ class TopLevel:
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.24", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.25", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
