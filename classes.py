@@ -307,7 +307,17 @@ class Rule:
 
 class Ruleset:
 	def __init__(self, name=None, description=None, rules=[], must_be_enabled=[], must_be_disabled=[]):
-		self.name = name
+		tempFullStr = ""
+		tempWordArr = name.split(" ")
+		lineLenCounter = 0
+		for word in tempWordArr:
+		    if (lineLenCounter + len(word) + 1 <= (25 + 1)):
+		        tempFullStr += word + " "
+		        lineLenCounter += len(word) + 1
+		    else:
+		        tempFullStr += '\n' + word + " "
+		        lineLenCounter = 0
+		self.name = tempFullStr.strip()
 		self.description = description
 		self.rules = rules
 		if must_be_enabled is None:

@@ -484,6 +484,7 @@ class TopLevel:
 		self.style.map('.',background=
 			[('selected', _compcolor), ('active',_ana2color)])
 		self.font = tkFont.Font(family='TkDefaultFont')
+		self.fontHeight = self.font.metrics('linespace') / 500
 		self.tooltip_font = "TkDefaultFont"
 
 		self.top = top
@@ -674,7 +675,9 @@ class TopLevel:
 		upper = lower + 5
 		sizeArr = []
 		for i in range(lower, min(upper, len(Optional_Rulesets))):
-			sizeArr.append(self.getTextLength(Optional_Rulesets[i].name)-.03)
+			# sizeArr.append(self.getTextLength(Optional_Rulesets[i].name)-.03)
+			for j in range(Optional_Rulesets[i].name.count('\n') + 1):
+				sizeArr.append(self.getTextLength(Optional_Rulesets[i].name.split('\n')[j])-.03)
 		if len(sizeArr) == 0:
 			return self.getTextLength("# of Seeds")-.03
 		return max(sizeArr)
@@ -734,11 +737,16 @@ class TopLevel:
 		yShiftArray = spaceOut(min(numOptRulesets+1, 5), .09, numDecimalPlaces=3)
 		optRulesetNum = 0
 		for i in range(len(Optional_Rulesets)):
+			tempMaxLen = 0
+			tempNumLines = 0
+			for line in Optional_Rulesets[i].name.split('\n'):
+				tempMaxLen = max(tempMaxLen, self.getTextLength(line))
+				tempNumLines += 1
 			if firstIndex <= i < lastIndex:
-				self.CheckButtons[i].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
+				self.CheckButtons[i].place(relx=.475-self.getMaxColumnWidth(optRulesetNum)/2+xShiftArray[optRulesetNum//5], rely=(.40+yShiftArray[optRulesetNum%5])*vMult, relheight=max(self.fontHeight*tempNumLines*vMult, 0.05), relwidth=tempMaxLen+.03)
 				optRulesetNum += 1
 			else:
-				self.CheckButtons[i].place(relx=10, rely=10, relheight=.05*vMult, relwidth=self.getTextLength(Optional_Rulesets[i].name)+.03)
+				self.CheckButtons[i].place(relx=10, rely=10, relheight=max(self.fontHeight*tempNumLines*vMult, 0.05), relwidth=tempMaxLen+.03)
 
 		if optRulesetNum < 15:
 			# Number of Seeds Label
@@ -821,7 +829,7 @@ class TopLevel:
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.25", "This was made using\nGateGuy's Simple Randomizer Maker.\n\nhttps://github.com/GateGuy/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.26", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
