@@ -706,7 +706,7 @@ class TopLevel:
 			currCheckButton.configure(state="normal")
 			for j in range(len(self.CheckButtons)):
 				currRulesetVal = optRulesetValues[j].get()
-				currRulesetName = Optional_Rulesets[j].name
+				currRulesetName = Optional_Rulesets[j].originalName
 				if ((currRulesetVal == "1") and (currRulesetName in Optional_Rulesets[i].must_be_disabled)
 					) or ((currRulesetVal == "0") and (currRulesetName in Optional_Rulesets[i].must_be_enabled)):
 					optRulesetValues[i].set("0")
@@ -829,7 +829,7 @@ class TopLevel:
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.26", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.26a", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).

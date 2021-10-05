@@ -307,6 +307,7 @@ class Rule:
 
 class Ruleset:
 	def __init__(self, name=None, description=None, rules=[], must_be_enabled=[], must_be_disabled=[]):
+		self.originalName = name
 		tempFullStr = ""
 		tempWordArr = name.split(" ")
 		lineLenCounter = 0
