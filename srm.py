@@ -663,7 +663,7 @@ class TopLevel:
 		self.RadioButton_UseSettings.configure(command=self.prepareSettingsAndSeed)
 		self.RadioButton_UseSeed.configure(command=self.prepareSettingsAndSeed)
 		self.Button_CreateRom.configure(command=self.attemptRandomize)
-		for i in range(min(len(Optional_Rulesets), 13)):
+		for i in range(len(Optional_Rulesets)):
 			self.CheckButtons[i].configure(command=self.prepareSettingsFromDependencies)
 		self.prepareSettingsFromDependencies()
 
@@ -829,7 +829,7 @@ class TopLevel:
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.26a", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.26b", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
