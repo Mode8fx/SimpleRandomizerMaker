@@ -829,7 +829,7 @@ class TopLevel:
 		showinfo("About", About_Page_Text)
 
 	def showSRMPopup(self):
-		showinfo("Simple Randomizer Maker v1.26b", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
+		showinfo("Simple Randomizer Maker v1.262", "This was made using\nMips96's Simple Randomizer Maker.\n\nhttps://github.com/Mips96/SimpleRandomizerMaker")
 
 # ======================================================
 # Support code for Balloon Help (also called tooltips).
